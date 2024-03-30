@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "128457266349",
+    "firebase_url": "https://greenhouse-ctrl-system-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "greenhouse-ctrl-system",
+    "storage_bucket": "greenhouse-ctrl-system.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:128457266349:android:f4447058471350a5172224",
+        "android_client_info": {
+          "package_name": "com.example.greenhouse_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOHR4kL1aHMVQBjXTW5Lq8piFrJLGYPeI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
