@@ -43,8 +43,8 @@ class _ChatsPageContent extends StatefulWidget {
 
 class _ChatsPageState extends State<_ChatsPageContent> {
   // User info
-  late final String _userRole = "";
-  late final String _userName = "";
+  late String _userRole = "";
+  late String _userName = "";
   late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
@@ -69,10 +69,10 @@ class _ChatsPageState extends State<_ChatsPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    //footer nav state
+    // Footer nav state
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
-    // If footer nav state is updated, call handle navigation
+    // If footer nav state is updated, handle navigation
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
         navigateToPage(context, state, _userRole, widget.userCredential);
@@ -87,6 +87,11 @@ class _ChatsPageState extends State<_ChatsPageContent> {
           }
           // Show page content once user info is loaded
           else if (state is UserInfoLoaded) {
+            // Assign user info
+            _userRole = state.userRole;
+            _userName = state.userName;
+            _userReference = state.userReference;
+
             return MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: customTheme,
@@ -96,6 +101,10 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                     createFooterNav(_selectedIndex, footerNavCubit, _userRole),
               ),
             );
+          }
+          // Show error if there is an issues with user info
+          else if (state is UserInfoError) {
+            return Center(child: Text('Error: ${state.errorMessage}'));
           }
           // Should never happen, but you never know
           else {

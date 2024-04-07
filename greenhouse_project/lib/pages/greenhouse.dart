@@ -62,8 +62,8 @@ class _GreenhousePageContent extends StatefulWidget {
 
 class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   // User info
-  late final String _userRole = "";
-  late final String _userName = "";
+  late String _userRole = "";
+  late String _userName = "";
   late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
@@ -100,7 +100,8 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
       listener: (context, state) {
         navigateToPage(context, state, _userRole, widget.userCredential);
       },
-      child: BlocBuilder<UserInfoCubit, HomeState>(
+      child: BlocConsumer<UserInfoCubit, HomeState>(
+        listener: (context, state) {},
         builder: (context, state) {
           // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
@@ -110,6 +111,11 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
           }
           // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
+            // Assign user info
+            _userRole = state.userRole;
+            _userName = state.userName;
+            _userReference = state.userReference;
+
             return MaterialApp(
                 theme: customTheme, home: _buildGreenhousePage());
           }
@@ -128,120 +134,117 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
 
   Widget _buildGreenhousePage() {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        appBar: createMainAppBar(context, widget.userCredential),
-        body: SingleChildScrollView(
-          child: Column(children: [
-            const Center(
-                child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-              child: Text("Greenhouse", style: headingTextStyle),
-            )),
-            // Search text field
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: TextField(
-                controller: _textController,
-                decoration: const InputDecoration(
-                    icon: Icon(Icons.search, size: 24), hintText: "Search..."),
-              ),
+    return Scaffold(
+      appBar: createMainAppBar(context, widget.userCredential),
+      body: SingleChildScrollView(
+        child: Column(children: [
+          const Center(
+              child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+            child: Text("Greenhouse", style: headingTextStyle),
+          )),
+          // Search text field
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: TextField(
+              controller: _textController,
+              decoration: const InputDecoration(
+                  icon: Icon(Icons.search, size: 24), hintText: "Search..."),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      "Plant Status",
-                      style: subheadingTextStyle,
-                    ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    "Plant Status",
+                    style: subheadingTextStyle,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                    child: GreenElevatedButton(
-                        text: "Details",
-                        onPressed: () {
-                          // TO-DO: Navigate to plant/sensor status page
-                        }),
-                  ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
+                  child: GreenElevatedButton(
+                      text: "Details",
+                      onPressed: () {
+                        // TO-DO: Navigate to plant/sensor status page
+                      }),
+                ),
+              ],
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _sensors.map((sensor) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: SizedBox(
-                        width: MediaQuery.of(context).size.width - 40,
-                        height: 400,
-                        child: ChartClass(sensor: sensor)),
-                  );
-                }).toList(),
-              ),
+          ),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: _sensors.map((sensor) {
+                return Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SizedBox(
+                      width: MediaQuery.of(context).size.width - 40,
+                      height: 400,
+                      child: ChartClass(sensor: sensor)),
+                );
+              }).toList(),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      "Active Programs",
-                      style: subheadingTextStyle,
-                    ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    "Active Programs",
+                    style: subheadingTextStyle,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                    child: GreenElevatedButton(
-                        text: "Details",
-                        onPressed: () {
-                          // TO-DO: Navigate to active programs page
-                        }),
-                  ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
+                  child: GreenElevatedButton(
+                      text: "Details",
+                      onPressed: () {
+                        // TO-DO: Navigate to active programs page
+                      }),
+                ),
+              ],
             ),
-            ListView.builder(
-                shrinkWrap: true,
-                itemCount: 0,
-                itemBuilder: (context, index) {
-                  return const Text("hi");
-                }),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
-              child: Row(
-                children: [
-                  const Expanded(
-                    child: Text(
-                      "Equipment Status",
-                      style: subheadingTextStyle,
-                    ),
+          ),
+          ListView.builder(
+              shrinkWrap: true,
+              itemCount: 0,
+              itemBuilder: (context, index) {
+                return const Text("hi");
+              }),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    "Equipment Status",
+                    style: subheadingTextStyle,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                    child: GreenElevatedButton(
-                        text: "Details",
-                        onPressed: () {
-                          // TO-DO: Navigate to equipments page
-                        }),
-                  ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
+                  child: GreenElevatedButton(
+                      text: "Details",
+                      onPressed: () {
+                        // TO-DO: Navigate to equipments page
+                      }),
+                ),
+              ],
             ),
-            ListView.builder(
-                shrinkWrap: true,
-                itemCount: 0,
-                itemBuilder: (context, index) {
-                  return const Text("hi");
-                }),
-          ]),
-        ),
-        bottomNavigationBar:
-            createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+          ),
+          ListView.builder(
+              shrinkWrap: true,
+              itemCount: 0,
+              itemBuilder: (context, index) {
+                return const Text("hi");
+              }),
+        ]),
       ),
+      bottomNavigationBar:
+          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );
   }
 }

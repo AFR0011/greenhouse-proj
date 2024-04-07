@@ -1,3 +1,5 @@
+import 'dart:js_util';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -90,7 +92,7 @@ class _HomePageContentState extends State<_HomePageContent> {
             return MaterialApp(
                 debugShowCheckedModeBanner: false,
                 theme: customTheme,
-                home: _buildUserRoleView());
+                home: _buildHomeView());
           } else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           } else {
@@ -101,20 +103,7 @@ class _HomePageContentState extends State<_HomePageContent> {
     );
   }
 
-  Widget _buildUserRoleView() {
-    switch (_userRole) {
-      case 'manager':
-        return _buildHomeView(isManager: true);
-      case 'worker':
-        return _buildHomeView(isManager: false);
-      default:
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-    }
-  }
-
-  Widget _buildHomeView({required bool isManager}) {
+  Widget _buildHomeView() {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return Scaffold(
       appBar: createMainAppBar(context, widget.userCredential),
