@@ -46,31 +46,33 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
-
   // Custom theme
   final ThemeData customTheme = theme;
-
   // Text Controllers
   final TextEditingController _textController = TextEditingController();
+  // Index of footer nav selection
+  final int _selectedIndex = 1;
 
+  // Dispose of controllers for performance
   @override
   void dispose() {
     _textController.dispose();
     super.dispose();
   }
 
+  // Init to get user info state
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
   }
 
-  // Index of footer nav selection
-  final int _selectedIndex = 1;
-
   @override
   Widget build(BuildContext context) {
+    // Footer nav state
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+
+    // If footer nav is updated, handle navigation
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
         navigateToPage(context, state, _userRole, widget.userCredential);
@@ -78,15 +80,19 @@ class _InventoryPageState extends State<_InventoryPageContent> {
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
         builder: (context, state) {
+          // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state is UserInfoLoaded) {
+          }
+          // Show content once user info is loaded
+          else if (state is UserInfoLoaded) {
             // Assign user info
             _userRole = state.userRole;
             _userName = state.userName;
             _userReference = state.userReference;
+
             return MaterialApp(
               theme: customTheme,
               home: Scaffold(
@@ -95,7 +101,13 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     createFooterNav(_selectedIndex, footerNavCubit, _userRole),
               ),
             );
-          } else {
+          }
+          // Show error if there is an issues with user info
+          else if (state is UserInfoError) {
+            return Center(child: Text('Error: ${state.errorMessage}'));
+          }
+          // Should never happen; but, you never know
+          else {
             return const Center(
               child: Text('Unexpected state'),
             );
