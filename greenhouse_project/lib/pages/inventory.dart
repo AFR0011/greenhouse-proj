@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
+import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
@@ -25,6 +26,9 @@ class InventoryPage extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => UserInfoCubit(),
+        ),
+        BlocProvider(
+          create: (context) => InventoryCubit(),
         ),
       ],
       child: _InventoryPageContent(userCredential: userCredential),
@@ -70,7 +74,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   @override
   Widget build(BuildContext context) {
     // Footer nav state
-    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+
 
     // If footer nav is updated, handle navigation
     return BlocListener<FooterNavCubit, int>(
@@ -95,11 +99,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
 
             return MaterialApp(
               theme: customTheme,
-              home: Scaffold(
-                appBar: createMainAppBar(context, widget.userCredential),
-                bottomNavigationBar:
-                    createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-              ),
+              home: _buildInventoryPage(),
             );
           }
           // Show error if there is an issues with user info
@@ -114,6 +114,44 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           }
         },
       ),
+    );
+  }
+  Widget _buildInventoryPage(){
+    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+    return Scaffold(
+      appBar: createMainAppBar(context, widget.userCredential),
+      body: BlocBuilder<InventoryCubit,InventoryState>(
+        builder: (context, state){
+          if (state is InventoryLoading){
+            return Center(child: CircularProgressIndicator(),);
+          }
+          else if (state is InventoryLoaded){
+            List<InventoryData> inventoryList = state.inventory;
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: inventoryList.length,
+              itemBuilder: (context, index) {
+                InventoryData inventory = inventoryList[index];
+                return ListTile(
+                  title: Text(inventory.name),
+                  subtitle: Text(inventory.timeAdded.toString()),
+                  trailing: Text(inventory.amount.toString()),
+
+                );
+              },
+            );
+          }
+          else if (state is InventoryError){
+            print(state.error.toString());
+            return Text(state.error.toString());
+          }
+          else{
+            return const Text("Something is wrong...");
+          }
+        }
+      ),
+      bottomNavigationBar:
+      createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );
   }
 }
