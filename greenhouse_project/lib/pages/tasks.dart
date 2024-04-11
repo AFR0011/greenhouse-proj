@@ -46,12 +46,12 @@ class _TasksPageState extends State<_TasksPageContent> {
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
-
   // Custom theme
   final ThemeData customTheme = theme;
-
   // Text Controllers
   final TextEditingController _textController = TextEditingController();
+  // Index of footer nav selection
+  final int _selectedIndex = 0;
 
   @override
   void dispose() {
@@ -64,9 +64,6 @@ class _TasksPageState extends State<_TasksPageContent> {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
   }
-
-  // Index of footer nav selection
-  final int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {

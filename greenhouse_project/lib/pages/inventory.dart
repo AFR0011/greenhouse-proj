@@ -73,9 +73,6 @@ class _InventoryPageState extends State<_InventoryPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    // Footer nav state
-
-
     // If footer nav is updated, handle navigation
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
@@ -116,42 +113,42 @@ class _InventoryPageState extends State<_InventoryPageContent> {
       ),
     );
   }
-  Widget _buildInventoryPage(){
+
+  Widget _buildInventoryPage() {
+    // Footer nav state
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+
     return Scaffold(
       appBar: createMainAppBar(context, widget.userCredential),
-      body: BlocBuilder<InventoryCubit,InventoryState>(
-        builder: (context, state){
-          if (state is InventoryLoading){
-            return Center(child: CircularProgressIndicator(),);
-          }
-          else if (state is InventoryLoaded){
-            List<InventoryData> inventoryList = state.inventory;
-            return ListView.builder(
-              shrinkWrap: true,
-              itemCount: inventoryList.length,
-              itemBuilder: (context, index) {
-                InventoryData inventory = inventoryList[index];
-                return ListTile(
-                  title: Text(inventory.name),
-                  subtitle: Text(inventory.timeAdded.toString()),
-                  trailing: Text(inventory.amount.toString()),
-
-                );
-              },
-            );
-          }
-          else if (state is InventoryError){
-            print(state.error.toString());
-            return Text(state.error.toString());
-          }
-          else{
-            return const Text("Something is wrong...");
-          }
+      body: BlocBuilder<InventoryCubit, InventoryState>(
+          builder: (context, state) {
+        if (state is InventoryLoading) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (state is InventoryLoaded) {
+          List<InventoryData> inventoryList = state.inventory;
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: inventoryList.length,
+            itemBuilder: (context, index) {
+              InventoryData inventory = inventoryList[index];
+              return ListTile(
+                title: Text(inventory.name),
+                subtitle: Text(inventory.timeAdded.toString()),
+                trailing: Text(inventory.amount.toString()),
+              );
+            },
+          );
+        } else if (state is InventoryError) {
+          print(state.error.toString());
+          return Text(state.error.toString());
+        } else {
+          return const Text("Something went wrong...");
         }
-      ),
+      }),
       bottomNavigationBar:
-      createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );
   }
 }
