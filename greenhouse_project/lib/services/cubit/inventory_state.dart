@@ -1,20 +1,18 @@
-
 part of 'inventory_cubit.dart';
 
-sealed class InventoryState{}
+@immutable
+sealed class InventoryState {}
 
-final class InventoryLoading extends InventoryState{}
+final class InventoryLoading extends InventoryState {}
 
-final class InventoryLoaded extends InventoryState{
-
-  List<InventoryData> inventory;
+final class InventoryLoaded extends InventoryState {
+  final List<InventoryData> inventory;
 
   InventoryLoaded(this.inventory);
 }
 
-final class InventoryError extends InventoryState{
-
-  String error;
+final class InventoryError extends InventoryState {
+  final String error;
 
   InventoryError(this.error);
 }
