@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/pages/chat.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -136,9 +137,20 @@ class _ChatsPageState extends State<_ChatsPageContent> {
               itemBuilder: (context, index) {
                 ChatsData? chat = chatsList[index];
                 Map<String, dynamic>? receiverData = chat?.receiverData;
-                return ListTile(
-                  title: Text(
-                      "${receiverData?['name']} ${receiverData?['surname']}"),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChatPage(
+                                  userCredential: widget.userCredential,
+                                  chatReference: chat?.chatReference,
+                                )));
+                  },
+                  child: ListTile(
+                    title: Text(
+                        "${receiverData?['name']} ${receiverData?['surname']}"),
+                  ),
                 );
               },
             );
