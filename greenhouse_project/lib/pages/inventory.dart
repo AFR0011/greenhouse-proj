@@ -119,7 +119,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
     return Scaffold(
-      appBar: createMainAppBar(context, widget.userCredential),
+      appBar: createMainAppBar(context, widget.userCredential, _userReference),
       body: BlocBuilder<InventoryCubit, InventoryState>(
           builder: (context, state) {
         if (state is InventoryLoading) {

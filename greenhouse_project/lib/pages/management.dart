@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
+import 'package:greenhouse_project/services/cubit/management_cubit.dart';
+import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
+import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ManagementPage extends StatelessWidget {
@@ -25,6 +28,12 @@ class ManagementPage extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => UserInfoCubit(),
+        ),
+        BlocProvider(
+          create: (context) => ManageTasksCubit(userCredential),
+        ),
+        BlocProvider(
+          create: (context) => ManageWorkersCubit(userCredential),
         ),
       ],
       child: _ManagementPageContent(userCredential: userCredential),
@@ -69,7 +78,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
         navigateToPage(context, state, _userRole, widget.userCredential);
@@ -91,11 +99,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
             _userReference = state.userReference;
             return MaterialApp(
               theme: customTheme,
-              home: Scaffold(
-                appBar: createMainAppBar(context, widget.userCredential),
-                bottomNavigationBar:
-                    createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-              ),
+              home: _buildManagementPage(),
             );
           }
           // Show error if there is an issues with user info
@@ -110,6 +114,118 @@ class _ManagementPageState extends State<_ManagementPageContent> {
           }
         },
       ),
+    );
+  }
+
+  Widget _buildManagementPage() {
+    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+
+    return Scaffold(
+      appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      body: SingleChildScrollView(
+        child: Column(children: [
+          const Center(
+              child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+            child: Text("Management", style: headingTextStyle),
+          )),
+          // Search text field
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: TextField(
+              controller: _textController,
+              decoration: const InputDecoration(
+                  icon: Icon(Icons.search, size: 24), hintText: "Search..."),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    "Tasks",
+                    style: subheadingTextStyle,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
+                  child: GreenElevatedButton(
+                      text: "Details",
+                      onPressed: () {
+                        // TO-DO: Navigate to tasks page
+                      }),
+                ),
+              ],
+            ),
+          ),
+          BlocBuilder<ManageTasksCubit, ManagementState>(
+            builder: (context, state) {
+              if (state is ManageTasksLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is ManageTasksLoaded) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: state.tasks.length,
+                  itemBuilder: (context, index) {
+                    TaskData task = state.tasks[index];
+                    return ListTile(
+                      title: Text(task.title),
+                      subtitle: Text(task.status),
+                    );
+                  },
+                );
+              } else {
+                return const Text("Something went wrong...");
+              }
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    "Workers",
+                    style: subheadingTextStyle,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
+                  child: GreenElevatedButton(
+                      text: "Details",
+                      onPressed: () {
+                        // TO-DO: Navigate to active programs page
+                      }),
+                ),
+              ],
+            ),
+          ),
+          BlocBuilder<ManageWorkersCubit, ManagementState>(
+            builder: (context, state) {
+              if (state is ManageWorkersLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is ManageWorkersLoaded) {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: state.workers.length,
+                  itemBuilder: (context, index) {
+                    WorkerData worker = state.workers[index];
+                    return ListTile(
+                      title: Text("${worker.name} ${worker.surname}"),
+                      subtitle: Text(worker.creationDate.toString()),
+                    );
+                  },
+                );
+              } else {
+                return const Text("Something went wrong...");
+              }
+            },
+          ),
+        ]),
+      ),
+      bottomNavigationBar:
+          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );
   }
 }

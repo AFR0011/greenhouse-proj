@@ -87,7 +87,8 @@ class _TasksPageState extends State<_TasksPageContent> {
             return MaterialApp(
               theme: customTheme,
               home: Scaffold(
-                appBar: createMainAppBar(context, widget.userCredential),
+                appBar: createMainAppBar(
+                    context, widget.userCredential, _userReference),
                 bottomNavigationBar:
                     createFooterNav(_selectedIndex, footerNavCubit, _userRole),
               ),

@@ -121,7 +121,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
   Widget _createChatsPage() {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return Scaffold(
-      appBar: createMainAppBar(context, widget.userCredential),
+      appBar: createMainAppBar(context, widget.userCredential, _userReference),
       body: BlocBuilder<ChatsCubit, ChatsState>(builder: (context, state) {
         if (state is ChatsLoading) {
           return const CircularProgressIndicator();

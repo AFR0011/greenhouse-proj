@@ -137,6 +137,13 @@ void buzzerTurnOff() {
   delay(500);
 }
 
+void soilMoistureCondition(limit, condition, soilMoisture) {
+  if (condition == "lower") {
+    if (soilMoisture > limit) {
+      turnPumpOn();
+    }
+  }
+}
 
 void setup() {
   // Set pin modes
@@ -203,5 +210,11 @@ void loop() {
   intruderDetected = digitalRead(irPin);
   gas = map(analogRead(gasPin), 0, 1023, 0, 255);
   phc = digitalRead(phcPin);
+
+  // SEND DATA TO DATABASE
+
+  // GET "CONDITIONS" AND "ACTIONS"
+
+  // CALL FUNCTIONS BASED ON THOSE
 
 }

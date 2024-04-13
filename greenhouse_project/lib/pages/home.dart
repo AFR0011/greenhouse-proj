@@ -106,7 +106,7 @@ class _HomePageContentState extends State<_HomePageContent> {
   Widget _buildHomeView() {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return Scaffold(
-      appBar: createMainAppBar(context, widget.userCredential),
+      appBar: createMainAppBar(context, widget.userCredential, _userReference),
       body: Column(
         children: [
           const SizedBox(height: 20),

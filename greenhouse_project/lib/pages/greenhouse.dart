@@ -135,7 +135,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   Widget _buildGreenhousePage() {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return Scaffold(
-      appBar: createMainAppBar(context, widget.userCredential),
+      appBar: createMainAppBar(context, widget.userCredential, _userReference),
       body: SingleChildScrollView(
         child: Column(children: [
           const Center(
