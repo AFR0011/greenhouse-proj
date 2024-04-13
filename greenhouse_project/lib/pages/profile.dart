@@ -8,42 +8,47 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
+import 'package:greenhouse_project/services/cubit/profile_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ProfilePage extends StatelessWidget {
   final UserCredential userCredential;
+  final DocumentReference userReference;
 
-  const ProfilePage({super.key, required this.userCredential});
+  const ProfilePage(
+      {super.key, required this.userCredential, required this.userReference});
 
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-
         BlocProvider(
           create: (context) => NotificationsCubit(userCredential),
         ),
         BlocProvider(
           create: (context) => UserInfoCubit(),
         ),
-
+        BlocProvider(
+          create: (context) => ProfileCubit(userReference),
+        ),
       ],
       child: _ProfilePageContent(userCredential: userCredential),
     );
   }
 }
+
 class _ProfilePageContent extends StatefulWidget {
   final UserCredential userCredential;
 
-  const _ProfilePageContent ({super.key, required this.userCredential});
+  const _ProfilePageContent({super.key, required this.userCredential});
 
   @override
-  State<_ProfilePageContent> createState() => _ProfilePageState();
+  State<_ProfilePageContent> createState() => __ProfilePageContentState();
 }
 
-class _ProfilePageState extends State<_ProfilePageContent> {
+class __ProfilePageContentState extends State<_ProfilePageContent> {
   // Define custom theme
   final ThemeData customTheme = theme;
 
@@ -60,26 +65,19 @@ class _ProfilePageState extends State<_ProfilePageContent> {
     super.dispose();
   }
 
-  // Define variables for user information
-
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<UserInfoCubit, HomeState>(
-      listener: (context, state){},
-      builder: (context, state){
-        if (state is UserInfoLoading){
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        else if (state is UserInfoLoaded){
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, state) {
+        if (state is ProfileLoading) {
+          return const CircularProgressIndicator();
+        } else if (state is ProfileLoaded) {
           return MaterialApp(
               theme: customTheme,
               home: Scaffold(
@@ -108,7 +106,7 @@ class _ProfilePageState extends State<_ProfilePageContent> {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.green[400],
-                            labelText: state.userName,
+                            labelText: state.userData['name'],
                             border: const OutlineInputBorder(),
                           )),
                     ),
@@ -120,7 +118,7 @@ class _ProfilePageState extends State<_ProfilePageContent> {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.green[400],
-                            labelText: widget.userCredential.user?.email,
+                            labelText: state.userData['email'],
                             border: const OutlineInputBorder(),
                           )),
                     ),
@@ -139,23 +137,15 @@ class _ProfilePageState extends State<_ProfilePageContent> {
                     ),
                     Align(
                         alignment: Alignment.bottomCenter,
-                        child: GreenElevatedButton(text: "Edit", onPressed: () {}))
+                        child:
+                            GreenElevatedButton(text: "Edit", onPressed: () {}))
                   ],
                 ),
               ));
-        }
-        else if (state is UserInfoError) {
-          return Center(child: Text('Error: ${state.errorMessage}'));
-        }
-        // Should never happen; but, you never know
-        else {
-          return const Center(
-            child: Text('Unexpected state'),
-          );
+        } else {
+          return const Text("Something went wrong...");
         }
       },
-
     );
-
   }
 }
