@@ -89,10 +89,7 @@ class _HomePageContentState extends State<_HomePageContent> {
             _userName = state.userName;
             _userReference = state.userReference;
 
-            return MaterialApp(
-                debugShowCheckedModeBanner: false,
-                theme: customTheme,
-                home: _buildHomeView());
+            return Theme(data: customTheme, child: _buildHomeView());
           } else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           } else {

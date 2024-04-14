@@ -116,8 +116,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
             _userName = state.userName;
             _userReference = state.userReference;
 
-            return MaterialApp(
-                theme: customTheme, home: _buildGreenhousePage());
+            return Theme(data: customTheme, child: _buildGreenhousePage());
           }
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {

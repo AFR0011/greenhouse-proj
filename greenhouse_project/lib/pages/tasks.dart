@@ -84,14 +84,11 @@ class _TasksPageState extends State<_TasksPageContent> {
             _userRole = state.userRole;
             _userName = state.userName;
             _userReference = state.userReference;
-            return MaterialApp(
-              theme: customTheme,
-              home: Scaffold(
-                appBar: createMainAppBar(
-                    context, widget.userCredential, _userReference),
-                bottomNavigationBar:
-                    createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-              ),
+            return Scaffold(
+              appBar: createMainAppBar(
+                  context, widget.userCredential, _userReference),
+              bottomNavigationBar:
+                  createFooterNav(_selectedIndex, footerNavCubit, _userRole),
             );
           } else {
             return const Center(
