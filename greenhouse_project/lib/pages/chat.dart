@@ -1,5 +1,5 @@
 /// Display chats properly (with username etc.)
-///
+/// 
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,8 +16,11 @@ class ChatPage extends StatelessWidget {
   final UserCredential userCredential;
   final DocumentReference? chatReference;
 
-  const ChatPage(
-      {super.key, required this.userCredential, required this.chatReference});
+  const ChatPage({
+    super.key,
+    required this.userCredential,
+    required this.chatReference,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,9 @@ class ChatPage extends StatelessWidget {
         BlocProvider(
           create: (context) => ChatsCubit(userCredential),
         ),
-        BlocProvider(create: (context) => ChatCubit(chatReference))
+        BlocProvider(
+          create: (context) => ChatCubit(chatReference),
+        ),
       ],
       child: _ChatPageContent(
         userCredential: userCredential,
