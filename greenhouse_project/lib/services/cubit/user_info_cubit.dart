@@ -25,6 +25,7 @@ class UserInfoCubit extends HomeCubit {
         emit(UserInfoError("User not found"));
       }
     } catch (error) {
+      print(error.toString());
       emit(UserInfoError(error.toString()));
     }
   }
