@@ -97,10 +97,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
             _userRole = state.userRole;
             _userName = state.userName;
             _userReference = state.userReference;
-            return MaterialApp(
-              theme: customTheme,
-              home: _buildManagementPage(),
-            );
+            return Theme(data: customTheme, child: _buildManagementPage());
           }
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {

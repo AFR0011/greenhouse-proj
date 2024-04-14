@@ -98,11 +98,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             _userName = state.userName;
             _userReference = state.userReference;
 
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              theme: customTheme,
-              home: _createChatsPage(),
-            );
+            return Theme(data: customTheme, child: _createChatsPage());
           }
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {

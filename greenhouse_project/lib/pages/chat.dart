@@ -8,11 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/chat_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
-import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
-import 'package:greenhouse_project/utils/footer_nav.dart';
-import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatPage extends StatelessWidget {
@@ -37,15 +34,20 @@ class ChatPage extends StatelessWidget {
         ),
         BlocProvider(create: (context) => ChatCubit(chatReference))
       ],
-      child: _ChatPageContent(userCredential: userCredential),
+      child: _ChatPageContent(
+        userCredential: userCredential,
+        chatReference: chatReference,
+      ),
     );
   }
 }
 
 class _ChatPageContent extends StatefulWidget {
   final UserCredential userCredential;
+  final DocumentReference? chatReference;
 
-  const _ChatPageContent({required this.userCredential});
+  const _ChatPageContent(
+      {required this.userCredential, required this.chatReference});
 
   @override
   State<_ChatPageContent> createState() => _ChatPageState();
@@ -93,11 +95,7 @@ class _ChatPageState extends State<_ChatPageContent> {
           _userName = state.userName;
           _userReference = state.userReference;
 
-          return MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: customTheme,
-            home: _createChatPage(),
-          );
+          return Theme(data: customTheme, child: _createChatPage());
         }
         // Show error if there is an issues with user info
         else if (state is UserInfoError) {
@@ -114,70 +112,55 @@ class _ChatPageState extends State<_ChatPageContent> {
   }
 
   Widget _createChatPage() {
-    return BlocBuilder<ChatCubit, ChatState>(
+    return BlocBuilder<ChatsCubit, ChatsState>(
       builder: (context, state) {
-        if (state is ChatLoading) {
-          return const CircularProgressIndicator();
-        } else if (state is ChatLoaded) {
-          List<MessageData?> messages = state.messages;
-          if (messages.isEmpty) {
-            return const Text("");
-          } else {
-            return ListView.builder(
-              shrinkWrap: true,
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                MessageData? message = messages[index];
-                // Received messages on left
-                if (message?.receiver == _userReference) {
-                  return Align(
-                    alignment: Alignment.centerLeft,
-                    child: ListTile(
-                      title: Text("${message?.message}"),
-                    ),
-                  );
-                }
-                // Sent messages on right
-                else {
-                  return Align(
-                    alignment: Alignment.centerRight,
-                    child: ListTile(
-                      title: Text("${message?.message}"),
-                    ),
-                  );
-                }
-              },
-            );
-          }
-        } else if (state is ChatError) {
-          print(state.error.toString());
-          return const Text("Something went wrong...");
-        } else {
-          return const Text("Something went wrong...");
-        }
+        ChatsData? chat = (state is ChatsLoaded)
+            ? state.chats.firstWhere(
+                (element) => element?.chatReference == widget.chatReference)
+            : null;
         return Scaffold(
           appBar: AppBar(
-            automaticallyImplyLeading: true,
-          ), // TO-DO: CHAT PAGE APPBAR
-          body: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _textEditingController,
-                      decoration: const InputDecoration(
-                        icon: Icon(Icons.send, size: 24),
-                        hintText: "Write a message...",
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                      child:
-                          GreenElevatedButton(text: "send", onPressed: () {}))
-                ],
-              )
-            ],
+              automaticallyImplyLeading: true,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              title: Text(
+                  "${chat?.receiverData?['name']} ${chat?.receiverData?['surname']}")),
+          body: BlocBuilder<ChatCubit, ChatState>(
+            builder: (context, state) {
+              if (state is ChatLoading) {
+                return const CircularProgressIndicator();
+              } else if (state is ChatLoaded) {
+                List<MessageData?> messages = state.messages;
+                if (messages.isEmpty) {
+                  return const Text("");
+                } else {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      MessageData? message = messages[index];
+                      Alignment alignment = message?.receiver == _userReference
+                          ? Alignment.centerLeft
+                          : Alignment.centerRight;
+                      return ListTile(
+                        title: Align(
+                            alignment: alignment,
+                            child: Text("${message?.message}")),
+                      );
+                    },
+                  );
+                }
+              } else if (state is ChatError) {
+                print(state.error.toString());
+                return const Text("Something went wrong...");
+              } else {
+                return const Text("Something went wrong...");
+              }
+            },
           ),
         );
       },
