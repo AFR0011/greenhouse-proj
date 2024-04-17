@@ -13,13 +13,12 @@ final class TaskLoaded extends TaskState {
   TaskLoaded({
     required this.tasks,
   });
-
 }
+
 final class TaskError extends TaskState {
   String error;
 
   TaskError({
     required this.error,
   });
-
 }

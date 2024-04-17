@@ -25,7 +25,7 @@ class InventoryCubit extends Cubit<InventoryState> {
 }
 
 class InventoryData {
-  final double amount;
+  final num amount;
   final String description;
   final String name;
   final DateTime timeAdded;

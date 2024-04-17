@@ -29,9 +29,7 @@ class TasksPage extends StatelessWidget {
         BlocProvider(
           create: (context) => UserInfoCubit(),
         ),
-        BlocProvider(
-          create: (context) => TaskCubit(userCredential)
-          )
+        BlocProvider(create: (context) => TaskCubit(userCredential)),
       ],
       child: _TasksPageContent(userCredential: userCredential),
     );
@@ -92,7 +90,7 @@ class _TasksPageState extends State<_TasksPageContent> {
             _userReference = state.userReference;
             return Theme(
               data: customTheme,
-              child: _createTasks(),
+              child: _createTasks(_userRole),
             );
           } else {
             return const Center(
@@ -103,16 +101,22 @@ class _TasksPageState extends State<_TasksPageContent> {
       ),
     );
   }
-  Widget _createTasks(){
-      final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+
+  Widget _createTasks(String _userRole) {
+    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return Scaffold(
-      appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      appBar: _userRole == "worker"
+          ? createMainAppBar(context, widget.userCredential, _userReference)
+          : AppBar(
+              automaticallyImplyLeading: true,
+              leading: IconButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back),
+              )),
       body: Column(
         children: [
-          const SizedBox(height: 20),
-          Center(
-              child:
-                  Text("Welcome Back, $_userName!", style: headingTextStyle)),
           const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
@@ -128,7 +132,7 @@ class _TasksPageState extends State<_TasksPageContent> {
           SizedBox(
             width: MediaQuery.of(context).size.width - 20,
             child: const Text(
-              "Notifications",
+              "Tasks",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               textAlign: TextAlign.left,
             ),
@@ -141,7 +145,7 @@ class _TasksPageState extends State<_TasksPageContent> {
               } else if (state is TaskLoaded) {
                 List<TaskData> taskList = state.tasks;
                 if (taskList.isEmpty) {
-                  return const Center(child: Text("No Notifications..."));
+                  return const Center(child: Text("No Tasks..."));
                 } else {
                   return ListView.builder(
                     shrinkWrap: true,
@@ -151,26 +155,77 @@ class _TasksPageState extends State<_TasksPageContent> {
                       return ListTile(
                         title: Text(task.title),
                         // subtitle: Text(task.dueDate as String),
-                        leading: GreenElevatedButton(text: 'details...', onPressed: () {  },),
+                        trailing: GreenElevatedButton(
+                          text: 'Details',
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                Widget buttonRow = _userRole == "worker"
+                                    ? Row(
+                                        children: [
+                                          GreenElevatedButton(
+                                              text: "Contact Manager",
+                                              onPressed: () {}),
+                                          GreenElevatedButton(
+                                              text: "Mark as Complete",
+                                              onPressed: () {
+                                                context
+                                                    .read<TaskCubit>()
+                                                    .completeTask(
+                                                        task.taskReference);
+                                              })
+                                        ],
+                                      )
+                                    : Row(children: [
+                                        GreenElevatedButton(
+                                            text: "Delete", onPressed: () {}),
+                                        GreenElevatedButton(
+                                            text: "Edit", onPressed: () {}),
+                                        task.status == "waiting"
+                                            ? GreenElevatedButton(
+                                                text: "Approve",
+                                                onPressed: () {})
+                                            : const SizedBox(),
+                                      ]);
+                                return Dialog(
+                                    child: Column(
+                                  children: [
+                                    IconButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        icon: const Icon(Icons.close)),
+                                    Text("Title: ${task.title}"),
+                                    Text("Description: ${task.description}"),
+                                    Text("Due Date: ${task.dueDate}"),
+                                    Text("Status: ${task.status}"),
+                                    Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: buttonRow)
+                                  ],
+                                ));
+                              },
+                            );
+                          },
+                        ),
                       );
                     },
                   );
                 }
               } else if (state is TaskError) {
                 print(state.error.toString());
-                return  Center(child: Text(state.error.toString()));
+                return Center(child: Text(state.error.toString()));
               } else {
                 return const Center(child: Text('Unexpected State'));
-
               }
             },
           ),
         ],
       ),
-      bottomNavigationBar:
-          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+      bottomNavigationBar: _userRole == "worker"
+          ? createFooterNav(_selectedIndex, footerNavCubit, _userRole)
+          : const SizedBox(),
     );
   }
 }
-
-
