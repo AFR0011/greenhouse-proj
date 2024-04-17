@@ -5,8 +5,7 @@ import 'package:flutter/foundation.dart';
 part 'task_state.dart';
 
 class TaskCubit extends Cubit<TaskState> {
-
-      final CollectionReference tasks =
+  final CollectionReference tasks =
       FirebaseFirestore.instance.collection('tasks');
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
@@ -15,53 +14,65 @@ class TaskCubit extends Cubit<TaskState> {
 
   TaskCubit(this.user) : super(TaskLoading()) {
     if (user != null) {
-      _subscribeToTasks();
+      _getTasks();
     }
   }
 
-  void _subscribeToTasks() async {
-     QuerySnapshot userQuery = await FirebaseFirestore.instance
+  void _getTasks() async {
+    QuerySnapshot userQuery = await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: user?.user?.email)
         .get();
     DocumentReference userReference = userQuery.docs.first.reference;
+    DocumentSnapshot userSnapshot = await userReference.get();
+    Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
 
     //Get user Tasks
     tasks
-        .where('worker', isEqualTo: userReference)
+        .where(userData['role'], isEqualTo: userReference)
         .orderBy('dueDate', descending: true)
         .snapshots()
         .listen((snapshot) {
-      final List<TaskData> tasks = snapshot.docs
-          .map((doc) => TaskData.fromFirestore(doc))
-          .toList();
+      final List<TaskData> tasks =
+          snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
       emit(TaskLoaded(tasks: [...tasks]));
     }, onError: (error) {
-      emit(TaskError(error: error.toString()));});
+      print(error);
+      emit(TaskError(error: error.toString()));
+    });
   }
 
-  
+  void completeTask(DocumentReference taskReference) async {
+    taskReference.set(
+        [
+          {'status': 'waiting'}
+        ] as Map<String, dynamic>,
+        SetOptions(merge: true));
   }
-  class TaskData{
-      final String description;
-      final String status;
-      final String title; 
-      final DateTime dueDate;
+}
 
-        TaskData({
-    required this.description,
-    required this.status,
-    required this.title,
-    required this.dueDate,
-  });
+class TaskData {
+  final String description;
+  final String status;
+  final String title;
+  final DateTime dueDate;
+  final DocumentReference taskReference;
 
-   factory TaskData.fromFirestore(DocumentSnapshot doc) {
+  TaskData(
+      {required this.description,
+      required this.status,
+      required this.title,
+      required this.dueDate,
+      required this.taskReference});
+
+  factory TaskData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return TaskData(
       description: data['description'],
       dueDate: (data['dueDate'] as Timestamp).toDate(),
       status: data['status'],
       title: data['title'],
+      taskReference: doc.reference,
     );
   }
-    }
+}
