@@ -18,6 +18,8 @@ class ManageWorkersCubit extends ManagementCubit {
           snapshot.docs.map((doc) => WorkerData.fromFirestore(doc)).toList();
 
       emit(ManageWorkersLoaded([...workers]));
+    }, onError: (error) {
+      emit(ManageWorkersError(error));
     });
   }
 }
@@ -27,21 +29,22 @@ class WorkerData {
   final DateTime creationDate;
   final String name;
   final String surname;
+  final DocumentReference workerReference;
 
-  WorkerData({
-    required this.email,
-    required this.creationDate,
-    required this.name,
-    required this.surname,
-  });
+  WorkerData(
+      {required this.email,
+      required this.creationDate,
+      required this.name,
+      required this.surname,
+      required this.workerReference});
 
   factory WorkerData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return WorkerData(
-      name: data['name'],
-      surname: data['surname'],
-      email: data['email'],
-      creationDate: (data['creationDate'] as Timestamp).toDate(),
-    );
+        name: data['name'],
+        surname: data['surname'],
+        email: data['email'],
+        creationDate: (data['creationDate'] as Timestamp).toDate(),
+        workerReference: doc.reference);
   }
 }
