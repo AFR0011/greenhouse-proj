@@ -11,6 +11,12 @@ final class ManageWorkersLoaded extends ManagementState {
   ManageWorkersLoaded(this.workers);
 }
 
+final class ManageWorkersError extends ManagementState {
+  final String error;
+
+  ManageWorkersError(this.error);
+}
+
 final class ManageTasksLoading extends ManagementState {}
 
 final class ManageTasksLoaded extends ManagementState {
