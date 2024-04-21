@@ -1,6 +1,6 @@
 /// TO-DO:
-/// * Connect to database and fetch actual user data
-/// * Make "edit" button functional
+/// - Fix BlocProvider issue for UserInfoCubit for Password Confirmation
+/// - Pop until profile page after profile update
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/profile_cubit.dart';
+import 'package:greenhouse_project/services/cubit/profile_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
@@ -66,6 +67,8 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordConfirmController =
+      TextEditingController();
 
   @override
   void dispose() {
@@ -182,45 +185,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                                           context: context,
                                           builder: (context) {
                                             return Dialog(
-                                              child: Column(
-                                                children: [
-                                                  TextField(
-                                                    controller: _nameController,
-                                                    decoration:
-                                                        InputDecoration(),
-                                                  ),
-                                                  TextField(
-                                                    controller:
-                                                        _emailController,
-                                                    decoration:
-                                                        InputDecoration(),
-                                                  ),
-                                                  TextField(
-                                                    controller:
-                                                        _passwordController,
-                                                    decoration:
-                                                        InputDecoration(),
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      GreenElevatedButton(
-                                                          text: "Submit",
-                                                          onPressed: () {
-                                                            // TO-DO: Input validation
-                                                            // TO-DO: (then) Password confirmation
-                                                            // TO-DO: (then) Commit to database
-                                                          }),
-                                                      GreenElevatedButton(
-                                                          text: "Cancel",
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          }),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            );
+                                                child: _createEditDialog());
                                           });
                                     })
                                 : GreenElevatedButton(
@@ -232,6 +197,164 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           return const Text("Something went wrong...");
         }
       },
+    );
+  }
+
+  Widget _createEditDialog() {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => ProfileEditCubit(),
+        ),
+        BlocProvider(
+          create: (context) => UserInfoCubit(),
+        ),
+      ],
+      child: BlocBuilder<ProfileEditCubit, List<bool>>(
+        builder: (context, state) {
+          return Column(
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                    errorText: state[0]
+                        ? ""
+                        : "Name should be longer than 4 characters."),
+              ),
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                    errorText: state[1] ? "" : "Email format invalid."),
+              ),
+              TextField(
+                controller: _passwordController,
+                decoration: InputDecoration(
+                    errorText: state[2]
+                        ? ""
+                        : "Password should be longer than 8 characters."),
+              ),
+              Row(
+                children: [
+                  GreenElevatedButton(
+                      text: "Submit",
+                      onPressed: () {
+                        List<bool> validation = [true, true, true];
+                        if (_nameController.text.length < 4) {
+                          validation[0] = !validation[0];
+                        }
+                        if (!_emailController.text
+                            .contains(RegExp(r'.+@.+\..+'))) {
+                          validation[1] = !validation[1];
+                        }
+                        if (_passwordController.text.length < 8) {
+                          validation[2] = !validation[2];
+                        }
+
+                        bool isValid = context
+                            .read<ProfileEditCubit>()
+                            .updateState(validation);
+
+                        if (!isValid) {
+                        } else {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Dialog(
+                                  child: Column(
+                                    children: [
+                                      const Center(
+                                          child: Text("Enter Password")),
+                                      TextField(
+                                        controller: _passwordConfirmController,
+                                      ),
+                                      Row(
+                                        children: [
+                                          GreenElevatedButton(
+                                              text: "Confirm",
+                                              onPressed: () async {
+                                                FirebaseAuth auth =
+                                                    FirebaseAuth.instance;
+                                                String email = widget
+                                                    .userCredential
+                                                    .user!
+                                                    .email as String;
+                                                try {
+                                                  UserCredential
+                                                      userCredential =
+                                                      await auth
+                                                          .signInWithEmailAndPassword(
+                                                              email: email,
+                                                              password:
+                                                                  _passwordConfirmController
+                                                                      .text);
+                                                  context
+                                                      .read<UserInfoCubit>()
+                                                      .setUserInfo(
+                                                          _userReference,
+                                                          _nameController.text,
+                                                          _emailController.text,
+                                                          _passwordController
+                                                              .text);
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (context) {
+                                                        return Dialog(
+                                                          child: Column(
+                                                            children: [
+                                                              const Center(
+                                                                child: Text(
+                                                                    "Profile Updated Succesfully."),
+                                                              ),
+                                                              Center(
+                                                                child:
+                                                                    GreenElevatedButton(
+                                                                  text: "OK",
+                                                                  onPressed: () =>
+                                                                      Navigator.popUntil(
+                                                                          context,
+                                                                          (route) =>
+                                                                              false),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      });
+                                                } catch (error) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                    content:
+                                                        Text(error.toString()),
+                                                  ));
+                                                  return;
+                                                }
+                                              }),
+                                          GreenElevatedButton(
+                                              text: "Cancel",
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              })
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                );
+                              });
+                        }
+                        // TO-DO: (then) Password confirmation
+                        // TO-DO: (then) Commit to database
+                      }),
+                  GreenElevatedButton(
+                      text: "Cancel",
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }),
+                ],
+              )
+            ],
+          );
+        },
+      ),
     );
   }
 }

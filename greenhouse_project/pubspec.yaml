@@ -45,6 +45,7 @@ dependencies:
   cloud_firestore: ^4.15.8
   syncfusion_flutter_charts: ^25.1.37
   firebase_database: ^10.4.10
+  list_utilities: ^1.0.3
 
 
 dev_dependencies:
