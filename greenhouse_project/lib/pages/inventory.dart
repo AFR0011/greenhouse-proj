@@ -178,7 +178,21 @@ class _InventoryPageState extends State<_InventoryPageContent> {
               return ListTile(
                 title: Text(inventory.name),
                 subtitle: Text(inventory.timeAdded.toString()),
-                trailing: Text(inventory.amount.toString()),
+                trailing: FittedBox(fit: BoxFit.scaleDown,
+                child: Row(
+                  children: [
+                  GreenElevatedButton(
+                  text: "Edit",
+                  onPressed: (){_showEditForm(context, inventory );},
+
+                ),
+                    GreenElevatedButton(
+                      text: "Delete",
+                      onPressed: (){_showDeleteForm(context, inventory);},
+
+                    ),
+                  ],)
+                ),
               );
             },
           ),
@@ -269,4 +283,99 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           );
         });
   }
+
+  void _showEditForm(BuildContext context, InventoryData inventory) {
+    InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
+    showDialog(
+        context: context,
+        builder: (context) {
+          _nameController.text = inventory.name;
+          _descController.text = inventory.description;
+          _amountController.text = inventory.amount.toString();
+          return Dialog(
+            child: Column(
+              children: [
+                TextField(
+                  controller: _nameController,
+                ),
+                TextField(
+                  controller: _descController,
+                ),
+                TextFormField(
+                  controller: _amountController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+                Row(
+                  children: [
+                    GreenElevatedButton(
+                        text: "Submit",
+                        onPressed: () async {
+                          Map<String, dynamic> data = {
+                            "amount": num.parse(_amountController.text),
+                            "description": _descController.text,
+                            "name": _nameController.text,
+                            "timeAdded": DateTime.now(),
+                            "pending": _userRole == 'manager' ? false : true,
+                          };
+                          await inventoryCubit.updateInventory(inventory.reference, data);
+                          _nameController.clear();
+                          _descController.clear();
+                          _amountController.clear();
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Item Edited succesfully")));
+                        }),
+                    GreenElevatedButton(
+                        text: "Cancel",
+                        onPressed: () {
+                          _nameController.clear();
+                          _descController.clear();
+                          _amountController.clear();
+                          Navigator.pop(context);
+                        })
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  void _showDeleteForm(BuildContext context, InventoryData inventory) {
+    InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Column(
+              children: [
+                Text("Are you Sure!!!"),
+                Row(
+                  children: [
+                    GreenElevatedButton(
+                        text: "Submit",
+                        onPressed: () async {
+                          await inventoryCubit.removeInventory(inventory.reference);
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Item Deleted succesfully")));
+                        }),
+                    GreenElevatedButton(
+                        text: "Cancel",
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
 }
