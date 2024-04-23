@@ -32,7 +32,7 @@ class InventoryCubit extends Cubit<InventoryState> {
     }
   }
 
-  void removeInventory(DocumentReference item) async {
+  Future<void>  removeInventory(DocumentReference item) async {
     emit(InventoryLoading());
     try {
       await item.delete();
@@ -42,7 +42,7 @@ class InventoryCubit extends Cubit<InventoryState> {
     }
   }
 
-  void updateInventory(
+  Future <void> updateInventory(
       DocumentReference item, Map<String, dynamic> data) async {
     emit(InventoryLoading());
     try {
@@ -75,7 +75,7 @@ class InventoryData {
     final data = doc.data() as Map<String, dynamic>;
     return InventoryData(
       amount: data['amount'],
-      description: data['descritpion'] ?? ' ',
+      description: data['description'] ?? ' ',
       name: data['name'],
       timeAdded: (data['timeAdded'] as Timestamp).toDate(),
       isPending: data['pending'],
