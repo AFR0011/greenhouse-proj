@@ -1,13 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
+import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
+import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+import 'package:list_utilities/list_utilities.dart';
 
 class InventoryPage extends StatelessWidget {
   final UserCredential userCredential;
@@ -54,6 +60,10 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   final ThemeData customTheme = theme;
   // Text Controllers
   final TextEditingController _textController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+
   // Index of footer nav selection
   final int _selectedIndex = 1;
 
@@ -61,6 +71,9 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   @override
   void dispose() {
     _textController.dispose();
+    _nameController.dispose();
+    _descController.dispose();
+    _amountController.dispose();
     super.dispose();
   }
 
@@ -117,35 +130,252 @@ class _InventoryPageState extends State<_InventoryPageContent> {
 
     return Scaffold(
       appBar: createMainAppBar(context, widget.userCredential, _userReference),
-      body: BlocBuilder<InventoryCubit, InventoryState>(
-          builder: (context, state) {
-        if (state is InventoryLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (state is InventoryLoaded) {
-          List<InventoryData> inventoryList = state.inventory;
-          return ListView.builder(
+      body: SingleChildScrollView(
+        child: BlocBuilder<InventoryCubit, InventoryState>(
+            builder: (context, state) {
+          if (state is InventoryLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (state is InventoryLoaded) {
+            List<InventoryData> inventoryList = state.inventory;
+            List actualInventory = inventoryList.map((e) {
+              if (!e.isPending) return e;
+            }).toList();
+            actualInventory.removeNull();
+            List pendingInventory = inventoryList.map((e) {
+              if (e.isPending) return e;
+            }).toList();
+            pendingInventory.removeNull();
+
+            return _createInventoryList(
+                actualInventory, pendingInventory, context);
+          } else if (state is InventoryError) {
+            print(state.error.toString());
+            return Text(state.error.toString());
+          } else {
+            return const Text("Something went wrong...");
+          }
+        }),
+      ),
+      bottomNavigationBar:
+          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+    );
+  }
+
+  Widget _createInventoryList(
+      List actualInventory, List pendingInventory, BuildContext context) {
+    return Column(
+      children: [
+        const Text("Inventory", style: subheadingTextStyle),
+        SizedBox(
+          height: MediaQuery.of(context).size.height / 3,
+          child: ListView.builder(
             shrinkWrap: true,
-            itemCount: inventoryList.length,
+            itemCount: actualInventory.length,
             itemBuilder: (context, index) {
-              InventoryData inventory = inventoryList[index];
+              InventoryData inventory = actualInventory[index];
+              return ListTile(
+                title: Text(inventory.name),
+                subtitle: Text(inventory.timeAdded.toString()),
+                trailing: FittedBox(fit: BoxFit.scaleDown,
+                child: Row(
+                  children: [
+                  GreenElevatedButton(
+                  text: "Edit",
+                  onPressed: (){_showEditForm(context, inventory );},
+
+                ),
+                    GreenElevatedButton(
+                      text: "Delete",
+                      onPressed: (){_showDeleteForm(context, inventory);},
+
+                    ),
+                  ],)
+                ),
+              );
+            },
+          ),
+        ),
+        const Text("Pending Updates", style: subheadingTextStyle),
+        SizedBox(
+          height: MediaQuery.of(context).size.height / 3,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: pendingInventory.length,
+            itemBuilder: (context, index) {
+              InventoryData inventory = pendingInventory[index];
               return ListTile(
                 title: Text(inventory.name),
                 subtitle: Text(inventory.timeAdded.toString()),
                 trailing: Text(inventory.amount.toString()),
               );
             },
-          );
-        } else if (state is InventoryError) {
-          print(state.error.toString());
-          return Text(state.error.toString());
-        } else {
-          return const Text("Something went wrong...");
-        }
-      }),
-      bottomNavigationBar:
-          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+          ),
+        ),
+        Row(
+          children: [
+            GreenElevatedButton(
+                text: "Add Item",
+                onPressed: () {
+                  _showAdditionForm(context);
+                })
+          ],
+        )
+      ],
     );
   }
+
+  void _showAdditionForm(BuildContext context) {
+    InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Column(
+              children: [
+                TextField(
+                  controller: _nameController,
+                ),
+                TextField(
+                  controller: _descController,
+                ),
+                TextFormField(
+                  controller: _amountController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+                Row(
+                  children: [
+                    GreenElevatedButton(
+                        text: "Submit",
+                        onPressed: () async {
+                          Map<String, dynamic> data = {
+                            "amount": num.parse(_amountController.text),
+                            "description": _descController.text,
+                            "name": _nameController.text,
+                            "timeAdded": DateTime.now(),
+                            "pending": _userRole == 'manager' ? false : true,
+                          };
+                          await inventoryCubit.addInventory(data);
+                          _nameController.clear();
+                          _descController.clear();
+                          _amountController.clear();
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Item added succesfully")));
+                        }),
+                    GreenElevatedButton(
+                        text: "Cancel",
+                        onPressed: () {
+                          _nameController.clear();
+                          _descController.clear();
+                          _amountController.clear();
+                          Navigator.pop(context);
+                        })
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  void _showEditForm(BuildContext context, InventoryData inventory) {
+    InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
+    showDialog(
+        context: context,
+        builder: (context) {
+          _nameController.text = inventory.name;
+          _descController.text = inventory.description;
+          _amountController.text = inventory.amount.toString();
+          return Dialog(
+            child: Column(
+              children: [
+                TextField(
+                  controller: _nameController,
+                ),
+                TextField(
+                  controller: _descController,
+                ),
+                TextFormField(
+                  controller: _amountController,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.digitsOnly
+                  ],
+                ),
+                Row(
+                  children: [
+                    GreenElevatedButton(
+                        text: "Submit",
+                        onPressed: () async {
+                          Map<String, dynamic> data = {
+                            "amount": num.parse(_amountController.text),
+                            "description": _descController.text,
+                            "name": _nameController.text,
+                            "timeAdded": DateTime.now(),
+                            "pending": _userRole == 'manager' ? false : true,
+                          };
+                          await inventoryCubit.updateInventory(inventory.reference, data);
+                          _nameController.clear();
+                          _descController.clear();
+                          _amountController.clear();
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Item Edited succesfully")));
+                        }),
+                    GreenElevatedButton(
+                        text: "Cancel",
+                        onPressed: () {
+                          _nameController.clear();
+                          _descController.clear();
+                          _amountController.clear();
+                          Navigator.pop(context);
+                        })
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  void _showDeleteForm(BuildContext context, InventoryData inventory) {
+    InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Column(
+              children: [
+                Text("Are you Sure!!!"),
+                Row(
+                  children: [
+                    GreenElevatedButton(
+                        text: "Submit",
+                        onPressed: () async {
+                          await inventoryCubit.removeInventory(inventory.reference);
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Item Deleted succesfully")));
+                        }),
+                    GreenElevatedButton(
+                        text: "Cancel",
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ],
+                )
+              ],
+            ),
+          );
+        });
+  }
+
 }
