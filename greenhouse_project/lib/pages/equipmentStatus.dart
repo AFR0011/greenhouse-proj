@@ -21,6 +21,9 @@ class EquipmentStatusPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
+          create: (context) => UserInfoCubit(),
+        ),
+        BlocProvider(
           create: (context) => FooterNavCubit(),
         ),
         BlocProvider(
@@ -29,7 +32,7 @@ class EquipmentStatusPage extends StatelessWidget {
         BlocProvider(
           create: (context) => EquipmentCubit(),
         ),
-         BlocProvider(
+        BlocProvider(
           create: (context) => EquipmentStatusCubit(),
         ),
       ],
@@ -104,63 +107,64 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   }
 
   Widget _buildEquipmentStausPage() {
-  final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
-  return Scaffold(
-    appBar: createMainAppBar(context, widget.userCredential, _userReference),
-    body: SingleChildScrollView(
-      child: Column(
-        children: [
-          Center(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-              child: Text("Equipment Status", style: headingTextStyle),
-            ),
-          ),
-          // Search field
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: TextField(
-              controller: _textController,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.search, size: 24),
-                hintText: "Search...",
+    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+    return Scaffold(
+      appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Center(
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                child: Text("Equipment Status", style: headingTextStyle),
               ),
             ),
-          ),
-          // Use BlocBuilder for Equipment Status
-          //STOPPED HERE!!!
-          BlocBuilder<EquipmentStatusCubit, EquipmentStatusState>(
-            builder: (context, state) {
-              if (state is StatusLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is StatusLoaded) {
-                List<EquipmentStatus> statusList = state.status;
-                if (statusList.isEmpty) {
-                  return const Center(child: Text("No Equipments..."));
+            // Search field
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+              child: TextField(
+                controller: _textController,
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.search, size: 24),
+                  hintText: "Search...",
+                ),
+              ),
+            ),
+            // Use BlocBuilder for Equipment Status
+            //STOPPED HERE!!!
+            BlocBuilder<EquipmentStatusCubit, EquipmentStatusState>(
+              builder: (context, state) {
+                if (state is StatusLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is StatusLoaded) {
+                  List<EquipmentStatus> statusList = state.status;
+                  if (statusList.isEmpty) {
+                    return const Center(child: Text("No Equipments..."));
+                  } else {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: statusList.length,
+                      itemBuilder: (context, index) {
+                        EquipmentStatus status = statusList[index];
+                        return ListTile(
+                          title: Text(status.type),
+                          subtitle: Text(status.status.toString()),
+                        );
+                      },
+                    );
+                  }
+                } else if (state is StatusError) {
+                  return Center(child: Text('Error: ${state.error}'));
                 } else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: statusList.length,
-                    itemBuilder: (context, index) {
-                      EquipmentStatus status = statusList[index];
-                      return ListTile(
-                        title: Text(status.type),
-                        subtitle: Text(status.status.toString()),
-                      );
-                    },
-                  );
+                  return const Center(child: Text('Unexpected State'));
                 }
-              } else if (state is StatusError) {
-                return Center(child: Text('Error: ${state.error}'));
-              } else {
-                return const Center(child: Text('Unexpected State'));
-              }
-            },
-          ),
-        ],
+              },
+            ),
+          ],
+        ),
       ),
-    ),
-    bottomNavigationBar: createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-  );
-}
+      bottomNavigationBar:
+          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+    );
+  }
 }
