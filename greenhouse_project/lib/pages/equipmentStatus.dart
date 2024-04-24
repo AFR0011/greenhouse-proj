@@ -109,7 +109,15 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   Widget _buildEquipmentStausPage() {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return Scaffold(
-      appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          ),
+          ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -137,18 +145,25 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                 if (state is StatusLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is StatusLoaded) {
-                  List<EquipmentStatus> statusList = state.status;
-                  if (statusList.isEmpty) {
+                  List<EquipmentStatus> equipmentList = state.status;
+                  if (equipmentList.isEmpty) {
                     return const Center(child: Text("No Equipments..."));
                   } else {
                     return ListView.builder(
                       shrinkWrap: true,
-                      itemCount: statusList.length,
+                      itemCount: equipmentList.length,
                       itemBuilder: (context, index) {
-                        EquipmentStatus status = statusList[index];
+                        EquipmentStatus equipment = equipmentList[index];
                         return ListTile(
-                          title: Text(status.type),
-                          subtitle: Text(status.status.toString()),
+                          title: Text(equipment.type),
+                          subtitle: Text(equipment.status.toString()),
+                          trailing: Switch(
+                            value: equipment.status,
+                            onChanged: (value){
+                              context
+                              .read<EquipmentStatusCubit>()
+                              .switchStatus(equipment.reference, equipment.status);
+                            }),
                         );
                       },
                     );
@@ -163,8 +178,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           ],
         ),
       ),
-      bottomNavigationBar:
-          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );
   }
 }
