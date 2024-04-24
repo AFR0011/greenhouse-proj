@@ -29,4 +29,23 @@ class UserInfoCubit extends HomeCubit {
       emit(UserInfoError(error.toString()));
     }
   }
+
+  Future<void> setUserInfo(DocumentReference userReference, String name,
+      String email, String password) async {
+    emit(UserInfoLoading());
+    try {
+      userReference.set({
+        "name": name,
+        "email": email,
+      }, SetOptions(merge: true));
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      userCredential.user?.updatePassword(password);
+
+      getUserInfo(userCredential);
+    } catch (error) {
+      print(error.toString());
+      emit(UserInfoError(error.toString()));
+    }
+  }
 }
