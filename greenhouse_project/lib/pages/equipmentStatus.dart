@@ -2,17 +2,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/services/cubit/equipment_status_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
+import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
-class HomePage extends StatelessWidget {
+class EquipmentStatusPage extends StatelessWidget {
   final UserCredential userCredential;
 
-  const HomePage({super.key, required this.userCredential});
+  const EquipmentStatusPage({super.key, required this.userCredential});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +27,10 @@ class HomePage extends StatelessWidget {
           create: (context) => NotificationsCubit(userCredential),
         ),
         BlocProvider(
-          create: (context) => UserInfoCubit(),
+          create: (context) => EquipmentCubit(),
+        ),
+         BlocProvider(
+          create: (context) => EquipmentStatusCubit(),
         ),
       ],
       child: _EquipmentPageContent(userCredential: userCredential),
@@ -87,7 +92,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             _userName = state.userName;
             _userReference = state.userReference;
 
-            return Theme(data: customTheme, child: _buildHomeView());
+            return Theme(data: customTheme, child: _buildEquipmentStausPage());
           } else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           } else {
@@ -98,17 +103,20 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  Widget _buildHomeView() {
-    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
-    return Scaffold(
-      appBar: createMainAppBar(context, widget.userCredential, _userReference),
-      body: Column(
+  Widget _buildEquipmentStausPage() {
+  final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+  return Scaffold(
+    appBar: createMainAppBar(context, widget.userCredential, _userReference),
+    body: SingleChildScrollView(
+      child: Column(
         children: [
-          const SizedBox(height: 20),
           Center(
-              child:
-                  Text("Welcome Back, $_userName!", style: headingTextStyle)),
-          const SizedBox(height: 20),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Text("Equipment Status", style: headingTextStyle),
+            ),
+          ),
+          // Search field
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
             child: TextField(
@@ -119,38 +127,31 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
               ),
             ),
           ),
-          const SizedBox(height: 40),
-          SizedBox(
-            width: MediaQuery.of(context).size.width - 20,
-            child: const Text(
-              "Notifications",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.left,
-            ),
-          ),
-          // Use BlocBuilder for notifications
-          BlocBuilder<NotificationsCubit, HomeState>(
+          // Use BlocBuilder for Equipment Status
+          //STOPPED HERE!!!
+          BlocBuilder<EquipmentStatusCubit, EquipmentStatusState>(
             builder: (context, state) {
-              if (state is NotificationsLoading) {
+              if (state is StatusLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is NotificationsLoaded) {
-                List<NotificationData> notificationsList = state.notifications;
-                if (notificationsList.isEmpty) {
-                  return const Center(child: Text("No Notifications..."));
+              } else if (state is StatusLoaded) {
+                List<EquipmentStatus> statusList = state.status;
+                if (statusList.isEmpty) {
+                  return const Center(child: Text("No Equipments..."));
                 } else {
                   return ListView.builder(
                     shrinkWrap: true,
-                    itemCount: notificationsList.length,
+                    itemCount: statusList.length,
                     itemBuilder: (context, index) {
-                      NotificationData notification = notificationsList[index];
+                      EquipmentStatus status = statusList[index];
                       return ListTile(
-                        title: Text(notification.message),
+                        title: Text(status.type),
+                        subtitle: Text(status.status.toString()),
                       );
                     },
                   );
                 }
-              } else if (state is NotificationsError) {
-                return Center(child: Text('Error: ${state.errorMessage}'));
+              } else if (state is StatusError) {
+                return Center(child: Text('Error: ${state.error}'));
               } else {
                 return const Center(child: Text('Unexpected State'));
               }
@@ -158,8 +159,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           ),
         ],
       ),
-      bottomNavigationBar:
-          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-    );
-  }
+    ),
+    bottomNavigationBar: createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+  );
+}
 }
