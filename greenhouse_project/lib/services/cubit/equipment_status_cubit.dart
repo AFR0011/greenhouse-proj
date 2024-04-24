@@ -1,34 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greenhouse_project/pages/equipmentStatus.dart';
-import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 
 part 'equipment_status_state.dart';
 
 class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
-  final CollectionReference equipment = 
-    FirebaseFirestore.instance.collection('equipment');
+  final CollectionReference equipment =
+      FirebaseFirestore.instance.collection('equipment');
 
-  EquipmentStatusCubit () : super(StatusLoading()) {
+  EquipmentStatusCubit() : super(StatusLoading()) {
     _fetchEquipmentStaus();
   }
 
   _fetchEquipmentStaus() {
-    equipment
-    .orderBy('timestamp', descending: true)
-    .snapshots()
-    .listen((snapshot) {
-      if(snapshot.docs.isNotEmpty){
-        final List<EquipmentStatus> status =
-        snapshot.docs.map((doc) => EquipmentStatus.fromFirestore(doc)).toList();
-        emit(StatusLoaded([...status]));
-      }       
-     });
+    equipment.snapshots().listen((snapshot) {
+      final List<EquipmentStatus> status = snapshot.docs
+          .map((doc) => EquipmentStatus.fromFirestore(doc))
+          .toList();
+      emit(StatusLoaded([...status]));
+    }, onError: (error) {
+      print(error.toString());
+      emit(StatusError(error.toString()));
+    });
   }
 }
 
-class EquipmentStatus{
+class EquipmentStatus {
   final int board;
   final bool status;
   final String type;
@@ -48,5 +45,3 @@ class EquipmentStatus{
     );
   }
 }
-
-
