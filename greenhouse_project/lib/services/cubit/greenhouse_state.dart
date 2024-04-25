@@ -3,14 +3,18 @@ part of 'greenhouse_cubit.dart';
 @immutable
 sealed class GreenhouseState {}
 
-final class GreenhouseInitial extends GreenhouseState {}
-
 final class ReadingsLoading extends GreenhouseState {}
 
 final class ReadingsLoaded extends GreenhouseState {
-  final List<ReadingData> readings;
+  final List<ReadingsData> readings;
 
   ReadingsLoaded(this.readings);
+}
+
+final class ReadingsError extends GreenhouseState {
+  final String error;
+
+  ReadingsError(this.error);
 }
 
 final class EquipmentLoading extends GreenhouseState {}
