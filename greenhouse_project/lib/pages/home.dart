@@ -28,21 +28,21 @@ class HomePage extends StatelessWidget {
           create: (context) => UserInfoCubit(),
         ),
       ],
-      child: _HomePageContent(userCredential: userCredential),
+      child: _EquipmentPageContent(userCredential: userCredential),
     );
   }
 }
 
-class _HomePageContent extends StatefulWidget {
+class _EquipmentPageContent extends StatefulWidget {
   final UserCredential userCredential;
 
-  const _HomePageContent({required this.userCredential});
+  const _EquipmentPageContent({required this.userCredential});
 
   @override
-  State<_HomePageContent> createState() => _HomePageContentState();
+  State<_EquipmentPageContent> createState() => _EquipmentPageContentState();
 }
 
-class _HomePageContentState extends State<_HomePageContent> {
+class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // User info
   late String _userRole = "";
   late String _userName = "";
