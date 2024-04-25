@@ -1,9 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -178,21 +176,24 @@ class _InventoryPageState extends State<_InventoryPageContent> {
               return ListTile(
                 title: Text(inventory.name),
                 subtitle: Text(inventory.timeAdded.toString()),
-                trailing: FittedBox(fit: BoxFit.scaleDown,
-                child: Row(
-                  children: [
-                  GreenElevatedButton(
-                  text: "Edit",
-                  onPressed: (){_showEditForm(context, inventory );},
-
-                ),
-                    GreenElevatedButton(
-                      text: "Delete",
-                      onPressed: (){_showDeleteForm(context, inventory);},
-
-                    ),
-                  ],)
-                ),
+                trailing: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      children: [
+                        GreenElevatedButton(
+                          text: "Edit",
+                          onPressed: () {
+                            _showEditForm(context, inventory);
+                          },
+                        ),
+                        GreenElevatedButton(
+                          text: "Delete",
+                          onPressed: () {
+                            _showDeleteForm(context, inventory);
+                          },
+                        ),
+                      ],
+                    )),
               );
             },
           ),
@@ -320,7 +321,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                             "timeAdded": DateTime.now(),
                             "pending": _userRole == 'manager' ? false : true,
                           };
-                          await inventoryCubit.updateInventory(inventory.reference, data);
+                          await inventoryCubit.updateInventory(
+                              inventory.reference, data);
                           _nameController.clear();
                           _descController.clear();
                           _amountController.clear();
@@ -359,7 +361,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     GreenElevatedButton(
                         text: "Submit",
                         onPressed: () async {
-                          await inventoryCubit.removeInventory(inventory.reference);
+                          await inventoryCubit
+                              .removeInventory(inventory.reference);
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -377,5 +380,4 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           );
         });
   }
-
 }
