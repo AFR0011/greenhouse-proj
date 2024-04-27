@@ -121,21 +121,10 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Center(
+            const Center(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                 child: Text("Equipment Status", style: headingTextStyle),
-              ),
-            ),
-            // Search field
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: TextField(
-                controller: _textController,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.search, size: 24),
-                  hintText: "Search...",
-                ),
               ),
             ),
             // Use BlocBuilder for Equipment Status
