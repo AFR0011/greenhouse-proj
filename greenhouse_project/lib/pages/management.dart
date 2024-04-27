@@ -128,15 +128,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
             padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
             child: Text("Management", style: headingTextStyle),
           )),
-          // Search text field
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: TextField(
-              controller: _textController,
-              decoration: const InputDecoration(
-                  icon: Icon(Icons.search, size: 24), hintText: "Search..."),
-            ),
-          ),
+          
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
             child: Row(

@@ -109,17 +109,6 @@ class _PlantsPageState extends State<_PlantsPageContent> {
           )),
       body: Column(
         children: [
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-            child: TextField(
-              controller: _textController,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.search, size: 24),
-                hintText: "Search...",
-              ),
-            ),
-          ),
           const SizedBox(height: 40),
           SizedBox(
             width: MediaQuery.of(mainContext).size.width - 20,
