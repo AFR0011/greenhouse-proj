@@ -38,7 +38,10 @@ String databasePath;
 // Database child nodes
 String tempPath = "/temperature";
 String humPath = "/humidity";
-String presPath = "/pressure";
+String intrPath = "/intruder";
+String phcPath = "/light";
+String gasPath = "/gas";
+String smPath = "/soilMoisture";
 String timePath = "/timestamp";
 
 // Parent Node (to be updated in every loop)
@@ -212,6 +215,48 @@ void loop() {
   phc = digitalRead(phcPin);
 
   // SEND DATA TO DATABASE
+
+  // Prepare JSON data
+  json.clear();
+  json.addFloat("soilMoisture", soilMoisture);
+  json.addFloat("humidity", humidity);
+  json.addFloat("temperature", temperature);
+  json.addInt("intruderDetected", intruderDetected);
+  json.addInt("gas", gas);
+  json.addFloat("light", phc);
+
+  // Get current epoch time
+  timestamp = getTime();
+
+  // Define parent path
+  parentPath = databasePath + "/" + timestamp;
+
+  // Set child paths
+  String tempDataPath = parentPath + tempPath;
+  String humDataPath = parentPath + humPath;
+  String intrDataPath = parentPath + intrPath;
+  String gasDataPath = parentPath + gasPath;
+  String phcDataPath = parentPath + phcPath;
+  String smDataPath = parentPath + smPath;
+  String timeDataPath = parentPath + timePath;
+  
+
+  // Push data to Firebase
+  Firebase.setFloat(fbdo, tempDataPath, json.getFloat("temperature"));
+  Firebase.setFloat(fbdo, humDataPath, json.getFloat("humidity"));
+  Firebase.setInt(fbdo, presDataPath, json.getInt("intruder"));
+  Firebase.setFloat(fbdo, presDataPath, json.getFloat("soilMoisture"));
+  Firebase.setFloat(fbdo, presDataPath, json.getFloat("light"));
+  Firebase.setInt(fbdo, presDataPath, json.getInt("gas"));
+  Firebase.setInt(fbdo, timeDataPath, timestamp);
+
+  // Handle errors, if any
+  if (Firebase.failed()) {
+    Serial.print("Error sending data to Firebase: ");
+    Serial.println(Firebase.error());
+  } else {
+    Serial.println("Data sent to Firebase successfully!");
+  }
 
   // GET "CONDITIONS" AND "ACTIONS"
 

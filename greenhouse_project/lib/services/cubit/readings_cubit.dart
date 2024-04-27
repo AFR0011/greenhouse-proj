@@ -9,47 +9,36 @@ class ReadingsCubit extends GreenhouseCubit {
   }
 
   _fetchReadingInfo() {
-    readings
-        .orderBy('timestamp', descending: true)
-        .snapshots()
-        .listen((snapshot) {
-      final List<ReadingData> readings =
-          snapshot.docs.map((doc) => ReadingData.fromFirestore(doc)).toList();
+    readings.snapshots().listen((snapshot) {
+      final List<ReadingsData> readings =
+          snapshot.docs.map((doc) => ReadingsData.fromFirestore(doc)).toList();
 
       emit(ReadingsLoaded([...readings]));
+    }, onError: (error) {
+      print(error.toString());
+      emit(ReadingsError(error.toString()));
     });
   }
 }
 
-class ReadingData {
-  final double gas;
-  final double humidity;
-  final double lightIntensity;
-  final double soilMoisture;
-  final double temperature;
-  final bool intruder;
-  final Timestamp timestamp;
+class ReadingsData {
+  final Set<Map<String, dynamic>> allReadings;
 
-  ReadingData({
-    required this.gas,
-    required this.humidity,
-    required this.lightIntensity,
-    required this.soilMoisture,
-    required this.temperature,
-    required this.intruder,
-    required this.timestamp,
-  });
+  ReadingsData({required this.allReadings});
 
-  factory ReadingData.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return ReadingData(
-      gas: data['gas'],
-      humidity: data['humidity'],
-      lightIntensity: data['lightIntensity'],
-      soilMoisture: data['soilMoisture'],
-      temperature: data['temprature'],
-      intruder: data['intruder'],
-      timestamp: (data['timestamp'] as Timestamp),
-    );
+  factory ReadingsData.fromFirestore(DocumentSnapshot doc) {
+    LinkedHashMap<String, dynamic> databaseReadings =
+        doc.data() as LinkedHashMap<String, dynamic>;
+
+    // Converting LinkedHashMap to a list of maps preserving keys
+    Set<Map<String, dynamic>> readingsList = databaseReadings.entries
+        .map(
+          (boardReading) => {
+            boardReading.key: boardReading.value,
+          },
+        )
+        .toSet();
+
+    return ReadingsData(allReadings: readingsList);
   }
 }
