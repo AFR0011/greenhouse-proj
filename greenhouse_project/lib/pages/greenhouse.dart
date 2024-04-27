@@ -6,6 +6,7 @@ library;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/equipmentStatus.dart';
+import 'package:greenhouse_project/pages/plants.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -167,7 +168,11 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
                   child: GreenElevatedButton(
                       text: "Details",
                       onPressed: () {
-                        // TO-DO: Navigate to plant/sensor status page
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => PlantsPage(
+                                    userCredential: widget.userCredential)));
                       }),
                 ),
               ],
@@ -187,6 +192,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
               }).toList(),
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
             child: Row(
@@ -231,10 +237,10 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
                       onPressed: () {
                         // TO-DO: Navigate to equipments page
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EquipmentStatusPage(
-                            userCredential: widget.userCredential)));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EquipmentStatusPage(
+                                    userCredential: widget.userCredential)));
                       }),
                 ),
               ],
