@@ -81,7 +81,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
     // If footer nav state is updated, handle navigation
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential);
+        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
       },
       child: BlocBuilder<UserInfoCubit, HomeState>(
         builder: (context, state) {
@@ -140,7 +140,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                         MaterialPageRoute(
                             builder: (context) => ChatPage(
                                   userCredential: widget.userCredential,
-                                  chatReference: chat?.chatReference,
+                                  reference: chat?.reference,
                                 )));
                   },
                   child: ListTile(

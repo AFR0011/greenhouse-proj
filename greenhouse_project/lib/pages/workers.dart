@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/profile.dart';
+import 'package:greenhouse_project/pages/tasks.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
@@ -75,7 +76,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential);
+        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
       },
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
@@ -165,7 +166,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                     GreenElevatedButton(
                                         text: "Tasks",
                                         onPressed: () {
-                                          // TO-DO: Navigate to tasks page and show only this workers tasks
+                                          Navigator.push(context, MaterialPageRoute(builder: (context)=>TasksPage(userCredential: widget.userCredential, userReference: worker.reference,)));
                                         }),
                                     GreenElevatedButton(
                                         text: "Show profile",
@@ -178,7 +179,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                                           userCredential: widget
                                                               .userCredential,
                                                           userReference: worker
-                                                              .workerReference)));
+                                                              .reference)));
                                         }),
                                     GreenElevatedButton(
                                         text: "Remove worker",

@@ -82,7 +82,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
   Widget build(BuildContext context) {
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential);
+        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
       },
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
@@ -156,7 +156,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => TasksPage(
-                                    userCredential: widget.userCredential)));
+                                    userCredential: widget.userCredential, userReference: _userReference,)));
                       }),
                 ),
               ],

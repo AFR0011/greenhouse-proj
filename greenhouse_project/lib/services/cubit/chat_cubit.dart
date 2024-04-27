@@ -7,15 +7,15 @@ part 'chat_state.dart';
 class ChatCubit extends Cubit<ChatState> {
   final CollectionReference messages =
       FirebaseFirestore.instance.collection('messages');
-  final DocumentReference? chatReference;
+  final DocumentReference? reference;
 
-  ChatCubit(this.chatReference) : super(ChatLoading()) {
+  ChatCubit(this.reference) : super(ChatLoading()) {
     _getMessages();
   }
   void _getMessages() {
     //Get user's chats
     messages
-        .where('chat', isEqualTo: chatReference)
+        .where('chat', isEqualTo: reference)
         .orderBy('timestamp', descending: false)
         .snapshots()
         .listen((snapshot) {
@@ -27,7 +27,12 @@ class ChatCubit extends Cubit<ChatState> {
       emit(ChatError(error.toString()));
     });
   }
+  Future<void> sendMessage (String message, DocumentReference receiver, DocumentReference sender, DocumentReference chat) async {
+    await messages.add({"chat": chat, "message": message, "receiver": receiver, "sender": sender, "timestamp": Timestamp.now()});
+    return _getMessages();
+  }
 }
+
 
 class MessageData {
   final String message;

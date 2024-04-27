@@ -45,12 +45,12 @@ class ChatsCubit extends Cubit<ChatsState> {
 class ChatsData {
   final DateTime creationDate;
   final Map<String, dynamic>? receiverData;
-  final DocumentReference chatReference;
+  final DocumentReference reference;
 
   ChatsData(
       {required this.receiverData,
       required this.creationDate,
-      required this.chatReference});
+      required this.reference});
 
   static Future<ChatsData?> fromFirestore(
       DocumentSnapshot doc, DocumentReference userReference) async {
@@ -67,10 +67,11 @@ class ChatsData {
     final snapshot = await receiverReference.get();
     final receiverSnapshotData = snapshot.data();
     final receiverData = receiverSnapshotData as Map<String, dynamic>;
+    receiverData['reference'] = receiverReference;
 
     return ChatsData(
         receiverData: receiverData,
         creationDate: (data['creationDate'] as Timestamp).toDate(),
-        chatReference: doc.reference);
+        reference: doc.reference);
   }
 }

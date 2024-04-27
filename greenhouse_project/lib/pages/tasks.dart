@@ -8,13 +8,13 @@ import 'package:greenhouse_project/services/cubit/task_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
-import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class TasksPage extends StatelessWidget {
   final UserCredential userCredential;
+  final DocumentReference? userReference;
 
-  const TasksPage({super.key, required this.userCredential});
+  const TasksPage({super.key, required this.userCredential, required this.userReference});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +29,7 @@ class TasksPage extends StatelessWidget {
         BlocProvider(
           create: (context) => UserInfoCubit(),
         ),
-        BlocProvider(create: (context) => TaskCubit(userCredential)),
+        BlocProvider(create: (context) => TaskCubit(userReference!)),
       ],
       child: _TasksPageContent(userCredential: userCredential),
     );
@@ -74,7 +74,7 @@ class _TasksPageState extends State<_TasksPageContent> {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential);
+        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
       },
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
@@ -224,7 +224,7 @@ class _TasksPageState extends State<_TasksPageContent> {
         ],
       ),
       bottomNavigationBar: _userRole == "worker"
-          ? createFooterNav(_selectedIndex, footerNavCubit, _userRole)
+          ? createFooterNav(_selectedIndex, footerNavCubit, _userRole,)
           : const SizedBox(),
     );
   }
