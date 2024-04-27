@@ -4,7 +4,9 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/chat_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
@@ -14,12 +16,12 @@ import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatPage extends StatelessWidget {
   final UserCredential userCredential;
-  final DocumentReference? chatReference;
+  final DocumentReference? reference;
 
   const ChatPage({
     super.key,
     required this.userCredential,
-    required this.chatReference,
+    required this.reference,
   });
 
   @override
@@ -36,12 +38,12 @@ class ChatPage extends StatelessWidget {
           create: (context) => ChatsCubit(userCredential),
         ),
         BlocProvider(
-          create: (context) => ChatCubit(chatReference),
+          create: (context) => ChatCubit(reference),
         ),
       ],
       child: _ChatPageContent(
         userCredential: userCredential,
-        chatReference: chatReference,
+        reference: reference,
       ),
     );
   }
@@ -49,10 +51,10 @@ class ChatPage extends StatelessWidget {
 
 class _ChatPageContent extends StatefulWidget {
   final UserCredential userCredential;
-  final DocumentReference? chatReference;
+  final DocumentReference? reference;
 
   const _ChatPageContent(
-      {required this.userCredential, required this.chatReference});
+      {required this.userCredential, required this.reference});
 
   @override
   State<_ChatPageContent> createState() => _ChatPageState();
@@ -121,7 +123,7 @@ class _ChatPageState extends State<_ChatPageContent> {
       builder: (context, state) {
         ChatsData? chat = (state is ChatsLoaded)
             ? state.chats.firstWhere(
-                (element) => element?.chatReference == widget.chatReference)
+                (element) => element?.reference == widget.reference)
             : null;
         return Scaffold(
           appBar: AppBar(
@@ -167,6 +169,19 @@ class _ChatPageState extends State<_ChatPageContent> {
               }
             },
           ),
+          bottomNavigationBar: Row(children: [
+            Expanded(
+              child: TextField(
+                controller: _textEditingController,
+              ),
+            ),
+            Expanded(child: GreenElevatedButton(text: "Send", onPressed: (){
+              if (_textEditingController.text != "") {
+              context.read<ChatCubit>().sendMessage(_textEditingController.text , chat?.receiverData?['reference'], _userReference, chat!.reference);
+              _textEditingController.text = "";
+              }
+              },))
+          ],),
         );
       },
     );

@@ -1,6 +1,7 @@
 /// Creates a footer navigation bar
 library;
 
+import "package:cloud_firestore/cloud_firestore.dart";
 import "package:firebase_auth/firebase_auth.dart";
 import "package:flutter/material.dart";
 import "package:greenhouse_project/pages/chats.dart";
@@ -12,7 +13,7 @@ import "package:greenhouse_project/pages/tasks.dart";
 import "package:greenhouse_project/services/cubit/footer_nav_cubit.dart";
 
 void navigateToPage(BuildContext context, int index, String userRole,
-    UserCredential userCredential) {
+    UserCredential userCredential, {DocumentReference? userReference}) {
   switch (index) {
     case 0:
       userRole == "manager"
@@ -28,6 +29,7 @@ void navigateToPage(BuildContext context, int index, String userRole,
               MaterialPageRoute(
                   builder: (context) => TasksPage(
                         userCredential: userCredential,
+                        userReference: userReference!,
                       )),
               (route) => false);
       break;

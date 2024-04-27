@@ -29,14 +29,14 @@ class WorkerData {
   final DateTime creationDate;
   final String name;
   final String surname;
-  final DocumentReference workerReference;
+  final DocumentReference reference;
 
   WorkerData(
       {required this.email,
       required this.creationDate,
       required this.name,
       required this.surname,
-      required this.workerReference});
+      required this.reference});
 
   factory WorkerData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -45,6 +45,6 @@ class WorkerData {
         surname: data['surname'],
         email: data['email'],
         creationDate: (data['creationDate'] as Timestamp).toDate(),
-        workerReference: doc.reference);
+        reference: doc.reference);
   }
 }

@@ -10,20 +10,13 @@ class TaskCubit extends Cubit<TaskState> {
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
 
-  final UserCredential? user;
+  final DocumentReference userReference;
 
-  TaskCubit(this.user) : super(TaskLoading()) {
-    if (user != null) {
-      _getTasks();
+  TaskCubit(this.userReference) : super(TaskLoading()) {
+        _getTasks();
     }
-  }
 
   void _getTasks() async {
-    QuerySnapshot userQuery = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: user?.user?.email)
-        .get();
-    DocumentReference userReference = userQuery.docs.first.reference;
     DocumentSnapshot userSnapshot = await userReference.get();
     Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
 

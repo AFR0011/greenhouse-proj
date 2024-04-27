@@ -99,7 +99,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   Widget build(BuildContext context) {
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential);
+        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
       },
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
