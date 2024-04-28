@@ -65,7 +65,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
 
   // Controller for input text field
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _equipmentController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordConfirmController =
       TextEditingController();
@@ -73,7 +73,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   @override
   void dispose() {
     _emailController.dispose();
-    _nameController.dispose();
+    _equipmentController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
@@ -117,7 +117,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
         if (state is ProfileLoading) {
           return const CircularProgressIndicator();
         } else if (state is ProfileLoaded) {
-          _nameController.text = state.userData['name'];
+          _equipmentController.text = state.userData['name'];
           _emailController.text = state.userData['email'];
           _passwordController.text = '****';
 
@@ -215,7 +215,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           return Column(
             children: [
               TextField(
-                controller: _nameController,
+                controller: _equipmentController,
                 decoration: InputDecoration(
                     errorText: state[0]
                         ? ""
@@ -239,7 +239,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                       text: "Submit",
                       onPressed: () {
                         List<bool> validation = [true, true, true];
-                        if (_nameController.text.length < 4) {
+                        if (_equipmentController.text.length < 4) {
                           validation[0] = !validation[0];
                         }
                         if (!_emailController.text
@@ -291,7 +291,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                                                       .read<UserInfoCubit>()
                                                       .setUserInfo(
                                                           _userReference,
-                                                          _nameController.text,
+                                                          _equipmentController.text,
                                                           _emailController.text,
                                                           _passwordController
                                                               .text);

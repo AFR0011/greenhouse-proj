@@ -25,10 +25,3 @@ final class EquipmentLoaded extends GreenhouseState {
   EquipmentLoaded(this.equipment);
 }
 
-final class ProgramsLoading extends GreenhouseState {}
-
-final class ProgramsLoaded extends GreenhouseState {
-  final List<ProgramData> programs;
-
-  ProgramsLoaded(this.programs);
-}
