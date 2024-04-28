@@ -15,7 +15,7 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ProfilePage extends StatelessWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
   final DocumentReference userReference;
 
   const ProfilePage(
@@ -44,7 +44,7 @@ class ProfilePage extends StatelessWidget {
 }
 
 class _ProfilePageContent extends StatefulWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
   final DocumentReference userReference;
 
   const _ProfilePageContent(
@@ -291,7 +291,8 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                                                       .read<UserInfoCubit>()
                                                       .setUserInfo(
                                                           _userReference,
-                                                          _equipmentController.text,
+                                                          _equipmentController
+                                                              .text,
                                                           _emailController.text,
                                                           _passwordController
                                                               .text);

@@ -1,7 +1,8 @@
 /// Chat Page - allows communication between 2 users
+///
 /// TODO:
 /// - Refresh messages for receiver after sending a message
-/// - Check cubit usage (129-200?)
+/// - Check cubit usage (lines 129-200?)
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,7 +16,7 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatPage extends StatelessWidget {
-  final UserCredential userCredential; // User auth credentials
+  final UserCredential userCredential; //User auth credentials
   final DocumentReference? chatReference; // Chat database reference
 
   const ChatPage({
@@ -51,7 +52,8 @@ class ChatPage extends StatelessWidget {
 }
 
 class _ChatPageContent extends StatefulWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential
+      userCredential; //User auth credentials //User auth credentials
   final DocumentReference? chatReference; //Chat database reference
 
   const _ChatPageContent(
@@ -187,9 +189,9 @@ class _ChatPageState extends State<_ChatPageContent> {
                 return const Text("Something went wrong...");
               }
               // If the state is not any of the predefined states;
-              // never happens; but, you never know
+              // never happen; but, anything can happen
               else {
-                return const Text("Unexpected state!");
+                return const Center(child: Text('Unexpected State'));
               }
             },
           ),

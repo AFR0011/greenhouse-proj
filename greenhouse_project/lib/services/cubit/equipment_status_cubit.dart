@@ -9,10 +9,10 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
       FirebaseFirestore.instance.collection('equipment');
 
   EquipmentStatusCubit() : super(StatusLoading()) {
-    _fetchEquipmentStaus();
+    _getEquipmentStatus();
   }
 
-  _fetchEquipmentStaus() {
+  _getEquipmentStatus() {
     equipment
         .orderBy('status', descending: true)
         .snapshots()
@@ -26,7 +26,7 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
     });
   }
 
-  void switchStatus(DocumentReference reference, bool currentStatus) async {
+  void toggleStatus(DocumentReference reference, bool currentStatus) async {
     reference.update({'status': !currentStatus});
   }
 }

@@ -1,3 +1,10 @@
+/// Inventory page - CRUD for inventory items
+///
+/// TODO:
+/// -
+///
+library;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +21,13 @@ import 'package:greenhouse_project/utils/theme.dart';
 import 'package:list_utilities/list_utilities.dart';
 
 class InventoryPage extends StatelessWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const InventoryPage({super.key, required this.userCredential});
 
   @override
   Widget build(BuildContext context) {
+    // Provide Cubits for state management
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -41,7 +49,7 @@ class InventoryPage extends StatelessWidget {
 }
 
 class _InventoryPageContent extends StatefulWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const _InventoryPageContent({required this.userCredential});
 
@@ -49,14 +57,17 @@ class _InventoryPageContent extends StatefulWidget {
   State<_InventoryPageContent> createState() => _InventoryPageState();
 }
 
+// Main page content goes here
 class _InventoryPageState extends State<_InventoryPageContent> {
   // User info
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
+
   // Custom theme
   final ThemeData customTheme = theme;
-  // Text Controllers
+
+  // Text controllers
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _equipmentController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
@@ -65,7 +76,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   // Index of footer nav selection
   final int _selectedIndex = 1;
 
-  // Dispose of controllers for performance
+  // Dispose (destructor)
   @override
   void dispose() {
     _textController.dispose();
@@ -84,12 +95,14 @@ class _InventoryPageState extends State<_InventoryPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    // If footer nav is updated, handle navigation
+    // BlocListener for handling footer nav events
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
         navigateToPage(context, state, _userRole, widget.userCredential,
             userReference: _userReference);
       },
+
+      // BlocBuilder for user info
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
         builder: (context, state) {
@@ -112,7 +125,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           }
-          // Should never happen; but, you never know
+          // If somehow state doesn't match predefined states;
+          // never happens; but, anything can happen
           else {
             return const Center(
               child: Text('Unexpected state'),
@@ -123,20 +137,30 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     );
   }
 
+  // Main page content
   Widget _buildInventoryPage() {
-    // Footer nav state
+    // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
+    // Page content
     return Scaffold(
+      // Main appbar (header)
       appBar: createMainAppBar(context, widget.userCredential, _userReference),
+
+      // Scrollable list of items
       body: SingleChildScrollView(
+        // BlocBuilder for inventory items
         child: BlocBuilder<InventoryCubit, InventoryState>(
             builder: (context, state) {
+          // Show "loading screen" if processing equipment state
           if (state is InventoryLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state is InventoryLoaded) {
+          }
+          // Show inventory items once inventory state is loaded
+          else if (state is InventoryLoaded) {
+            // Separate pending and actual inventory items
             List<InventoryData> inventoryList = state.inventory;
             List actualInventory = inventoryList.map((e) {
               if (!e.isPending) return e;
@@ -147,25 +171,35 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             }).toList();
             pendingInventory.removeNull();
 
+            // Function call to create inventory list
             return _createInventoryList(
                 actualInventory, pendingInventory, context);
-          } else if (state is InventoryError) {
+          }
+          // Show error message once an error occurs
+          else if (state is InventoryError) {
             print(state.error.toString());
             return Text(state.error.toString());
-          } else {
+          }
+          // If the state is not any of the predefined states;
+          // never happen; but, anything can happen
+          else {
             return const Text("Something went wrong...");
           }
         }),
       ),
+
+      // Footer nav bar
       bottomNavigationBar:
           createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );
   }
 
+  // Create inventory list function
   Widget _createInventoryList(
       List actualInventory, List pendingInventory, BuildContext context) {
     return Column(
       children: [
+        // Main inventory items
         const Text("Inventory", style: subheadingTextStyle),
         SizedBox(
           height: MediaQuery.of(context).size.height / 3,
@@ -177,6 +211,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
               return ListTile(
                 title: Text(inventory.name),
                 subtitle: Text(inventory.timeAdded.toString()),
+
+                // Buttons for edit and deleting items
                 trailing: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Row(
@@ -199,6 +235,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             },
           ),
         ),
+
+        // Pending inventory item updates
         const Text("Pending Updates", style: subheadingTextStyle),
         SizedBox(
           height: MediaQuery.of(context).size.height / 3,
@@ -215,10 +253,14 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             },
           ),
         ),
+
+        // Add item button
         Row(
           children: [
             GreenElevatedButton(
                 text: "Add Item",
+
+                // Display addition form
                 onPressed: () {
                   _showAdditionForm(context);
                 })
@@ -228,8 +270,12 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     );
   }
 
+  // Item addition form function
   void _showAdditionForm(BuildContext context) {
+    // Get instance of inventory cubit from main context
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
+
+    // Display item addition form
     showDialog(
         context: context,
         builder: (context) {
@@ -249,6 +295,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     FilteringTextInputFormatter.digitsOnly
                   ],
                 ),
+
+                // Submit and cancel buttons
                 Row(
                   children: [
                     GreenElevatedButton(
@@ -286,16 +334,22 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         });
   }
 
+  // Item edit form function
   void _showEditForm(BuildContext context, InventoryData inventory) {
+    // Get instance of inventory cubit from main context
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
+
     showDialog(
         context: context,
         builder: (context) {
+          // Set controller values to current item values
           _equipmentController.text = inventory.name;
           _descController.text = inventory.description;
           _amountController.text = inventory.amount.toString();
+
           return Dialog(
             child: Column(
+              // Textfields
               children: [
                 TextField(
                   controller: _equipmentController,
@@ -310,6 +364,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     FilteringTextInputFormatter.digitsOnly
                   ],
                 ),
+                // Submit and Cancel buttons
                 Row(
                   children: [
                     GreenElevatedButton(
@@ -348,6 +403,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         });
   }
 
+  // Create item deletion form function
   void _showDeleteForm(BuildContext context, InventoryData inventory) {
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
     showDialog(
@@ -356,7 +412,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           return Dialog(
             child: Column(
               children: [
-                Text("Are you Sure!!!"),
+                const Text("Are you Sure?"),
                 Row(
                   children: [
                     GreenElevatedButton(

@@ -11,10 +11,11 @@ import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class TasksPage extends StatelessWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
   final DocumentReference? userReference;
 
-  const TasksPage({super.key, required this.userCredential, required this.userReference});
+  const TasksPage(
+      {super.key, required this.userCredential, required this.userReference});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,7 @@ class TasksPage extends StatelessWidget {
 }
 
 class _TasksPageContent extends StatefulWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const _TasksPageContent({required this.userCredential});
 
@@ -52,7 +53,7 @@ class _TasksPageState extends State<_TasksPageContent> {
   late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
-  // Text Controllers
+  // Text controllers
   final TextEditingController _textController = TextEditingController();
   // Index of footer nav selection
   final int _selectedIndex = 0;
@@ -71,10 +72,13 @@ class _TasksPageState extends State<_TasksPageContent> {
 
   @override
   Widget build(BuildContext context) {
+    // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+    // BlocListener for handling footer nav events
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
+        navigateToPage(context, state, _userRole, widget.userCredential,
+            userReference: _userReference);
       },
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
@@ -103,6 +107,7 @@ class _TasksPageState extends State<_TasksPageContent> {
   }
 
   Widget _createTasks(String _userRole) {
+    // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return Scaffold(
       appBar: _userRole == "worker"
@@ -126,7 +131,7 @@ class _TasksPageState extends State<_TasksPageContent> {
               textAlign: TextAlign.left,
             ),
           ),
-          // Use BlocBuilder for notifications
+          // BlocBuilder for notifications
           BlocBuilder<TaskCubit, TaskState>(
             builder: (context, state) {
               if (state is TaskLoading) {
@@ -205,7 +210,9 @@ class _TasksPageState extends State<_TasksPageContent> {
               } else if (state is TaskError) {
                 print(state.error.toString());
                 return Center(child: Text(state.error.toString()));
-              } else {
+              } // If the state is not any of the predefined states;
+              // never happen; but, anything can happen
+              else {
                 return const Center(child: Text('Unexpected State'));
               }
             },
@@ -213,7 +220,11 @@ class _TasksPageState extends State<_TasksPageContent> {
         ],
       ),
       bottomNavigationBar: _userRole == "worker"
-          ? createFooterNav(_selectedIndex, footerNavCubit, _userRole,)
+          ? createFooterNav(
+              _selectedIndex,
+              footerNavCubit,
+              _userRole,
+            )
           : const SizedBox(),
     );
   }
