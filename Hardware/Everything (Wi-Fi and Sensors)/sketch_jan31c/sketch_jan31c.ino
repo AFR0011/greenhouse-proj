@@ -20,10 +20,10 @@
 
 // Insert Authorized Email and Corresponding Password
 #define USER_EMAIL "admin@admin.com"
-#define USER_PASSWORD 123456
+#define USER_PASSWORD 12345678
 
 // Insert RTDB URLefine the RTDB URL
-#define DATABASE_URL "https://wifi-arduino-test-58c55-default-rtdb.europe-west1.firebasedatabase.app/readings/temperature"
+#define DATABASE_URL "https://greenhouse-ctrl-system-default-rtdb.europe-west1.firebasedatabase.app/"
 
 // Define Firebase objects
 FirebaseData fbdo;
@@ -108,9 +108,9 @@ unsigned long getTime() { // Get current epoch time
 
 
 // Equipment control functions 
-void pumpTurnOn(float pwm){
-  digitalWrite(smIn1, HIGH);
-  digitalWrite(smIn2, LOW);
+void pumpToggle(float pwm, int status){
+  digitalWrite(smIn1, status);
+  digitalWrite(smIn2, !status);
   analogWrite(l298Ena, pwm);
   delay(500);
 }
@@ -141,12 +141,15 @@ void buzzerTurnOff() {
 }
 
 void soilMoistureCondition(limit, condition, soilMoisture) {
-  if (condition == "lower") {
-    if (soilMoisture > limit) {
-      turnPumpOn();
+  if (condition == 1) {
+    if (soilMoisture < limit) {
+      action
     }
   }
 }
+
+
+if (soilMositure ">50")
 
 void setup() {
   // Set pin modes
@@ -195,7 +198,7 @@ void setup() {
   uid = auth.token.uid.c_str();
 
   // Update database path
-  databasePath = "/readings"
+  databasePath = getTime() + "/";
 
   // Begin DHT
   dht.begin();
@@ -203,6 +206,14 @@ void setup() {
   // Begin serial monitoring
   Serial.begin(9600);
 }
+
+class Program {       
+  public:
+  int action;
+  int limit;
+  string equipment;
+  int condition;
+};
 
 void loop() {
   
@@ -229,11 +240,12 @@ void loop() {
   timestamp = getTime();
 
   // Define parent path
-  parentPath = databasePath + "/" + timestamp;
+  parentPath = databasePath + boardNo + "/readings";
+  // 12345678/1/readings
 
   // Set child paths
-  String tempDataPath = parentPath + tempPath;
-  String humDataPath = parentPath + humPath;
+  String tempDataPath = parentPath + tempPath; // 12345678/1/readings/temperature
+  String humDataPath = parentPath + humPath; 
   String intrDataPath = parentPath + intrPath;
   String gasDataPath = parentPath + gasPath;
   String phcDataPath = parentPath + phcPath;
@@ -250,16 +262,92 @@ void loop() {
   Firebase.setInt(fbdo, presDataPath, json.getInt("gas"));
   Firebase.setInt(fbdo, timeDataPath, timestamp);
 
-  // Handle errors, if any
+
+ /* // Handle errors, if any
   if (Firebase.failed()) {
     Serial.print("Error sending data to Firebase: ");
     Serial.println(Firebase.error());
   } else {
+    // SEND API REQUEST
+
     Serial.println("Data sent to Firebase successfully!");
   }
+*/if (!Firebase.failed()) {
+  // SEND API REQUEST
+  // Prepare your Firestore API request here
+  
+  // For example, to send a POST request to add a document to a Firestore collection:
+  // Replace "your-project-id" with your actual project ID
+  // Replace "your-collection" with the name of your Firestore collection
+  // Replace "your-auth-token" with your Firebase authentication token
+  
+  String request = '{ "readings": {"gas": ' + gas + ', "temperature": ' + temperature + ', "humidity": ' + humidity + ', "intruder": ' + intruder + ', "lightIntensity": ' + lightintensity + ', "soilMoisture": ' + soilMoisture + ', "timestamp": ' + timestamp + '} }';
 
-  // GET "CONDITIONS" AND "ACTIONS"
+  Firebase.stream()
+          .setToken("your-auth-token")
+          .setProjectId("your-project-id")
+          .addContentType(FIREBASE_JSON)
+          .addHeader("X-HTTP-Method-Override: POST")
+          .send("POST", "/v1/projects/your-project-id/databases/(default)/documents/your-collection", request);
 
+  if (Firebase.success()) {
+    Serial.println("API request sent to Firestore successfully!");
+    Serial.print("Response code: ");
+    Serial.println(Firebase.httpCode());
+    Serial.print("Response: ");
+    Serial.println(Firebase.responseString());
+  } else {
+    Serial.print("Error sending API request to Firestore: ");
+    Serial.println(Firebase.error());
+  }
+} else {
+  Serial.print("Error sending data to Firebase: ");
+  Serial.println(Firebase.error());
+}
+
+    
+
+
+
+  Program program1;
+  program1.action = 0;
+  program1.equipment = "pump";
+  program1.limit = 50;
+  program1.condition = 2;
+
+
+  Program programs[] = {program1};
+  programsLength = 1;
+  
+  for (int i = 0; i < programsLength; i++) {
+    currProgram = programs[i];
+    switch (currProgram.equipment) {
+      case "pump":
+      switch(currProgram.condition) {
+        case 1:
+          if (soilMoisture > currProgram.limit) {
+            pumpToggle(1023, currProgram.action);
+          }
+        break;
+        case 2:
+          if (soilMoisture < currProgram.limit) {
+            pumpToggle(1023, currProgram.action);
+          }
+        break;
+        case 3:
+          if (soilMoisture == currProgram.limit) {
+            pumpToggle(1023, currProgram.action);
+          }
+        break;
+      }
+      break;
+      case "fan":
+      break;
+      case "lamp":
+      break;
+
+    }
+  }
   // CALL FUNCTIONS BASED ON THOSE
 
 }

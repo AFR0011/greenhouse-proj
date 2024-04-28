@@ -87,7 +87,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     // If footer nav is updated, handle navigation
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
+        navigateToPage(context, state, _userRole, widget.userCredential,
+            userReference: _userReference);
       },
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},

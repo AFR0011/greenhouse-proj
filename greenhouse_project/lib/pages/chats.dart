@@ -1,4 +1,6 @@
-/// Display chats properly (with username etc.)
+/// Chats Page - all chats associated with the user
+/// TODO:
+/// - Display chats properly (with username etc.)
 ///
 library;
 
@@ -15,12 +17,13 @@ import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatsPage extends StatelessWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; // User auth credentials
 
   const ChatsPage({super.key, required this.userCredential});
 
   @override
   Widget build(BuildContext context) {
+    // Provide Cubits for state management
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -42,7 +45,7 @@ class ChatsPage extends StatelessWidget {
 }
 
 class _ChatsPageContent extends StatefulWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const _ChatsPageContent({required this.userCredential});
 
@@ -50,26 +53,26 @@ class _ChatsPageContent extends StatefulWidget {
   State<_ChatsPageContent> createState() => _ChatsPageState();
 }
 
+// Main page content goes here
 class _ChatsPageState extends State<_ChatsPageContent> {
-  // User info
+  // User info local variables
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
+
   // Custom theme
   final ThemeData customTheme = theme;
-  // Text Controllers
-  final TextEditingController _textController = TextEditingController();
+
   // Index of footer nav selection
   final int _selectedIndex = 4;
 
-  // Dispose of controllers for performance
+  // Dispose (destructor)
   @override
   void dispose() {
-    _textController.dispose();
     super.dispose();
   }
 
-  // Init to get user info state
+  // InitState - get user info state to check authentication later
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
@@ -78,11 +81,13 @@ class _ChatsPageState extends State<_ChatsPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    // If footer nav state is updated, handle navigation
+    // BlocListener for handling footer nav events
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
+        navigateToPage(context, state, _userRole, widget.userCredential,
+            userReference: _userReference);
       },
+      // BlocBuilder for user info
       child: BlocBuilder<UserInfoCubit, HomeState>(
         builder: (context, state) {
           // Show "loading screen" if processing user info
@@ -93,18 +98,20 @@ class _ChatsPageState extends State<_ChatsPageContent> {
           }
           // Show page content once user info is loaded
           else if (state is UserInfoLoaded) {
-            // Assign user info
+            // Store user info in local variables
             _userRole = state.userRole;
             _userName = state.userName;
             _userReference = state.userReference;
 
+            // Call function to create chats page
             return Theme(data: customTheme, child: _createChatsPage());
           }
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           }
-          // Should never happen, but you never know
+          // If somehow state doesn't match predefined states;
+          // never happens; but, anything can happen
           else {
             return const Center(
               child: Text('Unexpected state'),
@@ -115,24 +122,38 @@ class _ChatsPageState extends State<_ChatsPageContent> {
     );
   }
 
+  // Create chats page function
   Widget _createChatsPage() {
+    // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+
+    // Page content
     return Scaffold(
+      //Main appbar (header)
       appBar: createMainAppBar(context, widget.userCredential, _userReference),
+
+      // BlocBuilder for chats cubit (all chats)
       body: BlocBuilder<ChatsCubit, ChatsState>(builder: (context, state) {
+        // Show "loading screen" if processing chat state
         if (state is ChatsLoading) {
           return const CircularProgressIndicator();
-        } else if (state is ChatsLoaded) {
-          List<ChatsData?> chatsList = state.chats;
+        }
+        // Show chat messages once chat state is loaded
+        else if (state is ChatsLoaded) {
+          List<ChatsData?> chatsList = state.chats; // chats list
+          // Display nothing if no chats
           if (chatsList.isEmpty) {
             return const Text("No chats...");
-          } else {
+          }
+          // Display chats
+          else {
             return ListView.builder(
               shrinkWrap: true,
               itemCount: chatsList.length,
               itemBuilder: (context, index) {
-                ChatsData? chat = chatsList[index];
+                ChatsData? chat = chatsList[index]; // chat data
                 Map<String, dynamic>? receiverData = chat?.receiverData;
+                // Navigate to chat page when chat is pressed
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -140,9 +161,10 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                         MaterialPageRoute(
                             builder: (context) => ChatPage(
                                   userCredential: widget.userCredential,
-                                  reference: chat?.reference,
+                                  chatReference: chat?.reference,
                                 )));
                   },
+                  // Display chat info
                   child: ListTile(
                     title: Text(
                         "${receiverData?['name']} ${receiverData?['surname']}"),
@@ -151,12 +173,18 @@ class _ChatsPageState extends State<_ChatsPageContent> {
               },
             );
           }
-        } else if (state is ChatsError) {
+        }
+        // Show error message once an error occurs
+        else if (state is ChatsError) {
           return const Text("Something went wrong...");
-        } else {
+        }
+        // If the state is not any of the predefined states;
+        // never happen; but, anything can happen
+        else {
           return const Text("Something went wrong...");
         }
       }),
+      // Footer nav bar
       bottomNavigationBar:
           createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );

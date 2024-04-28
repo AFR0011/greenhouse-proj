@@ -1,6 +1,5 @@
 /// TODO:
-/// - Separate cubits for plants and readings in plant_status
-///   They're sharing the same state, so can't show properly
+/// - 
 ///
 library;
 
