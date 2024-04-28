@@ -14,7 +14,7 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class WorkersPage extends StatelessWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const WorkersPage({super.key, required this.userCredential});
 
@@ -39,7 +39,7 @@ class WorkersPage extends StatelessWidget {
 }
 
 class _WorkersPageContent extends StatefulWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const _WorkersPageContent({required this.userCredential});
 
@@ -54,7 +54,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
   late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
-  // Text Controllers
+  // Text controllers
   final TextEditingController _textController = TextEditingController();
   // Index of footer nav selection
   final int _selectedIndex = 0;
@@ -73,10 +73,13 @@ class _WorkersPageState extends State<_WorkersPageContent> {
 
   @override
   Widget build(BuildContext context) {
+    // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+    // BlocListener for handling footer nav events
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
+        navigateToPage(context, state, _userRole, widget.userCredential,
+            userReference: _userReference);
       },
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
@@ -105,6 +108,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
   }
 
   Widget _createWorkers(String _userRole) {
+    // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     return Scaffold(
       appBar: AppBar(
@@ -126,7 +130,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
               textAlign: TextAlign.left,
             ),
           ),
-          // Use BlocBuilder for workers
+          // BlocBuilder for workers
           BlocBuilder<ManageWorkersCubit, ManagementState>(
             builder: (context, state) {
               if (state is ManageWorkersLoading) {
@@ -155,7 +159,16 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                     GreenElevatedButton(
                                         text: "Tasks",
                                         onPressed: () {
-                                          Navigator.push(context, MaterialPageRoute(builder: (context)=>TasksPage(userCredential: widget.userCredential, userReference: worker.reference,)));
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TasksPage(
+                                                        userCredential: widget
+                                                            .userCredential,
+                                                        userReference:
+                                                            worker.reference,
+                                                      )));
                                         }),
                                     GreenElevatedButton(
                                         text: "Show profile",
@@ -204,7 +217,9 @@ class _WorkersPageState extends State<_WorkersPageContent> {
               } else if (state is ManageWorkersError) {
                 print(state.error.toString());
                 return Center(child: Text(state.error.toString()));
-              } else {
+              } // If the state is not any of the predefined states;
+              // never happen; but, anything can happen
+              else {
                 return const Center(child: Text('Unexpected State'));
               }
             },

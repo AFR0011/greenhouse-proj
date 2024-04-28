@@ -1,4 +1,5 @@
 /// Equipment page - view and modify equipment status
+///
 /// TODO:
 /// - Change equipment status references to equipment
 ///
@@ -17,7 +18,8 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class EquipmentStatusPage extends StatelessWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential
+      userCredential; //User auth credentials //User auth credentials
 
   const EquipmentStatusPage({super.key, required this.userCredential});
 
@@ -48,7 +50,7 @@ class EquipmentStatusPage extends StatelessWidget {
 }
 
 class _EquipmentPageContent extends StatefulWidget {
-  final UserCredential userCredential; // User auth credentials
+  final UserCredential userCredential; //User auth credentials
 
   const _EquipmentPageContent({required this.userCredential});
 
@@ -134,40 +136,53 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                 child: Text("Equipment Status", style: headingTextStyle),
               ),
             ),
-            // Use BlocBuilder for Equipment Status
-            //STOPPED HERE!!!
+            // BlocBuilder for Equipment Status
             BlocBuilder<EquipmentStatusCubit, EquipmentStatusState>(
               builder: (context, state) {
+                // Show "loading screen" if processing equipment state
                 if (state is StatusLoading) {
                   return const Center(child: CircularProgressIndicator());
+                  // Show equipment status once equipment status state is loaded
                 } else if (state is StatusLoaded) {
-                  List<EquipmentStatus> equipmentList = state.status;
+                  List<EquipmentStatus> equipmentList =
+                      state.status; //equipment list
+                  // Display nothing if no equipment
                   if (equipmentList.isEmpty) {
                     return const Center(child: Text("No Equipments..."));
-                  } else {
+                  }
+                  // Display equipment
+                  else {
                     return ListView.builder(
                       shrinkWrap: true,
                       itemCount: equipmentList.length,
                       itemBuilder: (context, index) {
-                        EquipmentStatus equipment = equipmentList[index];
+                        EquipmentStatus equipment =
+                            equipmentList[index]; //equipment data
+                        // Display equipment info
                         return ListTile(
                           title: Text(equipment.type),
                           subtitle: Text(equipment.status.toString()),
+                          // Toggle equipment status
                           trailing: Switch(
                               value: equipment.status,
                               onChanged: (value) {
                                 context
                                     .read<EquipmentStatusCubit>()
-                                    .switchStatus(
+                                    .toggleStatus(
                                         equipment.reference, equipment.status);
                               }),
                         );
                       },
                     );
                   }
-                } else if (state is StatusError) {
+                }
+                // Show error message once an error occurs
+                else if (state is StatusError) {
                   return Center(child: Text('Error: ${state.error}'));
-                } else {
+                }
+                // If the state is not any of the predefined states;
+                // never happen; but, anything can happen
+                else {
                   return const Center(child: Text('Unexpected State'));
                 }
               },

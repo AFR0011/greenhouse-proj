@@ -14,7 +14,7 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ManagementPage extends StatelessWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const ManagementPage({super.key, required this.userCredential});
 
@@ -44,7 +44,7 @@ class ManagementPage extends StatelessWidget {
 }
 
 class _ManagementPageContent extends StatefulWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const _ManagementPageContent({required this.userCredential});
 
@@ -59,7 +59,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
   late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
-  // Text Controllers
+  // Text controllers
   final TextEditingController _textController = TextEditingController();
   // Index of footer nav selection
   final int _selectedIndex = 0;
@@ -80,9 +80,11 @@ class _ManagementPageState extends State<_ManagementPageContent> {
 
   @override
   Widget build(BuildContext context) {
+    // BlocListener for handling footer nav events
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
+        navigateToPage(context, state, _userRole, widget.userCredential,
+            userReference: _userReference);
       },
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
@@ -117,6 +119,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
   }
 
   Widget _buildManagementPage() {
+    // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
     return Scaffold(
@@ -128,7 +131,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
             padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
             child: Text("Management", style: headingTextStyle),
           )),
-          
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
             child: Row(
@@ -148,7 +150,9 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) => TasksPage(
-                                    userCredential: widget.userCredential, userReference: _userReference,)));
+                                      userCredential: widget.userCredential,
+                                      userReference: _userReference,
+                                    )));
                       }),
                 ),
               ],

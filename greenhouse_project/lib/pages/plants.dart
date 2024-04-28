@@ -1,5 +1,5 @@
 /// TODO:
-/// - 
+/// -
 ///
 library;
 
@@ -53,7 +53,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
   late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
-  // Text Controllers
+  // Text controllers
   final TextEditingController _textController = TextEditingController();
 
   @override
@@ -117,7 +117,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
               textAlign: TextAlign.left,
             ),
           ),
-          // Use BlocBuilder for plants
+          // BlocBuilder for plants
           BlocBuilder<PlantStatusCubit, PlantStatusState>(
             builder: (context, state) {
               if (state is PlantsLoading) {
@@ -148,7 +148,9 @@ class _PlantsPageState extends State<_PlantsPageContent> {
               } else if (state is PlantsError) {
                 print(state.error.toString());
                 return Center(child: Text(state.error.toString()));
-              } else {
+              } // If the state is not any of the predefined states;
+              // never happen; but, anything can happen
+              else {
                 return const Center(child: Text('Unexpected State'));
               }
             },
@@ -194,8 +196,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
       bloc: readingsCubit,
       builder: (context, state) {
         if (state is ReadingsLoading ||
-            [EquipmentLoaded, EquipmentLoading]
-                .contains(state)) {
+            [EquipmentLoaded, EquipmentLoading].contains(state)) {
           return const Center(
             child: CircularProgressIndicator(),
           );

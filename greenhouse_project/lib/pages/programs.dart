@@ -15,7 +15,7 @@ import 'package:greenhouse_project/utils/theme.dart';
 // import 'package:list_utilities/list_utilities.dart';
 
 class ProgramsPage extends StatelessWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const ProgramsPage({super.key, required this.userCredential});
 
@@ -42,7 +42,7 @@ class ProgramsPage extends StatelessWidget {
 }
 
 class _ProgramsPageContent extends StatefulWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const _ProgramsPageContent({required this.userCredential});
 
@@ -57,7 +57,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
   late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
-  // Text Controllers
+  // Text controllers
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _limitController = TextEditingController();
   //final TextEditingController _amountController = TextEditingController();

@@ -1,3 +1,10 @@
+/// Home page - notifications, welcome message, and search
+///
+/// TODO:
+/// - Add delete notification option (individual and all)
+///
+library;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,12 +17,13 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class HomePage extends StatelessWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const HomePage({super.key, required this.userCredential});
 
   @override
   Widget build(BuildContext context) {
+    // Provide Cubits for state management
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -34,7 +42,7 @@ class HomePage extends StatelessWidget {
 }
 
 class _EquipmentPageContent extends StatefulWidget {
-  final UserCredential userCredential;
+  final UserCredential userCredential; //User auth credentials
 
   const _EquipmentPageContent({required this.userCredential});
 
@@ -42,26 +50,30 @@ class _EquipmentPageContent extends StatefulWidget {
   State<_EquipmentPageContent> createState() => _EquipmentPageContentState();
 }
 
+// Main page content goes here
 class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // User info
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
+
   // Custom theme
   final ThemeData customTheme = theme;
-  // Controllers
-  final TextEditingController _textController = TextEditingController();
+
+// Text controllers
+  final TextEditingController _searchController = TextEditingController();
+
   // Index of footer nav selection
   final int _selectedIndex = 2;
 
-  // Dispose of controllers for performance
+  // Dispose (destructor)
   @override
   void dispose() {
-    _textController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
-  // Get user info state
+  // InitState - get user info state to check authentication later
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
@@ -70,28 +82,39 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
 
   @override
   Widget build(BuildContext context) {
+    // BlocListener for handling footer nav events
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
         navigateToPage(context, state, _userRole, widget.userCredential,
             userReference: _userReference);
       },
+      // BlocBuilder for user info
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
         builder: (context, state) {
+          // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state is UserInfoLoaded) {
-            // Assign user info
+          }
+          // Show content once user info is loaded
+          else if (state is UserInfoLoaded) {
+            // Assign user info to local variables
             _userRole = state.userRole;
             _userName = state.userName;
             _userReference = state.userReference;
 
-            return Theme(data: customTheme, child: _buildHomeView());
-          } else if (state is UserInfoError) {
+            // Call function to create home page
+            return Theme(data: customTheme, child: _createHomePage());
+          }
+          // Show error if there is an issues with user info
+          else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
-          } else {
+          }
+          // If somehow state doesn't match predefined states;
+          // never happens; but, anything can happen
+          else {
             return const Center(child: Text('Unexpected State'));
           }
         },
@@ -99,28 +122,40 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  Widget _buildHomeView() {
+  // Create greenhouse page function
+  Widget _createHomePage() {
+    // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+
+    // Page content
     return Scaffold(
+      // Main appbar (header)
       appBar: createMainAppBar(context, widget.userCredential, _userReference),
+
+      // Column for items
       body: Column(
         children: [
-          const SizedBox(height: 20),
-          Center(
-              child:
-                  Text("Welcome Back, $_userName!", style: headingTextStyle)),
-          const SizedBox(height: 20),
+          // Welcome message
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+            padding: const EdgeInsets.only(top: 20, bottom: 20),
+            child: Center(
+                child:
+                    Text("Welcome Back, $_userName!", style: headingTextStyle)),
+          ),
+
+          // Search field
+          Padding(
+            padding: const EdgeInsets.only(left: 10, right: 10, bottom: 40),
             child: TextField(
-              controller: _textController,
+              controller: _searchController,
               decoration: const InputDecoration(
                 icon: Icon(Icons.search, size: 24),
                 hintText: "Search...",
               ),
             ),
           ),
-          const SizedBox(height: 40),
+
+          // Notifications subheading
           SizedBox(
             width: MediaQuery.of(context).size.width - 20,
             child: const Text(
@@ -129,36 +164,53 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
               textAlign: TextAlign.left,
             ),
           ),
-          // Use BlocBuilder for notifications
+
+          // BlocBuilder for notifications
           BlocBuilder<NotificationsCubit, HomeState>(
             builder: (context, state) {
+              // Show "loading screen" if processing notification state
               if (state is NotificationsLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is NotificationsLoaded) {
-                List<NotificationData> notificationsList = state.notifications;
+              }
+              // Show equipment status once notification state is loaded
+              else if (state is NotificationsLoaded) {
+                List<NotificationData> notificationsList =
+                    state.notifications; // notifications list
+                // Display nothing if no notifications
                 if (notificationsList.isEmpty) {
                   return const Center(child: Text("No Notifications..."));
-                } else {
+                }
+                // Display notifications
+                else {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: notificationsList.length,
                     itemBuilder: (context, index) {
-                      NotificationData notification = notificationsList[index];
+                      NotificationData notification =
+                          notificationsList[index]; // notification data
+                      // Notification message
                       return ListTile(
                         title: Text(notification.message),
                       );
                     },
                   );
                 }
-              } else if (state is NotificationsError) {
+              }
+              // Show error message once an error occurs
+              else if (state is NotificationsError) {
                 return Center(child: Text('Error: ${state.errorMessage}'));
-              } else {
+              }
+              // If the state is not any of the predefined states;
+              // never happen; but, anything can happen
+              else {
                 return const Center(child: Text('Unexpected State'));
               }
             },
           ),
         ],
       ),
+
+      // Footer nav bar
       bottomNavigationBar:
           createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );

@@ -1,4 +1,5 @@
 /// Chats Page - all chats associated with the user
+///
 /// TODO:
 /// - Display chats properly (with username etc.)
 ///
@@ -17,7 +18,7 @@ import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatsPage extends StatelessWidget {
-  final UserCredential userCredential; // User auth credentials
+  final UserCredential userCredential; //User auth credentials
 
   const ChatsPage({super.key, required this.userCredential});
 
@@ -45,7 +46,8 @@ class ChatsPage extends StatelessWidget {
 }
 
 class _ChatsPageContent extends StatefulWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential
+      userCredential; //User auth credentials //User auth credentials
 
   const _ChatsPageContent({required this.userCredential});
 
