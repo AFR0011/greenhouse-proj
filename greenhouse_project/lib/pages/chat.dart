@@ -1,12 +1,12 @@
-/// Display chats properly (with username etc.)
-/// 
+/// Chat Page - allows communication between 2 users
+/// TODO:
+/// - Refresh messages for receiver after sending a message
+/// - Check cubit usage (129-200?)
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/chat_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
@@ -15,17 +15,18 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatPage extends StatelessWidget {
-  final UserCredential userCredential;
-  final DocumentReference? reference;
+  final UserCredential userCredential; // User auth credentials
+  final DocumentReference? chatReference; // Chat database reference
 
   const ChatPage({
     super.key,
     required this.userCredential,
-    required this.reference,
+    required this.chatReference,
   });
 
   @override
   Widget build(BuildContext context) {
+    // Provide Cubits for state management
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -38,46 +39,49 @@ class ChatPage extends StatelessWidget {
           create: (context) => ChatsCubit(userCredential),
         ),
         BlocProvider(
-          create: (context) => ChatCubit(reference),
+          create: (context) => ChatCubit(chatReference),
         ),
       ],
       child: _ChatPageContent(
         userCredential: userCredential,
-        reference: reference,
+        chatReference: chatReference,
       ),
     );
   }
 }
 
 class _ChatPageContent extends StatefulWidget {
-  final UserCredential userCredential;
-  final DocumentReference? reference;
+  final UserCredential userCredential; //User auth credentials
+  final DocumentReference? chatReference; //Chat database reference
 
   const _ChatPageContent(
-      {required this.userCredential, required this.reference});
+      {required this.userCredential, required this.chatReference});
 
   @override
   State<_ChatPageContent> createState() => _ChatPageState();
 }
 
+// Main page content goes here
 class _ChatPageState extends State<_ChatPageContent> {
-  // User info
+  // User info local variables
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
+
   // Custom theme
   final ThemeData customTheme = theme;
+
   // Text controller for sending messages
   final TextEditingController _textEditingController = TextEditingController();
 
-  // Dispose of controllers for performance
+  // Dispose (destructor)
   @override
   void dispose() {
     _textEditingController.dispose();
     super.dispose();
   }
 
-  // Init to get user info state
+  // InitState - get user info state to check authentication later
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
@@ -86,7 +90,7 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    // If footer nav state is updated, handle navigation
+    // BlocBuilder for user info
     return BlocBuilder<UserInfoCubit, HomeState>(
       builder: (context, state) {
         // Show "loading screen" if processing user info
@@ -95,20 +99,22 @@ class _ChatPageState extends State<_ChatPageContent> {
             child: CircularProgressIndicator(),
           );
         }
-        // Show page content once user info is loaded
+        // Initiate page creation once user info is loaded
         else if (state is UserInfoLoaded) {
-          // Assign user info
+          // Store user info in local variables
           _userRole = state.userRole;
           _userName = state.userName;
           _userReference = state.userReference;
 
+          // Call function to create chat page
           return Theme(data: customTheme, child: _createChatPage());
         }
-        // Show error if there is an issues with user info
+        // Show error if there are issues with user info
         else if (state is UserInfoError) {
           return Center(child: Text('Error: ${state.errorMessage}'));
         }
-        // Should never happen, but you never know
+        // If somehow state doesn't match predefined states;
+        // never happens; but, anything can happen
         else {
           return const Center(
             child: Text('Unexpected state'),
@@ -118,14 +124,18 @@ class _ChatPageState extends State<_ChatPageContent> {
     );
   }
 
+  // Create chat page function
   Widget _createChatPage() {
+    // BlocBuilder for chats cubit (all chats)
     return BlocBuilder<ChatsCubit, ChatsState>(
       builder: (context, state) {
+        // Get chat using the database reference, null if somehow no chat matches
         ChatsData? chat = (state is ChatsLoaded)
             ? state.chats.firstWhere(
-                (element) => element?.reference == widget.reference)
+                (element) => element?.reference == widget.chatReference)
             : null;
         return Scaffold(
+          // Appbar (header)
           appBar: AppBar(
               automaticallyImplyLeading: true,
               leading: IconButton(
@@ -134,25 +144,34 @@ class _ChatPageState extends State<_ChatPageContent> {
                   Navigator.pop(context);
                 },
               ),
+              // Username of other chat party
               title: Text(
                   "${chat?.receiverData?['name']} ${chat?.receiverData?['surname']}")),
+
+          // BlocBuilder for chat cubit (one chat)
           body: BlocBuilder<ChatCubit, ChatState>(
             builder: (context, state) {
+              // Show "loading screen" if processing chat state
               if (state is ChatLoading) {
                 return const CircularProgressIndicator();
-              } else if (state is ChatLoaded) {
-                List<MessageData?> messages = state.messages;
+              }
+              // Show chat messages once chat state is loaded
+              else if (state is ChatLoaded) {
+                List<MessageData?> messages = state.messages; // messages list
+                // Display nothing if no messages
                 if (messages.isEmpty) {
-                  return const Text("");
-                } else {
+                  return const Center(child: Text("Write your first message!"));
+                }
+                // Display messages
+                else {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
-                      MessageData? message = messages[index];
+                      MessageData? message = messages[index]; // message data
                       Alignment alignment = message?.receiver == _userReference
                           ? Alignment.centerLeft
-                          : Alignment.centerRight;
+                          : Alignment.centerRight; //align based on receiver
                       return ListTile(
                         title: Align(
                             alignment: alignment,
@@ -161,27 +180,45 @@ class _ChatPageState extends State<_ChatPageContent> {
                     },
                   );
                 }
-              } else if (state is ChatError) {
+              }
+              // Show error message once an error occurs
+              else if (state is ChatError) {
                 print(state.error.toString());
                 return const Text("Something went wrong...");
-              } else {
-                return const Text("Something went wrong...");
+              }
+              // If the state is not any of the predefined states;
+              // never happens; but, you never know
+              else {
+                return const Text("Unexpected state!");
               }
             },
           ),
-          bottomNavigationBar: Row(children: [
-            Expanded(
-              child: TextField(
-                controller: _textEditingController,
+
+          // Message input box
+          bottomNavigationBar: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _textEditingController,
+                ),
               ),
-            ),
-            Expanded(child: GreenElevatedButton(text: "Send", onPressed: (){
-              if (_textEditingController.text != "") {
-              context.read<ChatCubit>().sendMessage(_textEditingController.text , chat?.receiverData?['reference'], _userReference, chat!.reference);
-              _textEditingController.text = "";
-              }
-              },))
-          ],),
+              Expanded(
+                  child: GreenElevatedButton(
+                text: "Send",
+                // Send message and clear text controller
+                onPressed: () {
+                  if (_textEditingController.text != "") {
+                    context.read<ChatCubit>().sendMessage(
+                        _textEditingController.text,
+                        chat?.receiverData?['reference'],
+                        _userReference,
+                        chat!.reference);
+                    _textEditingController.text = "";
+                  }
+                },
+              ))
+            ],
+          ),
         );
       },
     );

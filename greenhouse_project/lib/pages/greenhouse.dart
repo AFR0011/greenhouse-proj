@@ -5,7 +5,7 @@
 library;
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greenhouse_project/pages/equipmentStatus.dart';
+import 'package:greenhouse_project/pages/equipment.dart';
 import 'package:greenhouse_project/pages/plants.dart';
 import 'package:greenhouse_project/pages/programs.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
@@ -101,7 +101,8 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   Widget build(BuildContext context) {
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
-        navigateToPage(context, state, _userRole, widget.userCredential, userReference: _userReference);
+        navigateToPage(context, state, _userRole, widget.userCredential,
+            userReference: _userReference);
       },
       child: BlocConsumer<UserInfoCubit, HomeState>(
         listener: (context, state) {},
@@ -184,7 +185,6 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
               }).toList(),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
             child: Row(
