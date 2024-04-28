@@ -58,7 +58,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   final ThemeData customTheme = theme;
   // Text Controllers
   final TextEditingController _textController = TextEditingController();
-  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _equipmentController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
 
@@ -69,7 +69,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   @override
   void dispose() {
     _textController.dispose();
-    _nameController.dispose();
+    _equipmentController.dispose();
     _descController.dispose();
     _amountController.dispose();
     super.dispose();
@@ -236,7 +236,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             child: Column(
               children: [
                 TextField(
-                  controller: _nameController,
+                  controller: _equipmentController,
                 ),
                 TextField(
                   controller: _descController,
@@ -256,12 +256,12 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                           Map<String, dynamic> data = {
                             "amount": num.parse(_amountController.text),
                             "description": _descController.text,
-                            "name": _nameController.text,
+                            "name": _equipmentController.text,
                             "timeAdded": DateTime.now(),
                             "pending": _userRole == 'manager' ? false : true,
                           };
                           await inventoryCubit.addInventory(data);
-                          _nameController.clear();
+                          _equipmentController.clear();
                           _descController.clear();
                           _amountController.clear();
                           Navigator.pop(context);
@@ -272,7 +272,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     GreenElevatedButton(
                         text: "Cancel",
                         onPressed: () {
-                          _nameController.clear();
+                          _equipmentController.clear();
                           _descController.clear();
                           _amountController.clear();
                           Navigator.pop(context);
@@ -290,14 +290,14 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     showDialog(
         context: context,
         builder: (context) {
-          _nameController.text = inventory.name;
+          _equipmentController.text = inventory.name;
           _descController.text = inventory.description;
           _amountController.text = inventory.amount.toString();
           return Dialog(
             child: Column(
               children: [
                 TextField(
-                  controller: _nameController,
+                  controller: _equipmentController,
                 ),
                 TextField(
                   controller: _descController,
@@ -317,13 +317,13 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                           Map<String, dynamic> data = {
                             "amount": num.parse(_amountController.text),
                             "description": _descController.text,
-                            "name": _nameController.text,
+                            "name": _equipmentController.text,
                             "timeAdded": DateTime.now(),
                             "pending": _userRole == 'manager' ? false : true,
                           };
                           await inventoryCubit.updateInventory(
                               inventory.reference, data);
-                          _nameController.clear();
+                          _equipmentController.clear();
                           _descController.clear();
                           _amountController.clear();
                           Navigator.pop(context);
@@ -334,7 +334,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     GreenElevatedButton(
                         text: "Cancel",
                         onPressed: () {
-                          _nameController.clear();
+                          _equipmentController.clear();
                           _descController.clear();
                           _amountController.clear();
                           Navigator.pop(context);

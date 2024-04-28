@@ -195,7 +195,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
       bloc: readingsCubit,
       builder: (context, state) {
         if (state is ReadingsLoading ||
-            [EquipmentLoaded, EquipmentLoading, ProgramsLoading, ProgramsLoaded]
+            [EquipmentLoaded, EquipmentLoading]
                 .contains(state)) {
           return const Center(
             child: CircularProgressIndicator(),

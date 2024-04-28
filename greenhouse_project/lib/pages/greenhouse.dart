@@ -7,6 +7,7 @@ library;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/equipmentStatus.dart';
 import 'package:greenhouse_project/pages/plants.dart';
+import 'package:greenhouse_project/pages/programs.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -44,9 +45,9 @@ class GreenhousePage extends StatelessWidget {
         BlocProvider(
           create: (context) => EquipmentCubit(),
         ),
-        BlocProvider(
-          create: (context) => ProgramsCubit(),
-        ),
+        // BlocProvider(
+        //   create: (context) => ProgramsCubit(),
+        // ),
       ],
       child: _GreenhousePageContent(userCredential: userCredential),
     );
@@ -199,7 +200,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
                   child: GreenElevatedButton(
                       text: "Details",
                       onPressed: () {
-                        // TO-DO: Navigate to active programs page
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ProgramsPage(userCredential: widget.userCredential)));
                       }),
                 ),
               ],
