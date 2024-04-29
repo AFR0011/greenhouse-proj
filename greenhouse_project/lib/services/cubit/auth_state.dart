@@ -6,7 +6,7 @@ sealed class AuthState {}
 final class AuthInitial extends AuthState {}
 
 final class AuthSuccess extends AuthState {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
   AuthSuccess(this.userCredential);
 }
 

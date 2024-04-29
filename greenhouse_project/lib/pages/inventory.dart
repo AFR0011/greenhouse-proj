@@ -1,7 +1,7 @@
 /// Inventory page - CRUD for inventory items
 ///
 /// TODO:
-/// -
+/// - Add form validation to delete, edit, and add operations
 ///
 library;
 
@@ -21,7 +21,7 @@ import 'package:greenhouse_project/utils/theme.dart';
 import 'package:list_utilities/list_utilities.dart';
 
 class InventoryPage extends StatelessWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const InventoryPage({super.key, required this.userCredential});
 
@@ -49,7 +49,7 @@ class InventoryPage extends StatelessWidget {
 }
 
 class _InventoryPageContent extends StatefulWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const _InventoryPageContent({required this.userCredential});
 
@@ -59,7 +59,7 @@ class _InventoryPageContent extends StatefulWidget {
 
 // Main page content goes here
 class _InventoryPageState extends State<_InventoryPageContent> {
-  // User info
+  // User info local variables
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
@@ -86,7 +86,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     super.dispose();
   }
 
-  // Init to get user info state
+  // InitState - get user info state to check authentication later
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
@@ -103,8 +103,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
       },
 
       // BlocBuilder for user info
-      child: BlocConsumer<UserInfoCubit, HomeState>(
-        listener: (context, state) {},
+      child: BlocBuilder<UserInfoCubit, HomeState>(
         builder: (context, state) {
           // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
@@ -113,14 +112,22 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             );
           }
           // Show content once user info is loaded
+          // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
-            // Assign user info
+            // Assign user info to local variables
             _userRole = state.userRole;
             _userName = state.userName;
             _userReference = state.userReference;
 
-            return Theme(data: customTheme, child: _buildInventoryPage());
+            // Call function to create inventory page
+            return Theme(data: customTheme, child: _createInventoryPage());
           }
+          // Show error if there is an issues with user info
+          else if (state is UserInfoError) {
+            return Center(child: Text('Error: ${state.errorMessage}'));
+          }
+          // If somehow state doesn't match predefined states;
+          // never happens; but, anything can happen
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
@@ -138,7 +145,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   }
 
   // Main page content
-  Widget _buildInventoryPage() {
+  Widget _createInventoryPage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
@@ -181,7 +188,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             return Text(state.error.toString());
           }
           // If the state is not any of the predefined states;
-          // never happen; but, anything can happen
+          // never happens; but, anything can happen
           else {
             return const Text("Something went wrong...");
           }
@@ -309,22 +316,23 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                             "timeAdded": DateTime.now(),
                             "pending": _userRole == 'manager' ? false : true,
                           };
-                          await inventoryCubit.addInventory(data);
-                          _equipmentController.clear();
-                          _descController.clear();
-                          _amountController.clear();
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Item added succesfully")));
+                          await inventoryCubit.addInventory(data).then((value) {
+                            Navigator.pop(context);
+                            _equipmentController.clear();
+                            _descController.clear();
+                            _amountController.clear();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Item added succesfully")));
+                          });
                         }),
                     GreenElevatedButton(
                         text: "Cancel",
                         onPressed: () {
+                          Navigator.pop(context);
                           _equipmentController.clear();
                           _descController.clear();
                           _amountController.clear();
-                          Navigator.pop(context);
                         })
                   ],
                 )
@@ -377,23 +385,25 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                             "timeAdded": DateTime.now(),
                             "pending": _userRole == 'manager' ? false : true,
                           };
-                          await inventoryCubit.updateInventory(
-                              inventory.reference, data);
-                          _equipmentController.clear();
-                          _descController.clear();
-                          _amountController.clear();
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Item Edited succesfully")));
+                          inventoryCubit
+                              .updateInventory(inventory.reference, data)
+                              .then((value) {
+                            Navigator.pop(context);
+                            _equipmentController.clear();
+                            _descController.clear();
+                            _amountController.clear();
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Item Edited succesfully")));
+                          });
                         }),
                     GreenElevatedButton(
                         text: "Cancel",
                         onPressed: () {
+                          Navigator.pop(context);
                           _equipmentController.clear();
                           _descController.clear();
                           _amountController.clear();
-                          Navigator.pop(context);
                         })
                   ],
                 )
@@ -418,12 +428,14 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     GreenElevatedButton(
                         text: "Submit",
                         onPressed: () async {
-                          await inventoryCubit
-                              .removeInventory(inventory.reference);
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Item Deleted succesfully")));
+                          inventoryCubit
+                              .removeInventory(inventory.reference)
+                              .then((value) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Item Deleted succesfully")));
+                          });
                         }),
                     GreenElevatedButton(
                         text: "Cancel",

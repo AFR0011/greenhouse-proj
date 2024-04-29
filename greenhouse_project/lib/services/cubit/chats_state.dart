@@ -14,7 +14,7 @@ final class ChatsLoaded extends ChatsState {
 }
 
 class ChatsError extends ChatsState {
-  final String errorMessage;
+  final String error;
 
-  ChatsError(this.errorMessage);
+  ChatsError(this.error);
 }

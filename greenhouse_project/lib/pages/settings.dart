@@ -1,3 +1,11 @@
+/// Settings page - program settings and preferences
+///
+/// TODO:
+/// - Add brightness mode toggle
+/// - Add notification preferences
+/// - Delegate signout function to AuthCubit
+library;
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:greenhouse_project/pages/login.dart';

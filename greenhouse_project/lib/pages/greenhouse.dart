@@ -27,7 +27,7 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class GreenhousePage extends StatelessWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const GreenhousePage({super.key, required this.userCredential});
 
@@ -55,7 +55,7 @@ class GreenhousePage extends StatelessWidget {
 }
 
 class _GreenhousePageContent extends StatefulWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const _GreenhousePageContent({required this.userCredential});
 
@@ -65,7 +65,7 @@ class _GreenhousePageContent extends StatefulWidget {
 
 // Main page content goes here
 class _GreenhousePageContentState extends State<_GreenhousePageContent> {
-  // User info
+  // User info local variables
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
@@ -106,6 +106,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
         navigateToPage(context, state, _userRole, widget.userCredential,
             userReference: _userReference);
       },
+
       // BlocBuilder for user info
       child: BlocBuilder<UserInfoCubit, HomeState>(
         builder: (context, state) {
@@ -115,6 +116,8 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
               child: CircularProgressIndicator(),
             );
           }
+
+          // Show content once user info is loaded
           // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables

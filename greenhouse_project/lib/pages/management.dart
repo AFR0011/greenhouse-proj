@@ -1,3 +1,10 @@
+/// Management page - links to subpages: workers and tasks
+///
+/// TODO:
+/// -
+///
+library;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,12 +21,13 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ManagementPage extends StatelessWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const ManagementPage({super.key, required this.userCredential});
 
   @override
   Widget build(BuildContext context) {
+    // Provide Cubits for state management
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -44,7 +52,7 @@ class ManagementPage extends StatelessWidget {
 }
 
 class _ManagementPageContent extends StatefulWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const _ManagementPageContent({required this.userCredential});
 
@@ -53,25 +61,28 @@ class _ManagementPageContent extends StatefulWidget {
 }
 
 class _ManagementPageState extends State<_ManagementPageContent> {
-  // User info
+  // User info local variables
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
+
   // Custom theme
   final ThemeData customTheme = theme;
+
   // Text controllers
   final TextEditingController _textController = TextEditingController();
+
   // Index of footer nav selection
   final int _selectedIndex = 0;
 
-  // Dispose of controllers for better performance
+  // Dispose (destructor)
   @override
   void dispose() {
     _textController.dispose();
     super.dispose();
   }
 
-  // Init to get user info state
+  // InitState - get user info state to check authentication later
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
@@ -86,8 +97,9 @@ class _ManagementPageState extends State<_ManagementPageContent> {
         navigateToPage(context, state, _userRole, widget.userCredential,
             userReference: _userReference);
       },
-      child: BlocConsumer<UserInfoCubit, HomeState>(
-        listener: (context, state) {},
+
+      // BlocBuilder for user info
+      child: BlocBuilder<UserInfoCubit, HomeState>(
         builder: (context, state) {
           // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
@@ -95,19 +107,30 @@ class _ManagementPageState extends State<_ManagementPageContent> {
               child: CircularProgressIndicator(),
             );
           }
+
+          // Show content once user info is loaded
           // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
-            // Assign user info
+            // Assign user info to local variables
             _userRole = state.userRole;
             _userName = state.userName;
             _userReference = state.userReference;
-            return Theme(data: customTheme, child: _buildManagementPage());
+
+            // Call function to create management page
+            return Theme(data: customTheme, child: _createManagementPage());
           }
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           }
-          // Should never happen; but, you never know
+          // If somehow state doesn't match predefined states;
+          // never happens; but, anything can happen
+          // Show error if there is an issues with user info
+          else if (state is UserInfoError) {
+            return Center(child: Text('Error: ${state.errorMessage}'));
+          }
+          // If somehow state doesn't match predefined states;
+          // never happens; but, anything can happen
           else {
             return const Center(
               child: Text('Unexpected state'),
@@ -118,19 +141,27 @@ class _ManagementPageState extends State<_ManagementPageContent> {
     );
   }
 
-  Widget _buildManagementPage() {
+  // Main page content
+  Widget _createManagementPage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
+    // Page content
     return Scaffold(
+      // Main appbar (header)
       appBar: createMainAppBar(context, widget.userCredential, _userReference),
+
+      // Scrollable list of items
       body: SingleChildScrollView(
         child: Column(children: [
+          // Heading text
           const Center(
               child: Padding(
             padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
             child: Text("Management", style: headingTextStyle),
           )),
+
+          // Tasks subsection
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
             child: Row(
@@ -158,27 +189,50 @@ class _ManagementPageState extends State<_ManagementPageContent> {
               ],
             ),
           ),
+          // BlocBuilder for tasks
           BlocBuilder<ManageTasksCubit, ManagementState>(
             builder: (context, state) {
+              // Show "loading screen" if processing manageTasks state
               if (state is ManageTasksLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is ManageTasksLoaded) {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: state.tasks.length,
-                  itemBuilder: (context, index) {
-                    TaskData task = state.tasks[index];
-                    return ListTile(
-                      title: Text(task.title),
-                      subtitle: Text(task.status),
-                    );
-                  },
-                );
-              } else {
+              }
+              // Show inventory items once manageTasks state is loaded
+              else if (state is ManageTasksLoaded) {
+                List<TaskData> tasksList = state.tasks;
+
+                // Display nothing if no tasks
+                if (tasksList.isEmpty) {
+                  return const Center(child: Text("No Tasks..."));
+                }
+                // List of tasks
+                else {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: state.tasks.length,
+                    itemBuilder: (context, index) {
+                      TaskData task = state.tasks[index];
+                      return ListTile(
+                        title: Text(task.title),
+                        subtitle: Text(task.status),
+                      );
+                    },
+                  );
+                }
+              }
+              // Show error message once an error occurs
+              else if (state is ManageTasksError) {
+                print(state.error.toString());
+                return Text(state.error.toString());
+              }
+              // If the state is not any of the predefined states;
+              // never happens; but, anything can happen
+              else {
                 return const Text("Something went wrong...");
               }
             },
           ),
+
+          // Workers subsection
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
             child: Row(
@@ -204,11 +258,16 @@ class _ManagementPageState extends State<_ManagementPageContent> {
               ],
             ),
           ),
+
+          // BlocBuilder for manageWorkers state
           BlocBuilder<ManageWorkersCubit, ManagementState>(
             builder: (context, state) {
+              // Show "loading screen" if processing manageWorkers state
               if (state is ManageWorkersLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is ManageWorkersLoaded) {
+              }
+              // Show workers once manageWorkers state is loaded
+              else if (state is ManageWorkersLoaded) {
                 return ListView.builder(
                   shrinkWrap: true,
                   itemCount: state.workers.length,
@@ -220,13 +279,23 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                     );
                   },
                 );
-              } else {
+              }
+              // Show error message once an error occurs
+              else if (state is ManageWorkersError) {
+                print(state.error.toString());
+                return Text(state.error.toString());
+              }
+              // If the state is not any of the predefined states;
+              // never happens; but, anything can happen
+              else {
                 return const Text("Something went wrong...");
               }
             },
           ),
         ]),
       ),
+
+      // Footer nav bar
       bottomNavigationBar:
           createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );

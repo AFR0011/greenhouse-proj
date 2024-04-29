@@ -1,26 +1,31 @@
+/// Programs page - CRUD for arduino-side programs
+///
+/// TODO:
+/// - Update code to submit relevant data (line 311-*)
+/// - Fix async context usage
+///
+library;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
-//import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
 import 'package:greenhouse_project/services/cubit/programs_cubit.dart';
 import 'package:greenhouse_project/services/cubit/program_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
-// import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
-// import 'package:list_utilities/list_utilities.dart';
 
 class ProgramsPage extends StatelessWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const ProgramsPage({super.key, required this.userCredential});
 
   @override
   Widget build(BuildContext context) {
+    // Provide Cubits for state management
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -32,9 +37,6 @@ class ProgramsPage extends StatelessWidget {
         BlocProvider(
           create: (context) => ProgramsCubit(),
         ),
-        BlocProvider(
-          create: (context) => ProgramEditCubit(),
-        )
       ],
       child: _ProgramsPageContent(userCredential: userCredential),
     );
@@ -42,7 +44,7 @@ class ProgramsPage extends StatelessWidget {
 }
 
 class _ProgramsPageContent extends StatefulWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const _ProgramsPageContent({required this.userCredential});
 
@@ -50,31 +52,29 @@ class _ProgramsPageContent extends StatefulWidget {
   State<_ProgramsPageContent> createState() => _ProgramsPageState();
 }
 
+// Main page content
 class _ProgramsPageState extends State<_ProgramsPageContent> {
-  // User info
+  // User info local variables
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
+
   // Custom theme
   final ThemeData customTheme = theme;
+
   // Text controllers
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _limitController = TextEditingController();
-  //final TextEditingController _amountController = TextEditingController();
 
-  // Index of footer nav selection
-  //final int _selectedIndex = 1;
-
-  // Dispose of controllers for performance
+  // Dispose (destructor)
   @override
   void dispose() {
     _limitController.dispose();
     _titleController.dispose();
-    //_amountController.dispose();
     super.dispose();
   }
 
-  // Init to get user info state
+  // InitState - get user info state to check authentication later
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
@@ -83,30 +83,30 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    // If footer nav is updated, handle navigation
-    return BlocConsumer<UserInfoCubit, HomeState>(
-      listener: (context, state) {},
+    // BlocBuilder for user info state
+    return BlocBuilder<UserInfoCubit, HomeState>(
       builder: (context, state) {
         // Show "loading screen" if processing user info
         if (state is UserInfoLoading) {
           return const Center(
             child: CircularProgressIndicator(),
           );
-        }
-        // Show content once user info is loaded
+        } // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
-          // Assign user info
+          // Assign user info to local variables
           _userRole = state.userRole;
           _userName = state.userName;
           _userReference = state.userReference;
 
-          return Theme(data: customTheme, child: _buildProgramsPage());
+          // Function call to create programs page
+          return Theme(data: customTheme, child: _createProgramsPage());
         }
         // Show error if there is an issues with user info
         else if (state is UserInfoError) {
           return Center(child: Text('Error: ${state.errorMessage}'));
         }
-        // Should never happen; but, you never know
+        // If somehow state doesn't match predefined states;
+        // never happens; but, anything can happen
         else {
           return const Center(
             child: Text('Unexpected state'),
@@ -116,11 +116,10 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
     );
   }
 
-  Widget _buildProgramsPage() {
-    // Footer nav state
-    //final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
-
+  // Function to create programs page
+  Widget _createProgramsPage() {
     return Scaffold(
+      // Appbar (header)
       appBar: AppBar(
         automaticallyImplyLeading: true,
         leading: IconButton(
@@ -130,37 +129,38 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
           },
         ),
       ),
+
+      // Blocbuilder for programs state
       body:
           BlocBuilder<ProgramsCubit, ProgramsState>(builder: (context, state) {
+        // Show "loading screen" if processing programs state
         if (state is ProgramsLoading) {
           return const Center(
             child: CircularProgressIndicator(),
           );
-        } else if (state is ProgramsLoaded) {
-          List<ProgramData> programsList = state.programs;
-          // List actualInventory = inventoryList.map((e) {
-          //   if (!e.isPending) return e;
-          // }).toList();
-          // actualInventory.removeNull();
-          // List pendingInventory = inventoryList.map((e) {
-          //   if (e.isPending) return e;
-          // }).toList();
-          // pendingInventory.removeNull();
-
-          return _createProgramsList(programsList, context);
-        } else if (state is ProgramError) {
-          print(state.error.toString());
-          return Text(state.error.toString());
-        } else {
-          return const Text("Something went wrong...");
+        }
+        // Show programs once programs state is loaded
+        else if (state is ProgramsLoaded) {
+          List<ProgramData> programsList = state.programs; // programs list
+          // Function call to create programs list
+          return _createProgramsList(programsList);
+        } // Show error if there is an issues with user info
+        else if (state is ProgramsError) {
+          return Center(child: Text('Error: ${state.error}'));
+        }
+        // If somehow state doesn't match predefined states;
+        // never happens; but, anything can happen
+        else {
+          return const Center(
+            child: Text('Unexpected state'),
+          );
         }
       }),
-      // bottomNavigationBar:
-      //     createFooterNav(_selectedIndex, footerNavCubit, _userRole),
     );
   }
 
-  Widget _createProgramsList(List programsList, BuildContext context) {
+  // Function call to create programs list
+  Widget _createProgramsList(List programsList) {
     return Column(
       children: [
         const Text("Programs", style: subheadingTextStyle),
@@ -170,7 +170,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
             shrinkWrap: true,
             itemCount: programsList.length,
             itemBuilder: (context, index) {
-              ProgramData program = programsList[index];
+              ProgramData program = programsList[index]; // program info
               return ListTile(
                 title: Text(program.title),
                 subtitle: Text(program.creationDate.toString()),
@@ -181,13 +181,13 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                         GreenElevatedButton(
                           text: "Edit",
                           onPressed: () {
-                            _showEditForm(context, program);
+                            _showEditForm(program);
                           },
                         ),
                         GreenElevatedButton(
                           text: "Delete",
                           onPressed: () {
-                            _showDeleteForm(context, program);
+                            _showDeleteForm(program);
                           },
                         ),
                       ],
@@ -196,28 +196,12 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
             },
           ),
         ),
-        // const Text("Pending Updates", style: subheadingTextStyle),
-        // SizedBox(
-        //   height: MediaQuery.of(context).size.height / 3,
-        //   child: ListView.builder(
-        //     shrinkWrap: true,
-        //     itemCount: pendingInventory.length,
-        //     itemBuilder: (context, index) {
-        //       InventoryData inventory = pendingInventory[index];
-        //       return ListTile(
-        //         title: Text(inventory.name),
-        //         subtitle: Text(inventory.timeAdded.toString()),
-        //         trailing: Text(inventory.amount.toString()),
-        //       );
-        //     },
-        //   ),
-        // ),
         Row(
           children: [
             GreenElevatedButton(
                 text: "Create program",
                 onPressed: () {
-                  _showAdditionForm(context);
+                  _showAdditionForm();
                 })
           ],
         )
@@ -225,10 +209,10 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
     );
   }
 
-  void _showAdditionForm(BuildContext context) {
+  // Function to show program creation form
+  void _showAdditionForm() {
+    // Get instances of programs cubit from main context
     ProgramsCubit programsCubit = BlocProvider.of<ProgramsCubit>(context);
-    ProgramEditCubit programEditCubit =
-        BlocProvider.of<ProgramEditCubit>(context);
 
     showDialog(
         context: context,
@@ -240,90 +224,89 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                 TextField(
                   controller: _titleController,
                 ),
-
-                // TextFormField(
-                //   controller: _limitController,
-                //   keyboardType: TextInputType.number,
-                //   inputFormatters: <TextInputFormatter>[
-                //     FilteringTextInputFormatter.digitsOnly
-                //   ],
-                //   onChanged: (value) {
-                //     if (value <)
-                //   },
-                // ),
-                BlocBuilder<ProgramEditCubit, List<String>>(
-                  bloc: programEditCubit,
-                  builder: (context, state) {
-                    List<String> dropdownValues = state;
-                    return Column(
-                      children: [
-                        Slider(
-                            value: double.parse(_limitController.text),
-                            onChanged: (value) {
-                              _limitController.text = value.toString();
-                              programEditCubit.updateDropdown(dropdownValues);
-                            }),
-                        DropdownButton(
-                            value: dropdownValues[0] != ""
-                                ? dropdownValues[0]
-                                : null,
-                            items: const [
-                              DropdownMenuItem(
-                                child: Text('fan'),
-                                value: 'fan',
-                              ),
-                              DropdownMenuItem(
-                                child: Text('pump'),
-                                value: 'pump',
-                              ),
-                              DropdownMenuItem(
-                                child: Text('light'),
-                                value: 'light',
-                              ),
-                            ],
-                            onChanged: (selection) {
-                              dropdownValues[0] = selection!;
-                              programEditCubit.updateDropdown(dropdownValues);
-                            }),
-                        DropdownButton(
-                            value: dropdownValues[1] != ""
-                                ? dropdownValues[1]
-                                : null,
-                            items: const [
-                              DropdownMenuItem(
-                                child: Text('off'),
-                                value: 'off',
-                              ),
-                              DropdownMenuItem(
-                                child: Text('on'),
-                                value: 'on',
-                              ),
-                            ],
-                            onChanged: (selection) {
-                              dropdownValues[1] = selection!;
-                              programEditCubit.updateDropdown(dropdownValues);
-                            }),
-                        DropdownButton(
-                            value: dropdownValues[2] != ""
-                                ? dropdownValues[2]
-                                : null,
-                            items: const [
-                              DropdownMenuItem(
-                                child: Text('less than'),
-                                value: 'lt',
-                              ),
-                              DropdownMenuItem(
-                                child: Text('greater than'),
-                                value: 'gt',
-                              ),
-                            ],
-                            onChanged: (selection) {
-                              dropdownValues[2] = selection!;
-                              programEditCubit.updateDropdown(dropdownValues);
-                            }),
-                      ],
-                    );
-                  },
+                BlocProvider(
+                  create: (context) => ProgramEditCubit(),
+                  child: BlocBuilder<ProgramEditCubit, List<String>>(
+                    builder: (context, state) {
+                      List<String> dropdownValues = state;
+                      return Column(
+                        children: [
+                          Slider(
+                              value: double.parse(_limitController.text),
+                              onChanged: (value) {
+                                _limitController.text = value.toString();
+                                context
+                                    .read<ProgramEditCubit>()
+                                    .updateDropdown(dropdownValues);
+                              }),
+                          DropdownButton(
+                              value: dropdownValues[0] != ""
+                                  ? dropdownValues[0]
+                                  : null,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'fan',
+                                  child: Text('fan'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'pump',
+                                  child: Text('pump'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'light',
+                                  child: Text('light'),
+                                ),
+                              ],
+                              onChanged: (selection) {
+                                dropdownValues[0] = selection!;
+                                context
+                                    .read<ProgramEditCubit>()
+                                    .updateDropdown(dropdownValues);
+                              }),
+                          DropdownButton(
+                              value: dropdownValues[1] != ""
+                                  ? dropdownValues[1]
+                                  : null,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'off',
+                                  child: Text('off'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'on',
+                                  child: Text('on'),
+                                ),
+                              ],
+                              onChanged: (selection) {
+                                dropdownValues[1] = selection!;
+                                context
+                                    .read<ProgramEditCubit>()
+                                    .updateDropdown(dropdownValues);
+                              }),
+                          DropdownButton(
+                              value: dropdownValues[2] != ""
+                                  ? dropdownValues[2]
+                                  : null,
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'lt',
+                                  child: Text('less than'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'gt',
+                                  child: Text('greater than'),
+                                ),
+                              ],
+                              onChanged: (selection) {
+                                dropdownValues[2] = selection!;
+                                context
+                                    .read<ProgramEditCubit>()
+                                    .updateDropdown(dropdownValues);
+                              }),
+                        ],
+                      );
+                    },
+                  ),
                 ),
                 Row(
                   children: [
@@ -331,7 +314,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                         text: "Submit",
                         onPressed: () async {
                           Map<String, dynamic> data = {
-                            //"amount": num.parse(_amountController.text),
                             "description": _limitController.text,
                             "name": _titleController.text,
                             "timeAdded": DateTime.now(),
@@ -340,7 +322,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                           await programsCubit.addProgram(data);
                           _titleController.clear();
                           _limitController.clear();
-                          //_amountController.clear();
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -362,14 +343,15 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
         });
   }
 
-  void _showEditForm(BuildContext context, ProgramData program) {
+  void _showEditForm(ProgramData program) {
+    // Get instance of programs cubit from main context
     ProgramsCubit programsCubit = BlocProvider.of<ProgramsCubit>(context);
+
     showDialog(
         context: context,
         builder: (context) {
           _titleController.text = program.title;
           _limitController.text = program.creationDate.toString();
-          // _amountController.text = inventory.amount.toString();
           return Dialog(
             child: Column(
               children: [
@@ -380,7 +362,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                   controller: _limitController,
                 ),
                 TextFormField(
-                  //controller: _amountController,
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[
                     FilteringTextInputFormatter.digitsOnly
@@ -392,9 +373,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                         text: "Submit",
                         onPressed: () async {
                           Map<String, dynamic> data = {
-                            // "amount": num.parse(_amountController.text),
                             "title": _limitController.text,
-                            // "name": _titleController.text,
                             "creationDate": DateTime.now(),
                             "pending": _userRole == 'manager' ? false : true,
                           };
@@ -402,7 +381,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                               program.reference, data);
                           _titleController.clear();
                           _limitController.clear();
-                          //_amountController.clear();
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -413,7 +391,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                         onPressed: () {
                           _titleController.clear();
                           _limitController.clear();
-                          //_amountController.clear();
                           Navigator.pop(context);
                         })
                   ],
@@ -424,7 +401,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
         });
   }
 
-  void _showDeleteForm(BuildContext context, ProgramData program) {
+  void _showDeleteForm(ProgramData program) {
     ProgramsCubit programsCubit = BlocProvider.of<ProgramsCubit>(context);
     showDialog(
         context: context,
@@ -432,7 +409,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
           return Dialog(
             child: Column(
               children: [
-                Text("Are you Sure!!!"),
+                const Text("Are you Sure?"),
                 Row(
                   children: [
                     GreenElevatedButton(

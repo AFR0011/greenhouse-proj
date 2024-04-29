@@ -22,14 +22,15 @@ class ManageTasksCubit extends ManagementCubit {
         .get();
     DocumentReference userReference = userQuery.docs.first.reference;
 
-    tasks
-        .where("manager", isEqualTo: userReference)
-        .snapshots()
-        .listen((snapshot) {
+    tasks.where("manager", isEqualTo: userReference).snapshots().listen(
+        (snapshot) {
       final List<TaskData> tasks =
           snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
 
       emit(ManageTasksLoaded([...tasks]));
+    }, onError: (error) {
+      print(error.toString());
+      emit(ManageTasksError(error.toString()));
     });
   }
 }

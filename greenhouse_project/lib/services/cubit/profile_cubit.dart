@@ -16,9 +16,14 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   void _getUserProfile() async {
-    DocumentSnapshot? userSnapshot = await userReference?.get();
-    final userSnapshotData = userSnapshot?.data();
-    final userData = userSnapshotData as Map<String, dynamic>;
-    emit(ProfileLoaded(userData));
+    try {
+      DocumentSnapshot? userSnapshot = await userReference?.get();
+      final userSnapshotData = userSnapshot?.data();
+      final userData = userSnapshotData as Map<String, dynamic>;
+      emit(ProfileLoaded(userData));
+    } catch (error) {
+      print(error.toString());
+      emit(ProfileError(error.toString()));
+    }
   }
 }
