@@ -10,3 +10,9 @@ final class ProfileLoaded extends ProfileState {
 
   ProfileLoaded(this.userData);
 }
+
+final class ProfileError extends ProfileState {
+  String error;
+
+  ProfileError(this.error);
+}

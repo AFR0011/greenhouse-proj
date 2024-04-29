@@ -13,7 +13,6 @@ class InventoryCubit extends Cubit<InventoryState> {
   }
 
   void _getInventory() {
-    emit(InventoryLoading());
     inventory.snapshots().listen((snapshot) {
       final List<InventoryData> inventory =
           snapshot.docs.map((doc) => InventoryData.fromFirestore(doc)).toList();
@@ -24,7 +23,6 @@ class InventoryCubit extends Cubit<InventoryState> {
   }
 
   Future<void> addInventory(Map<String, dynamic> data) async {
-    emit(InventoryLoading());
     try {
       await inventory.add(data);
     } catch (error) {
@@ -32,22 +30,20 @@ class InventoryCubit extends Cubit<InventoryState> {
     }
   }
 
-  Future<void>  removeInventory(DocumentReference item) async {
-    emit(InventoryLoading());
+  Future<void> removeInventory(DocumentReference item) async {
     try {
       await item.delete();
-      _getInventory();
+      // _getInventory();
     } catch (error) {
       emit(InventoryError(error.toString()));
     }
   }
 
-  Future <void> updateInventory(
+  Future<void> updateInventory(
       DocumentReference item, Map<String, dynamic> data) async {
-    emit(InventoryLoading());
     try {
       await item.set(data, SetOptions(merge: true));
-      _getInventory();
+      // _getInventory();
     } catch (error) {
       emit(InventoryError(error.toString()));
     }

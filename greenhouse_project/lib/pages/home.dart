@@ -17,7 +17,7 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class HomePage extends StatelessWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const HomePage({super.key, required this.userCredential});
 
@@ -42,7 +42,7 @@ class HomePage extends StatelessWidget {
 }
 
 class _EquipmentPageContent extends StatefulWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const _EquipmentPageContent({required this.userCredential});
 
@@ -52,7 +52,7 @@ class _EquipmentPageContent extends StatefulWidget {
 
 // Main page content goes here
 class _EquipmentPageContentState extends State<_EquipmentPageContent> {
-  // User info
+  // User info local variables
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
@@ -89,8 +89,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             userReference: _userReference);
       },
       // BlocBuilder for user info
-      child: BlocConsumer<UserInfoCubit, HomeState>(
-        listener: (context, state) {},
+      child: BlocBuilder<UserInfoCubit, HomeState>(
         builder: (context, state) {
           // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
@@ -98,6 +97,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
               child: CircularProgressIndicator(),
             );
           }
+          // Show content once user info is loaded
           // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
@@ -201,7 +201,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                 return Center(child: Text('Error: ${state.errorMessage}'));
               }
               // If the state is not any of the predefined states;
-              // never happen; but, anything can happen
+              // never happens; but, anything can happen
               else {
                 return const Center(child: Text('Unexpected State'));
               }

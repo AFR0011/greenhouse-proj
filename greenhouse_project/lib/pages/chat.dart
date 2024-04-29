@@ -16,7 +16,7 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatPage extends StatelessWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
   final DocumentReference? chatReference; // Chat database reference
 
   const ChatPage({
@@ -52,8 +52,7 @@ class ChatPage extends StatelessWidget {
 }
 
 class _ChatPageContent extends StatefulWidget {
-  final UserCredential
-      userCredential; //User auth credentials //User auth credentials
+  final UserCredential userCredential; // user auth credentials
   final DocumentReference? chatReference; //Chat database reference
 
   const _ChatPageContent(
@@ -102,6 +101,7 @@ class _ChatPageState extends State<_ChatPageContent> {
           );
         }
         // Initiate page creation once user info is loaded
+        // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
           // Store user info in local variables
           _userRole = state.userRole;
@@ -189,7 +189,7 @@ class _ChatPageState extends State<_ChatPageContent> {
                 return const Text("Something went wrong...");
               }
               // If the state is not any of the predefined states;
-              // never happen; but, anything can happen
+              // never happens; but, anything can happen
               else {
                 return const Center(child: Text('Unexpected State'));
               }

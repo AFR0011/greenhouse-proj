@@ -18,7 +18,7 @@ import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatsPage extends StatelessWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const ChatsPage({super.key, required this.userCredential});
 
@@ -46,8 +46,7 @@ class ChatsPage extends StatelessWidget {
 }
 
 class _ChatsPageContent extends StatefulWidget {
-  final UserCredential
-      userCredential; //User auth credentials //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const _ChatsPageContent({required this.userCredential});
 
@@ -99,6 +98,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             );
           }
           // Show page content once user info is loaded
+          // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
             // Store user info in local variables
             _userRole = state.userRole;
@@ -108,6 +108,12 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             // Call function to create chats page
             return Theme(data: customTheme, child: _createChatsPage());
           }
+          // Show error if there is an issues with user info
+          else if (state is UserInfoError) {
+            return Center(child: Text('Error: ${state.errorMessage}'));
+          }
+          // If somehow state doesn't match predefined states;
+          // never happens; but, anything can happen
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
@@ -178,10 +184,11 @@ class _ChatsPageState extends State<_ChatsPageContent> {
         }
         // Show error message once an error occurs
         else if (state is ChatsError) {
-          return const Text("Something went wrong...");
+          print(state.error);
+          return Center(child: Text('Error: ${state.error}'));
         }
         // If the state is not any of the predefined states;
-        // never happen; but, anything can happen
+        // never happens; but, anything can happen
         else {
           return const Text("Something went wrong...");
         }

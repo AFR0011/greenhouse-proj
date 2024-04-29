@@ -10,7 +10,7 @@ part 'plants_state.dart';
 
 class PlantStatusCubit extends Cubit<PlantStatusState> {
   CollectionReference plants = FirebaseFirestore.instance.collection("plants");
-  PlantStatusCubit() : super(PlantStatusLoading()) {
+  PlantStatusCubit() : super(PlantsLoading()) {
     _getPlants();
   }
 

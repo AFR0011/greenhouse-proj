@@ -18,8 +18,7 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class EquipmentStatusPage extends StatelessWidget {
-  final UserCredential
-      userCredential; //User auth credentials //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const EquipmentStatusPage({super.key, required this.userCredential});
 
@@ -50,7 +49,7 @@ class EquipmentStatusPage extends StatelessWidget {
 }
 
 class _EquipmentPageContent extends StatefulWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const _EquipmentPageContent({required this.userCredential});
 
@@ -93,6 +92,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           );
         }
         // Initiate page creation once user info is loaded
+        // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
           // Store user info in local variables
           _userRole = state.userRole;
@@ -181,7 +181,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   return Center(child: Text('Error: ${state.error}'));
                 }
                 // If the state is not any of the predefined states;
-                // never happen; but, anything can happen
+                // never happens; but, anything can happen
                 else {
                   return const Center(child: Text('Unexpected State'));
                 }

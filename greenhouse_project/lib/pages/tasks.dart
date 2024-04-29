@@ -1,3 +1,10 @@
+/// Tasks page - CRUD for worker tasks
+///
+/// TODO:
+/// -
+///
+library;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +18,7 @@ import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class TasksPage extends StatelessWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
   final DocumentReference? userReference;
 
   const TasksPage(
@@ -19,6 +26,7 @@ class TasksPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Provide Cubits for state management
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -38,7 +46,7 @@ class TasksPage extends StatelessWidget {
 }
 
 class _TasksPageContent extends StatefulWidget {
-  final UserCredential userCredential; //User auth credentials
+  final UserCredential userCredential; // user auth credentials
 
   const _TasksPageContent({required this.userCredential});
 
@@ -46,24 +54,30 @@ class _TasksPageContent extends StatefulWidget {
   State<_TasksPageContent> createState() => _TasksPageState();
 }
 
+// Main page content
 class _TasksPageState extends State<_TasksPageContent> {
-  // User info
+  // User info local variables
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
+
   // Custom theme
   final ThemeData customTheme = theme;
+
   // Text controllers
   final TextEditingController _textController = TextEditingController();
+
   // Index of footer nav selection
   final int _selectedIndex = 0;
 
+  // Dispose (destructor)
   @override
   void dispose() {
     _textController.dispose();
     super.dispose();
   }
 
+  // InitState - get user info state to check authentication later
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
@@ -72,31 +86,37 @@ class _TasksPageState extends State<_TasksPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    // Get instance of footer nav cubit from main context
-    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     // BlocListener for handling footer nav events
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
         navigateToPage(context, state, _userRole, widget.userCredential,
             userReference: _userReference);
       },
-      child: BlocConsumer<UserInfoCubit, HomeState>(
-        listener: (context, state) {},
+      // BlocBuilder for user info
+      child: BlocBuilder<UserInfoCubit, HomeState>(
         builder: (context, state) {
+          // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-          } else if (state is UserInfoLoaded) {
-            // Assign user info
+          }
+          // Show content once user info is loaded
+          else if (state is UserInfoLoaded) {
+            // Assign user info to local variables
             _userRole = state.userRole;
             _userName = state.userName;
             _userReference = state.userReference;
-            return Theme(
-              data: customTheme,
-              child: _createTasks(_userRole),
-            );
-          } else {
+
+            // Function call to create tasks page
+            return Theme(data: customTheme, child: _createTasksPage());
+          } // Show error if there is an issues with user info
+          else if (state is UserInfoError) {
+            return Center(child: Text('Error: ${state.errorMessage}'));
+          }
+          // If somehow state doesn't match predefined states;
+          // never happens; but, anything can happen
+          else {
             return const Center(
               child: Text('Unexpected state'),
             );
@@ -106,10 +126,12 @@ class _TasksPageState extends State<_TasksPageContent> {
     );
   }
 
-  Widget _createTasks(String _userRole) {
+  Widget _createTasksPage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+
     return Scaffold(
+      // Appbar (header)
       appBar: _userRole == "worker"
           ? createMainAppBar(context, widget.userCredential, _userReference)
           : AppBar(
@@ -120,6 +142,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                 },
                 icon: const Icon(Icons.arrow_back),
               )),
+      // Tasks section
       body: Column(
         children: [
           const SizedBox(height: 40),
@@ -131,24 +154,31 @@ class _TasksPageState extends State<_TasksPageContent> {
               textAlign: TextAlign.left,
             ),
           ),
-          // BlocBuilder for notifications
+          // BlocBuilder for tasks
           BlocBuilder<TaskCubit, TaskState>(
             builder: (context, state) {
+              // Show "loading screen" if processing tasks state
               if (state is TaskLoading) {
                 return const Center(child: CircularProgressIndicator());
-              } else if (state is TaskLoaded) {
-                List<TaskData> taskList = state.tasks;
+              }
+              // Show tasks if tasks state is loaded
+              else if (state is TaskLoaded) {
+                List<TaskData> taskList = state.tasks; // tasks list
+
+                // Display nothing if no tasks
                 if (taskList.isEmpty) {
                   return const Center(child: Text("No Tasks..."));
-                } else {
+                }
+                // Display tasks
+                else {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: taskList.length,
                     itemBuilder: (context, index) {
-                      TaskData task = taskList[index];
+                      TaskData task = taskList[index]; // task info
                       return ListTile(
                         title: Text(task.title),
-                        // subtitle: Text(task.dueDate as String),
+                        subtitle: Text(task.dueDate.toString()),
                         trailing: GreenElevatedButton(
                           text: 'Details',
                           onPressed: () {
@@ -207,11 +237,14 @@ class _TasksPageState extends State<_TasksPageContent> {
                     },
                   );
                 }
-              } else if (state is TaskError) {
+              }
+              // Show error message once an error occurs
+              else if (state is TaskError) {
                 print(state.error.toString());
                 return Center(child: Text(state.error.toString()));
-              } // If the state is not any of the predefined states;
-              // never happen; but, anything can happen
+              }
+              // If the state is not any of the predefined states;
+              // never happens; but, anything can happen
               else {
                 return const Center(child: Text('Unexpected State'));
               }
@@ -219,6 +252,8 @@ class _TasksPageState extends State<_TasksPageContent> {
           ),
         ],
       ),
+
+      // Footer nav bar
       bottomNavigationBar: _userRole == "worker"
           ? createFooterNav(
               _selectedIndex,

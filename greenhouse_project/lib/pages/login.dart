@@ -1,6 +1,9 @@
-/// Login page of the application
-// ignore_for_file: library_private_types_in_public_api
-
+/// Login page - login to the app
+///
+/// TODO:
+/// - Handle animation with Cubits
+/// - Convert state management stuff
+/// - Review cubit usage; builder and listener usage might be unnecessary
 library;
 
 import 'package:flutter/material.dart';
@@ -19,11 +22,13 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
-// Text controllers
+  // Text controllers
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
   // Firebase authentication init
   FirebaseAuth auth = FirebaseAuth.instance;
+
   // Gradient animation variables
   late AnimationController _animController;
   late Animation<Alignment> _topAlignmentAnimation;
@@ -42,6 +47,8 @@ class _LoginPageState extends State<LoginPage>
   @override
   void initState() {
     super.initState();
+
+    // Background animation
     _animController =
         AnimationController(vsync: this, duration: const Duration(seconds: 5));
     _topAlignmentAnimation = TweenSequence<Alignment>([
@@ -81,6 +88,7 @@ class _LoginPageState extends State<LoginPage>
           weight: 1),
     ]).animate(_animController);
 
+    // Repeat animation
     _animController.repeat();
   }
 

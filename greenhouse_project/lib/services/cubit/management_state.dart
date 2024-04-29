@@ -24,3 +24,9 @@ final class ManageTasksLoaded extends ManagementState {
 
   ManageTasksLoaded(this.tasks);
 }
+
+final class ManageTasksError extends ManagementState {
+  final String error;
+
+  ManageTasksError(this.error);
+}

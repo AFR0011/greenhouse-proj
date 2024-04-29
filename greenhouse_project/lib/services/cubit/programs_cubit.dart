@@ -13,18 +13,16 @@ class ProgramsCubit extends Cubit<ProgramsState> {
   }
 
   void _getPrograms() {
-    programs
-        .orderBy('creationDate', descending: true)
-        .snapshots()
-        .listen((snapshot) {
-          if(snapshot.docs.isNotEmpty){
-            final List<ProgramData> programs =
+    programs.orderBy('creationDate', descending: true).snapshots().listen(
+        (snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        final List<ProgramData> programs =
             snapshot.docs.map((doc) => ProgramData.fromFirestore(doc)).toList();
-            emit(ProgramsLoaded([...programs]));
-          }
-    }, onError: (error){
+        emit(ProgramsLoaded([...programs]));
+      }
+    }, onError: (error) {
       print(error.toString());
-      emit(ProgramError(error));
+      emit(ProgramsError(error));
     });
   }
 
@@ -33,7 +31,7 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     try {
       await programs.add(data);
     } catch (error) {
-      emit(ProgramError(error.toString()));
+      emit(ProgramsError(error.toString()));
     }
   }
 
@@ -43,25 +41,23 @@ class ProgramsCubit extends Cubit<ProgramsState> {
       await item.delete();
       _getPrograms();
     } catch (error) {
-      emit(ProgramError(error.toString()));
+      emit(ProgramsError(error.toString()));
     }
   }
 
-  Future <void> updatePrograms(
+  Future<void> updatePrograms(
       DocumentReference item, Map<String, dynamic> data) async {
     emit(ProgramsLoading());
     try {
       await item.set(data, SetOptions(merge: true));
       _getPrograms();
     } catch (error) {
-      emit(ProgramError(error.toString()));
+      emit(ProgramsError(error.toString()));
     }
   }
-
 }
 
 class ProgramData {
-
   final int action;
   final int condition;
   final int limit;
@@ -70,26 +66,24 @@ class ProgramData {
   final String title;
   final DocumentReference reference;
 
-  ProgramData({
-    required this.action,
-    required this.condition,
-    required this.limit,
-    required this.equipment,
-    required this.creationDate,
-    required this.title,
-    required this.reference
-  });
+  ProgramData(
+      {required this.action,
+      required this.condition,
+      required this.limit,
+      required this.equipment,
+      required this.creationDate,
+      required this.title,
+      required this.reference});
 
   factory ProgramData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return ProgramData(
-      action: data['action'],
-      condition: data['condition'],
-      limit: data['limit'],
-      equipment: data['equipment'],
-      title: data['title'],
-      creationDate: (data['creationDate'] as Timestamp).toDate(),
-      reference: doc.reference
-    );
+        action: data['action'],
+        condition: data['condition'],
+        limit: data['limit'],
+        equipment: data['equipment'],
+        title: data['title'],
+        creationDate: (data['creationDate'] as Timestamp).toDate(),
+        reference: doc.reference);
   }
 }
