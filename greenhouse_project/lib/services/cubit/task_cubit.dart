@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
 part 'task_state.dart';
@@ -13,8 +12,8 @@ class TaskCubit extends Cubit<TaskState> {
   final DocumentReference userReference;
 
   TaskCubit(this.userReference) : super(TaskLoading()) {
-        _getTasks();
-    }
+    _getTasks();
+  }
 
   void _getTasks() async {
     DocumentSnapshot userSnapshot = await userReference.get();
@@ -30,7 +29,6 @@ class TaskCubit extends Cubit<TaskState> {
           snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
       emit(TaskLoaded(tasks: [...tasks]));
     }, onError: (error) {
-      print(error);
       emit(TaskError(error: error.toString()));
     });
   }

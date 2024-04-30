@@ -5,7 +5,6 @@
 ///
 library;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -15,7 +14,6 @@ import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
-import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class WorkersPage extends StatelessWidget {
@@ -55,11 +53,6 @@ class _WorkersPageContent extends StatefulWidget {
 
 // Main page content
 class _WorkersPageState extends State<_WorkersPageContent> {
-  // User info local variables
-  late String _userRole = "";
-  late String _userName = "";
-  late DocumentReference _userReference;
-
   // Custom theme
   final ThemeData customTheme = theme;
 
@@ -93,16 +86,8 @@ class _WorkersPageState extends State<_WorkersPageContent> {
         }
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
-          // Assign user info to local variables
-          _userRole = state.userRole;
-          _userName = state.userName;
-          _userReference = state.userReference;
-
           // Function call to create workers page
-          return Theme(
-            data: customTheme,
-            child: _createWorkersPage(),
-          );
+          return Theme(data: customTheme, child: _createWorkersPage());
         } else {
           return const Center(
             child: Text('Unexpected state'),
@@ -232,7 +217,6 @@ class _WorkersPageState extends State<_WorkersPageContent> {
               }
               // Show error message once an error occurs
               else if (state is ManageWorkersError) {
-                print(state.error.toString());
                 return Center(child: Text(state.error.toString()));
               }
               // If the state is not any of the predefined states;

@@ -63,7 +63,6 @@ class _ManagementPageContent extends StatefulWidget {
 class _ManagementPageState extends State<_ManagementPageContent> {
   // User info local variables
   late String _userRole = "";
-  late String _userName = "";
   late DocumentReference _userReference;
 
   // Custom theme
@@ -113,7 +112,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
             _userRole = state.userRole;
-            _userName = state.userName;
             _userReference = state.userReference;
 
             // Call function to create management page
@@ -221,7 +219,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
               }
               // Show error message once an error occurs
               else if (state is ManageTasksError) {
-                print(state.error.toString());
                 return Text(state.error.toString());
               }
               // If the state is not any of the predefined states;
@@ -282,7 +279,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
               }
               // Show error message once an error occurs
               else if (state is ManageWorkersError) {
-                print(state.error.toString());
                 return Text(state.error.toString());
               }
               // If the state is not any of the predefined states;

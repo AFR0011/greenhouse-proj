@@ -15,7 +15,6 @@ class ReadingsCubit extends GreenhouseCubit {
 
       emit(ReadingsLoaded([...readings]));
     }, onError: (error) {
-      print(error.toString());
       emit(ReadingsError(error.toString()));
     });
   }

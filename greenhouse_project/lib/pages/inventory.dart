@@ -61,7 +61,6 @@ class _InventoryPageContent extends StatefulWidget {
 class _InventoryPageState extends State<_InventoryPageContent> {
   // User info local variables
   late String _userRole = "";
-  late String _userName = "";
   late DocumentReference _userReference;
 
   // Custom theme
@@ -116,7 +115,6 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
             _userRole = state.userRole;
-            _userName = state.userName;
             _userReference = state.userReference;
 
             // Call function to create inventory page
@@ -184,7 +182,6 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           }
           // Show error message once an error occurs
           else if (state is InventoryError) {
-            print(state.error.toString());
             return Text(state.error.toString());
           }
           // If the state is not any of the predefined states;

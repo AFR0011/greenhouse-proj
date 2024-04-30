@@ -29,7 +29,6 @@ class ManageTasksCubit extends ManagementCubit {
 
       emit(ManageTasksLoaded([...tasks]));
     }, onError: (error) {
-      print(error.toString());
       emit(ManageTasksError(error.toString()));
     });
   }

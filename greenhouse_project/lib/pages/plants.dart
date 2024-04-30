@@ -5,7 +5,6 @@
 ///
 library;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -51,11 +50,6 @@ class _PlantsPageContent extends StatefulWidget {
 
 // Main page content
 class _PlantsPageState extends State<_PlantsPageContent> {
-  // User info local variables
-  late String _userRole = "";
-  late String _userName = "";
-  late DocumentReference _userReference;
-
   // Custom theme
   final ThemeData customTheme = theme;
 
@@ -89,11 +83,6 @@ class _PlantsPageState extends State<_PlantsPageContent> {
         }
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
-          // Assign user info to local variables
-          _userRole = state.userRole;
-          _userName = state.userName;
-          _userReference = state.userReference;
-
           // Call function to create plants page
           return Theme(data: customTheme, child: _createPlantsPage());
         }
@@ -266,7 +255,6 @@ class _PlantsPageState extends State<_PlantsPageContent> {
         }
         // Show error message once an error occurs
         else if (state is ReadingsError) {
-          print(state.error);
           return Text(state.error);
         }
         // If the state is not any of the predefined states;

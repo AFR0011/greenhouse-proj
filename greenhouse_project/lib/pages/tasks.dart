@@ -58,7 +58,6 @@ class _TasksPageContent extends StatefulWidget {
 class _TasksPageState extends State<_TasksPageContent> {
   // User info local variables
   late String _userRole = "";
-  late String _userName = "";
   late DocumentReference _userReference;
 
   // Custom theme
@@ -105,7 +104,6 @@ class _TasksPageState extends State<_TasksPageContent> {
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
             _userRole = state.userRole;
-            _userName = state.userName;
             _userReference = state.userReference;
 
             // Function call to create tasks page
@@ -240,7 +238,6 @@ class _TasksPageState extends State<_TasksPageContent> {
               }
               // Show error message once an error occurs
               else if (state is TaskError) {
-                print(state.error.toString());
                 return Center(child: Text(state.error.toString()));
               }
               // If the state is not any of the predefined states;

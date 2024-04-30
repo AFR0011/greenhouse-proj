@@ -4,6 +4,7 @@
 /// - Error snackbar shows outside of dialogs
 ///   (either show a dialog for errors or fix this)
 /// - Add profile picture
+/// - Put user info builder inside scaffold
 ///
 library;
 
@@ -52,8 +53,10 @@ class _ProfilePageContent extends StatefulWidget {
   final UserCredential userCredential; // user auth credentials
   final DocumentReference userReference; // user database reference
 
-  const _ProfilePageContent(
-      {super.key, required this.userCredential, required this.userReference});
+  const _ProfilePageContent({
+    required this.userCredential,
+    required this.userReference,
+  });
 
   @override
   State<_ProfilePageContent> createState() => __ProfilePageContentState();
@@ -63,7 +66,6 @@ class _ProfilePageContent extends StatefulWidget {
 class __ProfilePageContentState extends State<_ProfilePageContent> {
   // User info local variables
   late String _userRole = "";
-  late String _userName = "";
   late DocumentReference _userReference;
 
   // Custom theme
@@ -108,7 +110,6 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
         else if (state is UserInfoLoaded) {
           // Assign user info to local variables
           _userRole = state.userRole;
-          _userName = state.userName;
           _userReference = state.userReference;
 
           // Call function to create profile page
@@ -343,8 +344,9 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     FirebaseAuth auth = FirebaseAuth.instance;
     String email = widget.userCredential.user!.email as String;
     try {
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
-          email: email, password: _passwordConfirmController.text);
+      await auth.signInWithEmailAndPassword(
+          email: email,
+          password: _passwordConfirmController.text); // attempt to login
 
       userInfoCubit.setUserInfo(
           _userReference,
@@ -378,14 +380,12 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                   child: GreenElevatedButton(
                     text: "OK",
                     onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ProfilePage(
-                                    userCredential: widget.userCredential,
-                                    userReference: widget.userReference,
-                                  )),
-                          (route) => false);
+                      // Wait a few seconds for info to load
+                      Future.delayed(const Duration(seconds: 3));
+                      // Pop all dialogs
+                      Navigator.pop(context);
+                      Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                   ),
                 ),

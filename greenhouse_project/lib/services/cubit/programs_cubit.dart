@@ -21,7 +21,6 @@ class ProgramsCubit extends Cubit<ProgramsState> {
         emit(ProgramsLoaded([...programs]));
       }
     }, onError: (error) {
-      print(error.toString());
       emit(ProgramsError(error));
     });
   }

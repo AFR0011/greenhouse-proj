@@ -40,6 +40,11 @@ class ChatsCubit extends Cubit<ChatsState> {
       emit(ChatsError(error.toString()));
     });
   }
+
+  ChatsData? getChatByReference(
+      List<ChatsData?> chats, DocumentReference chatReference) {
+    return chats.firstWhere((chat) => chatReference == chat?.reference);
+  }
 }
 
 class ChatsData {
@@ -60,8 +65,6 @@ class ChatsData {
         data["users"].cast<DocumentReference>().toList();
     DocumentReference receiverReference =
         users[0] == userReference ? users[1] : users[0];
-
-    print("Receiver Reference Path: ${receiverReference.path}");
 
     // Fetch receiver data asynchronously
     final snapshot = await receiverReference.get();

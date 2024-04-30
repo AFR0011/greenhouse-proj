@@ -65,8 +65,6 @@ class _ChatPageContent extends StatefulWidget {
 // Main page content goes here
 class _ChatPageState extends State<_ChatPageContent> {
   // User info local variables
-  late String _userRole = "";
-  late String _userName = "";
   late DocumentReference _userReference;
 
   // Custom theme
@@ -104,8 +102,6 @@ class _ChatPageState extends State<_ChatPageContent> {
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
           // Store user info in local variables
-          _userRole = state.userRole;
-          _userName = state.userName;
           _userReference = state.userReference;
 
           // Call function to create chat page
@@ -126,103 +122,118 @@ class _ChatPageState extends State<_ChatPageContent> {
     );
   }
 
-  // Create chat page function
+// Create chat page function
   Widget _createChatPage() {
-    // BlocBuilder for chats cubit (all chats)
     return BlocBuilder<ChatsCubit, ChatsState>(
       builder: (context, state) {
-        // Get chat using the database reference, null if somehow no chat matches
+        // Get the specific chat directly from the cubit
         ChatsData? chat = (state is ChatsLoaded)
-            ? state.chats.firstWhere(
-                (element) => element?.reference == widget.chatReference)
+            ? context
+                .read<ChatsCubit>()
+                .getChatByReference(state.chats, widget.chatReference!)
             : null;
-        return Scaffold(
-          // Appbar (header)
-          appBar: AppBar(
-              automaticallyImplyLeading: true,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              // Username of other chat party
-              title: Text(
-                  "${chat?.receiverData?['name']} ${chat?.receiverData?['surname']}")),
 
-          // BlocBuilder for chat cubit (one chat)
-          body: BlocBuilder<ChatCubit, ChatState>(
-            builder: (context, state) {
-              // Show "loading screen" if processing chat state
-              if (state is ChatLoading) {
-                return const CircularProgressIndicator();
-              }
-              // Show chat messages once chat state is loaded
-              else if (state is ChatLoaded) {
-                List<MessageData?> messages = state.messages; // messages list
-                // Display nothing if no messages
-                if (messages.isEmpty) {
-                  return const Center(child: Text("Write your first message!"));
-                }
-                // Display messages
-                else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      MessageData? message = messages[index]; // message data
-                      Alignment alignment = message?.receiver == _userReference
-                          ? Alignment.centerLeft
-                          : Alignment.centerRight; //align based on receiver
-                      return ListTile(
-                        title: Align(
-                            alignment: alignment,
-                            child: Text("${message?.message}")),
-                      );
-                    },
-                  );
-                }
-              }
-              // Show error message once an error occurs
-              else if (state is ChatError) {
-                print(state.error.toString());
-                return const Text("Something went wrong...");
-              }
-              // If the state is not any of the predefined states;
-              // never happens; but, anything can happen
-              else {
-                return const Center(child: Text('Unexpected State'));
-              }
-            },
-          ),
+        // Return loading indicator if chat is still loading
+        if (chat == null) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
 
-          // Message input box
-          bottomNavigationBar: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _textEditingController,
-                ),
-              ),
-              Expanded(
-                  child: GreenElevatedButton(
-                text: "Send",
-                // Send message and clear text controller
-                onPressed: () {
-                  if (_textEditingController.text != "") {
-                    context.read<ChatCubit>().sendMessage(
-                        _textEditingController.text,
-                        chat?.receiverData?['reference'],
-                        _userReference,
-                        chat!.reference);
-                    _textEditingController.text = "";
-                  }
-                },
-              ))
-            ],
-          ),
-        );
+        // Return the chat page UI once chat data is available
+        return _buildChatUI(chat);
       },
     );
+  }
+
+// Build chat page UI using the provided chat data
+  Widget _buildChatUI(ChatsData chat) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        title: Text(
+          "${chat.receiverData?['name']} ${chat.receiverData?['surname']}",
+        ),
+      ),
+      body: BlocBuilder<ChatCubit, ChatState>(
+        builder: (context, state) {
+          // Handle different states of the chat
+          if (state is ChatLoading) {
+            return const CircularProgressIndicator();
+          } else if (state is ChatLoaded) {
+            return _buildChatMessages(state.messages);
+          } else if (state is ChatError) {
+            return const Text("Something went wrong...");
+          } else {
+            return const Center(child: Text('Unexpected State'));
+          }
+        },
+      ),
+      bottomNavigationBar: _buildMessageInput(chat),
+    );
+  }
+
+// Build the list of chat messages
+  Widget _buildChatMessages(List<MessageData?> messages) {
+    if (messages.isEmpty) {
+      return const Center(child: Text("Write your first message!"));
+    } else {
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: messages.length,
+        itemBuilder: (context, index) {
+          MessageData? message = messages[index];
+          Alignment alignment = message?.receiver == _userReference
+              ? Alignment.centerLeft
+              : Alignment.centerRight;
+          return ListTile(
+            title: Align(
+              alignment: alignment,
+              child: Text("${message?.message}"),
+            ),
+          );
+        },
+      );
+    }
+  }
+
+// Build the message input box
+  Widget _buildMessageInput(ChatsData? chat) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: _textEditingController,
+          ),
+        ),
+        Expanded(
+          child: GreenElevatedButton(
+            text: "Send",
+            onPressed: () {
+              _sendMessage(chat);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+// Function to send a message
+  void _sendMessage(ChatsData? chat) {
+    if (_textEditingController.text.isNotEmpty) {
+      context.read<ChatCubit>().sendMessage(
+            _textEditingController.text,
+            chat?.receiverData?['reference'],
+            _userReference,
+            chat!.reference,
+          );
+      _textEditingController.text = "";
+    }
   }
 }
