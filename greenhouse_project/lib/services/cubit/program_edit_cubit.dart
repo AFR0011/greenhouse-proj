@@ -1,12 +1,12 @@
-import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
 
 part 'program_edit_state.dart';
 
 class ProgramEditCubit extends Cubit<List<String>> {
   ProgramEditCubit() : super(["", "", ""]);
 
-  void updateDropdown(List<String> values){
+  void updateDropdown(List<String> values) {
     emit([...values]);
   }
 }

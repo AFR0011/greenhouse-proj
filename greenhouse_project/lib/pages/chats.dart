@@ -58,7 +58,6 @@ class _ChatsPageContent extends StatefulWidget {
 class _ChatsPageState extends State<_ChatsPageContent> {
   // User info local variables
   late String _userRole = "";
-  late String _userName = "";
   late DocumentReference _userReference;
 
   // Custom theme
@@ -102,7 +101,6 @@ class _ChatsPageState extends State<_ChatsPageContent> {
           else if (state is UserInfoLoaded) {
             // Store user info in local variables
             _userRole = state.userRole;
-            _userName = state.userName;
             _userReference = state.userReference;
 
             // Call function to create chats page
@@ -184,7 +182,6 @@ class _ChatsPageState extends State<_ChatsPageContent> {
         }
         // Show error message once an error occurs
         else if (state is ChatsError) {
-          print(state.error);
           return Center(child: Text('Error: ${state.error}'));
         }
         // If the state is not any of the predefined states;

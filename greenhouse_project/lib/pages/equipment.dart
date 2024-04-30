@@ -6,7 +6,6 @@
 ///
 library;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,11 +58,6 @@ class _EquipmentPageContent extends StatefulWidget {
 
 // Main page content goes here
 class _EquipmentPageContentState extends State<_EquipmentPageContent> {
-  // User info local variables
-  late String _userRole = "";
-  late String _userName = "";
-  late DocumentReference _userReference;
-
   // Custom theme
   final ThemeData customTheme = theme;
 
@@ -94,11 +88,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
         // Initiate page creation once user info is loaded
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
-          // Store user info in local variables
-          _userRole = state.userRole;
-          _userName = state.userName;
-          _userReference = state.userReference;
-
           // Call function to create equipment page
           return Theme(data: customTheme, child: _createEquipmentPage());
         }

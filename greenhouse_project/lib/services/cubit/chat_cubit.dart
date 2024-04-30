@@ -27,12 +27,19 @@ class ChatCubit extends Cubit<ChatState> {
       emit(ChatError(error.toString()));
     });
   }
-  Future<void> sendMessage (String message, DocumentReference receiver, DocumentReference sender, DocumentReference chat) async {
-    await messages.add({"chat": chat, "message": message, "receiver": receiver, "sender": sender, "timestamp": Timestamp.now()});
-    return _getMessages();
+
+  Future<void> sendMessage(String message, DocumentReference receiver,
+      DocumentReference sender, DocumentReference chat) async {
+    await messages.add({
+      "chat": chat,
+      "message": message,
+      "receiver": receiver,
+      "sender": sender,
+      "timestamp": Timestamp.now()
+    });
+    return;
   }
 }
-
 
 class MessageData {
   final String message;

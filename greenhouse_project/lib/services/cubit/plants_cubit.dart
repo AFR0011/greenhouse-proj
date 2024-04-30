@@ -22,7 +22,6 @@ class PlantStatusCubit extends Cubit<PlantStatusState> {
           snapshot.docs.map((doc) => PlantData.fromFirestore(doc)).toList();
       emit(PlantsLoaded([...plants]));
     }, onError: (error) {
-      print(error);
       emit(PlantsError(error.toString()));
     });
   }

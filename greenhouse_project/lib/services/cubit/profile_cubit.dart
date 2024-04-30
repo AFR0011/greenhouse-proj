@@ -22,7 +22,6 @@ class ProfileCubit extends Cubit<ProfileState> {
       final userData = userSnapshotData as Map<String, dynamic>;
       emit(ProfileLoaded(userData));
     } catch (error) {
-      print(error.toString());
       emit(ProfileError(error.toString()));
     }
   }

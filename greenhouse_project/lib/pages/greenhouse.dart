@@ -67,7 +67,6 @@ class _GreenhousePageContent extends StatefulWidget {
 class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   // User info local variables
   late String _userRole = "";
-  late String _userName = "";
   late DocumentReference _userReference;
 
   // Custom theme
@@ -122,7 +121,6 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
             _userRole = state.userRole;
-            _userName = state.userName;
             _userReference = state.userReference;
 
             // Call function to create greenhouse page
