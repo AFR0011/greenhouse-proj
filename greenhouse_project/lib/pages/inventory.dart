@@ -250,7 +250,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
               return ListTile(
                 title: Text(inventory.name),
                 subtitle: Text(inventory.timeAdded.toString()),
-                trailing: Text(inventory.amount.toString()),
+                trailing: _userRole == 'manager' ? FittedBox(child: Row(children: [GreenElevatedButton(text:"Approve", onPressed: (){context.read<InventoryCubit>().approveItem(inventory.reference);}), GreenElevatedButton(text: "Deny", onPressed: (){context.read<InventoryCubit>().removeInventory(inventory.reference);})],)):Text(inventory.amount.toString()),
               );
             },
           ),

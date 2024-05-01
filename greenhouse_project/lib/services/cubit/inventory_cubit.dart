@@ -48,6 +48,14 @@ class InventoryCubit extends Cubit<InventoryState> {
       emit(InventoryError(error.toString()));
     }
   }
+  Future<void> approveItem(DocumentReference itemRef) async {
+  try {
+    await itemRef.set({"pending": false}, SetOptions(merge: true));
+  }
+  catch (error){
+    emit(InventoryError(error.toString()));
+  }
+  }
 }
 
 class InventoryData {
