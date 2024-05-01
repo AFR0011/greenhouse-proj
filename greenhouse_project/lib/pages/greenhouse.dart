@@ -130,6 +130,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           }
+
           // If somehow state doesn't match predefined states;
           // never happens; but, anything can happen
           else {
@@ -140,7 +141,43 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
     );
   }
 
-  // Create greenhouse page function
+  // Define a function to navigate to greenhouse subpages
+  void _navigateToDetailsPage(Widget pageWidget) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => pageWidget,
+      ),
+    );
+  }
+
+  // Function to create a subheading row with a details button
+  Widget _buildSubheadingRow(String subheading, Widget pageWidget) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              subheading,
+              style: subheadingTextStyle,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(25, 15, 25, 15),
+            child: GreenElevatedButton(
+              text: "Details",
+              onPressed: () {
+                _navigateToDetailsPage(pageWidget);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Creates the main content of the greenhouse page.
   Widget _createGreenhousePage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
@@ -150,113 +187,54 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
       // Main appbar (header)
       appBar: createMainAppBar(context, widget.userCredential, _userReference),
 
-      // Scrollabe column for items
+      // Scrollable column for items
       body: SingleChildScrollView(
-        child: Column(children: [
-          // Title (Greenhouse)
-          const Center(
+        child: Column(
+          children: [
+            // Title (Greenhouse)
+            const Center(
               child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Text("Greenhouse", style: headingTextStyle),
-          )),
-
-          // Plant status subheading and details button
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    "Plant Status",
-                    style: subheadingTextStyle,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                  child: GreenElevatedButton(
-                      text: "Details",
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => PlantsPage(
-                                    userCredential: widget.userCredential)));
-                      }),
-                ),
-              ],
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                child: Text("Greenhouse", style: headingTextStyle),
+              ),
             ),
-          ),
-          // Plant status graphs
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _sensors.map((sensor) {
-                return Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: SizedBox(
+
+            // Plant status subheading and details button
+            _buildSubheadingRow(
+              "Plant Status",
+              PlantsPage(userCredential: widget.userCredential),
+            ),
+
+            // Plant status graphs
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: _sensors.map((sensor) {
+                  return Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width - 40,
                       height: 400,
-                      child: ChartClass(sensor: sensor)),
-                );
-              }).toList(),
+                      child: ChartClass(sensor: sensor),
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
-          ),
 
-          // Plant status subheading and details button
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    "Active Programs",
-                    style: subheadingTextStyle,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                  child: GreenElevatedButton(
-                      text: "Details",
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ProgramsPage(
-                                    userCredential: widget.userCredential)));
-                      }),
-                ),
-              ],
+            // Active programs subheading and details button
+            _buildSubheadingRow(
+              "Active Programs",
+              ProgramsPage(userCredential: widget.userCredential),
             ),
-          ),
 
-          // Plant status subheading and details button
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    "Equipment Status",
-                    style: subheadingTextStyle,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                  child: GreenElevatedButton(
-                      text: "Details",
-                      onPressed: () {
-                        // TO-DO: Navigate to equipments page
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EquipmentStatusPage(
-                                    userCredential: widget.userCredential)));
-                      }),
-                ),
-              ],
+            // Equipment status subheading and details button
+            _buildSubheadingRow(
+              "Equipment Status",
+              EquipmentStatusPage(userCredential: widget.userCredential),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
 
       // Footer nav bar

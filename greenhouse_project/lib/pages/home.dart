@@ -98,7 +98,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             );
           }
           // Show content once user info is loaded
-          // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
             _userRole = state.userRole;
@@ -132,87 +131,91 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
       // Main appbar (header)
       appBar: createMainAppBar(context, widget.userCredential, _userReference),
 
-      // Column for items
-      body: Column(
-        children: [
-          // Welcome message
-          Padding(
-            padding: const EdgeInsets.only(top: 20, bottom: 20),
-            child: Center(
-                child:
-                    Text("Welcome Back, $_userName!", style: headingTextStyle)),
-          ),
-
-          // Search field
-          Padding(
-            padding: const EdgeInsets.only(left: 10, right: 10, bottom: 40),
-            child: TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                icon: Icon(Icons.search, size: 24),
-                hintText: "Search...",
-              ),
-            ),
-          ),
-
-          // Notifications subheading
-          SizedBox(
-            width: MediaQuery.of(context).size.width - 20,
-            child: const Text(
-              "Notifications",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.left,
-            ),
-          ),
-
-          // BlocBuilder for notifications
-          BlocBuilder<NotificationsCubit, HomeState>(
-            builder: (context, state) {
-              // Show "loading screen" if processing notification state
-              if (state is NotificationsLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              // Show equipment status once notification state is loaded
-              else if (state is NotificationsLoaded) {
-                List<NotificationData> notificationsList =
-                    state.notifications; // notifications list
-                // Display nothing if no notifications
-                if (notificationsList.isEmpty) {
-                  return const Center(child: Text("No Notifications..."));
-                }
-                // Display notifications
-                else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: notificationsList.length,
-                    itemBuilder: (context, index) {
-                      NotificationData notification =
-                          notificationsList[index]; // notification data
-                      // Notification message
-                      return ListTile(
-                        title: Text(notification.message),
-                      );
-                    },
-                  );
-                }
-              }
-              // Show error message once an error occurs
-              else if (state is NotificationsError) {
-                return Center(child: Text('Error: ${state.errorMessage}'));
-              }
-              // If the state is not any of the predefined states;
-              // never happens; but, anything can happen
-              else {
-                return const Center(child: Text('Unexpected State'));
-              }
-            },
-          ),
-        ],
-      ),
+      // Call function to build notificaitons list
+      body: _buildNotifications(),
 
       // Footer nav bar
       bottomNavigationBar:
           createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+    );
+  }
+
+  Widget _buildNotifications() {
+    return Column(
+      children: [
+        // Welcome message
+        Padding(
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          child: Center(
+              child:
+                  Text("Welcome Back, $_userName!", style: headingTextStyle)),
+        ),
+
+        // Search field
+        Padding(
+          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 40),
+          child: TextField(
+            controller: _searchController,
+            decoration: const InputDecoration(
+              icon: Icon(Icons.search, size: 24),
+              hintText: "Search...",
+            ),
+          ),
+        ),
+
+        // Notifications subheading
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 20,
+          child: const Text(
+            "Notifications",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.left,
+          ),
+        ),
+
+        // BlocBuilder for notifications
+        BlocBuilder<NotificationsCubit, HomeState>(
+          builder: (context, state) {
+            // Show "loading screen" if processing notification state
+            if (state is NotificationsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            // Show equipment status once notification state is loaded
+            else if (state is NotificationsLoaded) {
+              List<NotificationData> notificationsList =
+                  state.notifications; // notifications list
+              // Display nothing if no notifications
+              if (notificationsList.isEmpty) {
+                return const Center(child: Text("No Notifications..."));
+              }
+              // Display notifications
+              else {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: notificationsList.length,
+                  itemBuilder: (context, index) {
+                    NotificationData notification =
+                        notificationsList[index]; // notification data
+                    // Notification message
+                    return ListTile(
+                      title: Text(notification.message),
+                    );
+                  },
+                );
+              }
+            }
+            // Show error message once an error occurs
+            else if (state is NotificationsError) {
+              return Center(child: Text('Error: ${state.errorMessage}'));
+            }
+            // If the state is not any of the predefined states;
+            // never happens; but, anything can happen
+            else {
+              return const Center(child: Text('Unexpected State'));
+            }
+          },
+        ),
+      ],
     );
   }
 }
