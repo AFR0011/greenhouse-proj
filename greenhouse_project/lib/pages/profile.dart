@@ -4,7 +4,7 @@
 /// - Error snackbar shows outside of dialogs
 ///   (either show a dialog for errors or fix this)
 /// - Add profile picture
-/// - Put user info builder inside scaffold
+/// - Revert controller text after "cancel" on edit dialogue
 ///
 library;
 
@@ -73,7 +73,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
 
   // Text controllers for input
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _equipmentController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _passwordConfirmController =
       TextEditingController();
@@ -82,7 +82,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   @override
   void dispose() {
     _emailController.dispose();
-    _equipmentController.dispose();
+    _nameController.dispose();
     _passwordController.dispose();
     _passwordConfirmController.dispose();
     super.dispose();
@@ -135,100 +135,106 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     // BlocBuilder for profile state
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
-        // Show "loading screen" if processing profile state
         if (state is ProfileLoading) {
-          return const CircularProgressIndicator();
-        }
-        // Show profile once profile state is loaded
-        else if (state is ProfileLoaded) {
-          // Store profile info in controllers
-          _equipmentController.text = state.userData['name'];
-          _emailController.text = state.userData['email'];
-          _passwordController.text = '';
-
-          // Profile info
-          return Scaffold(
-            appBar: AppBar(
-                leading: IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Image.asset(
-                      "lib/utils/Icons/Left Arrow.png",
-                      scale: 3,
-                    )),
-                title: const Padding(
-                  padding: EdgeInsets.fromLTRB(70, 0, 0, 0),
-                  child: Text(
-                    "Profile",
-                    style: headingTextStyle,
-                  ),
-                )),
-            body: Column(
-              children: [
-                // Profile information
-                const Center(child: Text("PROFILE PIC")), // Profile picture
-                const Text("Name"),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(state.userData['name']),
-                ),
-                const Text("Email"),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(state.userData['email']),
-                ),
-                state.userData['email'] == widget.userCredential.user?.email
-                    ? const Column(
-                        children: [
-                          Text("Password"),
-                          Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text('*******'),
-                          ),
-                        ],
-                      )
-                    : const SizedBox(),
-
-                // Action buttons
-                Align(
-                    alignment: Alignment.bottomCenter,
-                    child: state.userData['role'] == 'worker' &&
-                            _userRole == 'manager'
-                        ? Row(
-                            children: [
-                              GreenElevatedButton(
-                                  text: "Message", onPressed: () {}),
-                              GreenElevatedButton(
-                                  text: "Delete", onPressed: () {})
-                            ],
-                          )
-                        : state.userData['email'] ==
-                                widget.userCredential.user?.email
-                            ? GreenElevatedButton(
-                                text: "Edit",
-                                onPressed: () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return Dialog(
-                                            child: _createEditDialog());
-                                      });
-                                })
-                            : GreenElevatedButton(
-                                text: "Message", onPressed: () {}))
-              ],
-            ),
+          // Show loading indicator while profile state is loading
+          return const Center(
+            child: CircularProgressIndicator(),
           );
-        }
-        // Show error message once an error occurs
-        else if (state is ProfileError) {
+        } else if (state is ProfileLoaded) {
+          // Once profile state is loaded, display profile information
+          return _buildProfileContent(state.userData);
+        } else if (state is ProfileError) {
+          // Show error message if there's an error loading profile state
           return Center(child: Text('Error: ${state.error}'));
-        }
-        // If the state is not any of the predefined states;
-        // never happens; but, anything can happen
-        else {
+        } else {
+          // Handle unexpected state (should never happen)
           return const Center(child: Text('Unexpected State'));
         }
       },
+    );
+  }
+
+// Function to build profile content based on user data
+  Widget _buildProfileContent(Map<String, dynamic> userData) {
+    // Assign user data to controllers
+    _emailController.text = userData['email'];
+    _nameController.text = userData['name'];
+    _passwordController.text = "";
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Image.asset(
+            "lib/utils/Icons/Left Arrow.png",
+            scale: 3,
+          ),
+        ),
+        title: const Padding(
+          padding: EdgeInsets.fromLTRB(70, 0, 0, 0),
+          child: Text(
+            "Profile",
+            style: headingTextStyle,
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
+          // Profile picture (TODO: Implement profile picture functionality)
+          const Center(child: Text("PROFILE PIC")),
+          // Display user name
+          _buildProfileField("Name", userData['name']),
+          // Display user email
+          _buildProfileField("Email", userData['email']),
+          // Display password (if user is viewing their own profile)
+          if (userData['email'] == widget.userCredential.user?.email)
+            _buildProfileField("Password", "*******"),
+          // Action buttons based on user role and authorization
+          _buildActionButtons(userData),
+        ],
+      ),
+    );
+  }
+
+// Function to build a profile information field
+  Widget _buildProfileField(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(label),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(value),
+        ),
+      ],
+    );
+  }
+
+// Function to build action buttons based on user role and authorization
+  Widget _buildActionButtons(Map<String, dynamic> userData) {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: userData['role'] == 'worker' && _userRole == 'manager'
+          ? Row(
+              children: [
+                GreenElevatedButton(text: "Message", onPressed: () {}),
+                GreenElevatedButton(text: "Delete", onPressed: () {}),
+              ],
+            )
+          : userData['email'] == widget.userCredential.user?.email
+              ? GreenElevatedButton(
+                  text: "Edit",
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return Dialog(
+                          child: _createEditDialog(),
+                        );
+                      },
+                    );
+                  },
+                )
+              : GreenElevatedButton(text: "Message", onPressed: () {}),
     );
   }
 
@@ -249,7 +255,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           return Column(
             children: [
               TextField(
-                controller: _equipmentController,
+                controller: _nameController,
                 decoration: InputDecoration(
                     errorText: state[0]
                         ? ""
@@ -273,7 +279,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                       text: "Submit",
                       onPressed: () {
                         List<bool> validation = [true, true, true];
-                        if (_equipmentController.text.length < 4) {
+                        if (_nameController.text.length < 4) {
                           validation[0] = !validation[0];
                         }
                         if (!_emailController.text
@@ -321,8 +327,6 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                                 );
                               });
                         }
-                        // TO-DO: (then) Password confirmation
-                        // TO-DO: (then) Commit to database
                       }),
                   GreenElevatedButton(
                       text: "Cancel",
@@ -350,11 +354,13 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
 
       userInfoCubit.setUserInfo(
           _userReference,
-          _equipmentController.text,
+          _nameController.text,
           _emailController.text,
           _passwordController.text.isNotEmpty
               ? _passwordController.text
               : _passwordConfirmController.text);
+      _passwordConfirmController.text = "";
+      // _passwordController.text = "";
       _showConfirmation();
     } catch (error) {
       scaffoldMessenger.showSnackBar(SnackBar(
@@ -381,7 +387,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                     text: "OK",
                     onPressed: () {
                       // Wait a few seconds for info to load
-                      Future.delayed(const Duration(seconds: 3));
+                      Future.delayed(const Duration(seconds: 5));
                       // Pop all dialogs
                       Navigator.pop(context);
                       Navigator.pop(context);

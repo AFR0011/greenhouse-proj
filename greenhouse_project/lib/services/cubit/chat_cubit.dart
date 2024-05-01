@@ -8,12 +8,14 @@ class ChatCubit extends Cubit<ChatState> {
   final CollectionReference messages =
       FirebaseFirestore.instance.collection('messages');
   final DocumentReference? reference;
+  bool _isActive = true; // Flag to track the status of the ChatCubit
 
   ChatCubit(this.reference) : super(ChatLoading()) {
     _getMessages();
   }
+
   void _getMessages() {
-    //Get user's chats
+    // Get user's chats
     messages
         .where('chat', isEqualTo: reference)
         .orderBy('timestamp', descending: false)
@@ -22,7 +24,9 @@ class ChatCubit extends Cubit<ChatState> {
       final List<MessageData> messages =
           snapshot.docs.map((doc) => MessageData.fromFirestore(doc)).toList();
 
-      emit(ChatLoaded([...messages]));
+      if (_isActive) {
+        emit(ChatLoaded([...messages]));
+      }
     }, onError: (error) {
       emit(ChatError(error.toString()));
     });
@@ -30,14 +34,29 @@ class ChatCubit extends Cubit<ChatState> {
 
   Future<void> sendMessage(String message, DocumentReference receiver,
       DocumentReference sender, DocumentReference chat) async {
-    await messages.add({
-      "chat": chat,
-      "message": message,
-      "receiver": receiver,
-      "sender": sender,
-      "timestamp": Timestamp.now()
-    });
-    return;
+    if (!_isActive) {
+      return; // Do nothing if the ChatCubit is closed
+    }
+
+    try {
+      await messages.add({
+        "chat": chat,
+        "message": message,
+        "receiver": receiver,
+        "sender": sender,
+        "timestamp": Timestamp.now()
+      });
+    } catch (error) {
+      emit(ChatError(
+          error.toString())); // Emit an error state if an error occurs
+    }
+  }
+
+  // Close (cubit destructor)
+  @override
+  Future<void> close() {
+    _isActive = false; // Set the flag to indicate that the ChatCubit is closed
+    return super.close();
   }
 }
 

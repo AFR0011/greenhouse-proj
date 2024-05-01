@@ -263,6 +263,10 @@ void loop() {
   Firebase.setInt(fbdo, timeDataPath, timestamp);
 
 
+
+
+
+
  /* // Handle errors, if any
   if (Firebase.failed()) {
     Serial.print("Error sending data to Firebase: ");
@@ -272,7 +276,8 @@ void loop() {
 
     Serial.println("Data sent to Firebase successfully!");
   }
-*/if (!Firebase.failed()) {
+*/
+if (!Firebase.failed()) {
   // SEND API REQUEST
   // Prepare your Firestore API request here
   
@@ -316,6 +321,11 @@ void loop() {
   program1.condition = 2;
 
 
+
+// Fetched database data (programs)
+// Assigned to array of programs
+// loop over all programs, apply each one
+
   Program programs[] = {program1};
   programsLength = 1;
   
@@ -331,11 +341,6 @@ void loop() {
         break;
         case 2:
           if (soilMoisture < currProgram.limit) {
-            pumpToggle(1023, currProgram.action);
-          }
-        break;
-        case 3:
-          if (soilMoisture == currProgram.limit) {
             pumpToggle(1023, currProgram.action);
           }
         break;

@@ -97,7 +97,6 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             );
           }
           // Show page content once user info is loaded
-          // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
             // Store user info in local variables
             _userRole = state.userRole;
@@ -106,12 +105,6 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             // Call function to create chats page
             return Theme(data: customTheme, child: _createChatsPage());
           }
-          // Show error if there is an issues with user info
-          else if (state is UserInfoError) {
-            return Center(child: Text('Error: ${state.errorMessage}'));
-          }
-          // If somehow state doesn't match predefined states;
-          // never happens; but, anything can happen
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
@@ -128,71 +121,72 @@ class _ChatsPageState extends State<_ChatsPageContent> {
     );
   }
 
-  // Create chats page function
   Widget _createChatsPage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
-    // Page content
+    // Main page content
     return Scaffold(
-      //Main appbar (header)
       appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      body: _buildChatsList(),
+      bottomNavigationBar:
+          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+    );
+  }
 
-      // BlocBuilder for chats cubit (all chats)
-      body: BlocBuilder<ChatsCubit, ChatsState>(builder: (context, state) {
-        // Show "loading screen" if processing chat state
+  Widget _buildChatsList() {
+    // BlocBuilder for chats cubit (all chats)
+    return BlocBuilder<ChatsCubit, ChatsState>(
+      builder: (context, state) {
         if (state is ChatsLoading) {
-          return const CircularProgressIndicator();
-        }
-        // Show chat messages once chat state is loaded
-        else if (state is ChatsLoaded) {
-          List<ChatsData?> chatsList = state.chats; // chats list
-          // Display nothing if no chats
+          // Show loading indicator while chats are being fetched
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is ChatsLoaded) {
+          final chatsList = state.chats;
           if (chatsList.isEmpty) {
-            return const Text("No chats...");
-          }
-          // Display chats
-          else {
+            // Display a message if there are no chats
+            return const Center(child: Text("No chats..."));
+          } else {
+            // Display the list of chats
             return ListView.builder(
               shrinkWrap: true,
               itemCount: chatsList.length,
               itemBuilder: (context, index) {
-                ChatsData? chat = chatsList[index]; // chat data
-                Map<String, dynamic>? receiverData = chat?.receiverData;
-                // Navigate to chat page when chat is pressed
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ChatPage(
-                                  userCredential: widget.userCredential,
-                                  chatReference: chat?.reference,
-                                )));
-                  },
-                  // Display chat info
-                  child: ListTile(
-                    title: Text(
-                        "${receiverData?['name']} ${receiverData?['surname']}"),
-                  ),
-                );
+                final chat = chatsList[index];
+                return _buildChatItem(chat);
               },
             );
           }
-        }
-        // Show error message once an error occurs
-        else if (state is ChatsError) {
+        } else if (state is ChatsError) {
+          // Display an error message if chats cannot be loaded
           return Center(child: Text('Error: ${state.error}'));
+        } else {
+          // Display a generic error message if an unexpected state occurs
+          return const Center(child: Text("Something went wrong..."));
         }
-        // If the state is not any of the predefined states;
-        // never happens; but, anything can happen
-        else {
-          return const Text("Something went wrong...");
-        }
-      }),
-      // Footer nav bar
-      bottomNavigationBar:
-          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+      },
+    );
+  }
+
+  Widget _buildChatItem(ChatsData? chat) {
+    final receiverData = chat?.receiverData;
+    // Display chat information
+    return GestureDetector(
+      onTap: () {
+        // Navigate to the chat page when a chat is tapped
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatPage(
+              userCredential: widget.userCredential,
+              chatReference: chat?.reference,
+            ),
+          ),
+        );
+      },
+      child: ListTile(
+        title: Text("${receiverData?['name']} ${receiverData?['surname']}"),
+      ),
     );
   }
 }

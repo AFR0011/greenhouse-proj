@@ -124,8 +124,6 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           }
-          // If somehow state doesn't match predefined states;
-          // never happens; but, anything can happen
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
