@@ -16,11 +16,15 @@
 #define WIFI_PASSWORD "WIFI_PASSWORD"
 
 // Insert Firebase project API Key
-#define API_KEY "AIzaSyC9Yb8SohWmWsAWxkKcj7eUcIqJnl_jdYc"
+#define API_KEY "Your_API_Key"
 
 // Insert Authorized Email and Corresponding Password
-#define USER_EMAIL "admin@admin.com"
-#define USER_PASSWORD 12345678
+#define USER_EMAIL "board1@arduino.com"
+#define USER_PASSWORD "12345678"
+
+
+// Define your Firebase credentials
+#define FIREBASE_HOST "https://greenhouse-ctrl-system-default-rtdb.europe-west1.firebasedatabase.app/"
 
 // Insert RTDB URLefine the RTDB URL
 #define DATABASE_URL "https://greenhouse-ctrl-system-default-rtdb.europe-west1.firebasedatabase.app/"
@@ -43,9 +47,6 @@ String phcPath = "/light";
 String gasPath = "/gas";
 String smPath = "/soilMoisture";
 String timePath = "/timestamp";
-
-// Parent Node (to be updated in every loop)
-String parentPath;
 
 FirebaseJson json;
 
@@ -87,8 +88,15 @@ unsigned long timerDelay = 180000;
 
 DHT dht = DHT(dhtPin, DHTTYPE);
 
-// Define functions
+class Program {       
+public:
+  int action;
+  int limit;
+  String equipment;
+  int condition;
+};
 
+// Define functions
 void initWiFi() { // Initialize WiFi
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.print("Connecting to WiFi ..");
@@ -106,50 +114,54 @@ unsigned long getTime() { // Get current epoch time
   return now;
 }
 
+void fetchPrograms(int programsLength, Program programs[], String programsPath) {
+  Firebase.getJSON(fbdo, programsPath);
+  if (Firebase.success()) {
+    FirebaseJsonArray programsArray = fbdo.jsonObjectPtr()->getJsonArray("programs");
+    int numPrograms = programsArray.size();
+    
+    // Loop through each program in the array
+    for (int i = 0; i < numPrograms; i++) {
+      FirebaseJsonObject programObj = programsArray.getJsonObject(i);
+      
+      // Extract program data from JSON object
+      int action = programObj.getInt("action");
+      int limit = programObj.getInt("limit");
+      String equipment = programObj.getString("equipment");
+      int condition = programObj.getInt("condition");
 
-// Equipment control functions 
-void pumpToggle(float pwm, int status){
-  digitalWrite(smIn1, status);
-  digitalWrite(smIn2, !status);
-  analogWrite(l298Ena, pwm);
-  delay(500);
-}
+      // Create a Program object and add it to the programs array
+      Program program;
+      program.action = action;
+      program.limit = limit;
+      program.equipment = equipment;
+      program.condition = condition;
 
-/*CHECK FUNCTIONALITY*/
-// void pumpTurnOff(float pwm) {
-//   digitalWrite(smIn1, LOW);
-//   digitalWrite(smIn2, HIGH);
-//   analogWrite(l298Ena, pwm);
-//   delay(500);
-// }
-
-void fanTurnOn(float pwm){
-  digitalWrite(dhtIn3, HIGH);
-  digitalWrite(dhtIn4, LOW);
-  analogWrite(l298Ena, pwm);
-  delay(500);
-}
-void buzzerTurnOn() {
-  digitalWrite(bzPin, HIGH);
-  Serial.println("Turning Buzzer On!");
-  delay(500);
-}
-void buzzerTurnOff() {
-  Serial.println("Turning Buzzer Off!");
-  digitalWrite(bzPin, LOW);
-  delay(500);
-}
-
-void soilMoistureCondition(limit, condition, soilMoisture) {
-  if (condition == 1) {
-    if (soilMoisture < limit) {
-      action
+      programs[i] = program; // Add program to array of programs
     }
+    programsLength = numPrograms; // Update programsLength variable
+  } else {
+    Serial.print("Error fetching programs from Firebase: ");
+    Serial.println(fbdo.errorReason());
   }
 }
 
-
-if (soilMositure ">50")
+void printPrograms(int programsLength, Program programs[]) {
+  Serial.println("Programs:");
+  for (int i = 0; i < programsLength; i++) {
+    Program program = programs[i];
+    Serial.print("Program ");
+    Serial.print(i + 1);
+    Serial.print(": Action - ");
+    Serial.print(program.action);
+    Serial.print(", Limit - ");
+    Serial.print(program.limit);
+    Serial.print(", Equipment - ");
+    Serial.print(program.equipment);
+    Serial.print(", Condition - ");
+    Serial.println(program.condition);
+  }
+}
 
 void setup() {
   // Set pin modes
@@ -172,10 +184,10 @@ void setup() {
   timeClient.begin();
 
   // Assign database connection parameters
-  config.api_key = API_KEY
-  config.database_url = DATABASE_URL
-  auth.user.email = USER_EMAIL
-  auth.user.password = USER_PASSWORD
+  config.api_key = API_KEY;
+  config.database_url = DATABASE_URL;
+  auth.user.email = USER_EMAIL;
+  auth.user.password = USER_PASSWORD;
   
   // More configuration
   Firebase.reconnectWiFi(true);
@@ -187,7 +199,6 @@ void setup() {
   // Assign the maximum retry of token generation
   config.max_token_generation_retry = 5;
 
-  
   // Initialize the library with the Firebase authen and config
   Firebase.begin(&config, &auth);
 
@@ -207,152 +218,150 @@ void setup() {
   Serial.begin(9600);
 }
 
-class Program {       
-  public:
-  int action;
-  int limit;
-  string equipment;
-  int condition;
-};
-
 void loop() {
-  
-  // Read sensor values
-  soilMoisture = (abs(1023 - analogRead(smPin)) / 1023) * 100;
-  humidity = dht.readHumidity();
-  temperature  = dht.readTemperature();
-  intruderDetected = digitalRead(irPin);
-  gas = map(analogRead(gasPin), 0, 1023, 0, 255);
-  phc = digitalRead(phcPin);
+  // Fetch and print programs
+  String programsPath = databasePath + "/programs";
+  Program programs[10]; // assuming maximum 10 programs
+  int programsLength = 0;
+  fetchPrograms(programsLength, programs, programsPath);
+  printPrograms(programsLength, programs);
 
-  // SEND DATA TO DATABASE
-
-  // Prepare JSON data
-  json.clear();
-  json.addFloat("soilMoisture", soilMoisture);
-  json.addFloat("humidity", humidity);
-  json.addFloat("temperature", temperature);
-  json.addInt("intruderDetected", intruderDetected);
-  json.addInt("gas", gas);
-  json.addFloat("light", phc);
-
-  // Get current epoch time
-  timestamp = getTime();
-
-  // Define parent path
-  parentPath = databasePath + boardNo + "/readings";
-  // 12345678/1/readings
-
-  // Set child paths
-  String tempDataPath = parentPath + tempPath; // 12345678/1/readings/temperature
-  String humDataPath = parentPath + humPath; 
-  String intrDataPath = parentPath + intrPath;
-  String gasDataPath = parentPath + gasPath;
-  String phcDataPath = parentPath + phcPath;
-  String smDataPath = parentPath + smPath;
-  String timeDataPath = parentPath + timePath;
-  
-
-  // Push data to Firebase
-  Firebase.setFloat(fbdo, tempDataPath, json.getFloat("temperature"));
-  Firebase.setFloat(fbdo, humDataPath, json.getFloat("humidity"));
-  Firebase.setInt(fbdo, presDataPath, json.getInt("intruder"));
-  Firebase.setFloat(fbdo, presDataPath, json.getFloat("soilMoisture"));
-  Firebase.setFloat(fbdo, presDataPath, json.getFloat("light"));
-  Firebase.setInt(fbdo, presDataPath, json.getInt("gas"));
-  Firebase.setInt(fbdo, timeDataPath, timestamp);
-
-
-
-
-
-
- /* // Handle errors, if any
-  if (Firebase.failed()) {
-    Serial.print("Error sending data to Firebase: ");
-    Serial.println(Firebase.error());
-  } else {
-    // SEND API REQUEST
-
-    Serial.println("Data sent to Firebase successfully!");
-  }
-*/
-if (!Firebase.failed()) {
-  // SEND API REQUEST
-  // Prepare your Firestore API request here
-  
-  // For example, to send a POST request to add a document to a Firestore collection:
-  // Replace "your-project-id" with your actual project ID
-  // Replace "your-collection" with the name of your Firestore collection
-  // Replace "your-auth-token" with your Firebase authentication token
-  
-  String request = '{ "readings": {"gas": ' + gas + ', "temperature": ' + temperature + ', "humidity": ' + humidity + ', "intruder": ' + intruder + ', "lightIntensity": ' + lightintensity + ', "soilMoisture": ' + soilMoisture + ', "timestamp": ' + timestamp + '} }';
-
-  Firebase.stream()
-          .setToken("your-auth-token")
-          .setProjectId("your-project-id")
-          .addContentType(FIREBASE_JSON)
-          .addHeader("X-HTTP-Method-Override: POST")
-          .send("POST", "/v1/projects/your-project-id/databases/(default)/documents/your-collection", request);
-
-  if (Firebase.success()) {
-    Serial.println("API request sent to Firestore successfully!");
-    Serial.print("Response code: ");
-    Serial.println(Firebase.httpCode());
-    Serial.print("Response: ");
-    Serial.println(Firebase.responseString());
-  } else {
-    Serial.print("Error sending API request to Firestore: ");
-    Serial.println(Firebase.error());
-  }
-} else {
-  Serial.print("Error sending data to Firebase: ");
-  Serial.println(Firebase.error());
+  // Add your program execution logic here
 }
 
-    
 
+ // // Read sensor values
+  // soilMoisture = (abs(1023 - analogRead(smPin)) / 1023) * 100;
+  // humidity = dht.readHumidity();
+  // temperature  = dht.readTemperature();
+  // intruderDetected = digitalRead(irPin);
+  // gas = map(analogRead(gasPin), 0, 1023, 0, 255);
+  // phc = digitalRead(phcPin);
 
+  // // SEND DATA TO DATABASE
 
-  Program program1;
-  program1.action = 0;
-  program1.equipment = "pump";
-  program1.limit = 50;
-  program1.condition = 2;
+  // // Prepare JSON data
+  // json.clear();
+  // json.addFloat("soilMoisture", soilMoisture);
+  // json.addFloat("humidity", humidity);
+  // json.addFloat("temperature", temperature);
+  // json.addInt("intruderDetected", intruderDetected);
+  // json.addInt("gas", gas);
+  // json.addFloat("light", phc);
 
+  // // Get current epoch time
+  // timestamp = getTime();
 
+  // // Define parent path
+  // readingsPath = databasePath + boardNo + "/readings";
+  // // 12345678/1/readings
 
-// Fetched database data (programs)
-// Assigned to array of programs
-// loop over all programs, apply each one
-
-  Program programs[] = {program1};
-  programsLength = 1;
+  // // Set child paths
+  // String tempDataPath = readingsPath + tempPath; // 12345678/1/readings/temperature
+  // String humDataPath = readingsPath + humPath; 
+  // String intrDataPath = readingsPath + intrPath;
+  // String gasDataPath = readingsPath + gasPath;
+  // String phcDataPath = readingsPath + phcPath;
+  // String smDataPath = readingsPath + smPath;
+  // String timeDataPath = readingsPath + timePath;
   
-  for (int i = 0; i < programsLength; i++) {
-    currProgram = programs[i];
-    switch (currProgram.equipment) {
-      case "pump":
-      switch(currProgram.condition) {
-        case 1:
-          if (soilMoisture > currProgram.limit) {
-            pumpToggle(1023, currProgram.action);
-          }
-        break;
-        case 2:
-          if (soilMoisture < currProgram.limit) {
-            pumpToggle(1023, currProgram.action);
-          }
-        break;
-      }
-      break;
-      case "fan":
-      break;
-      case "lamp":
-      break;
 
-    }
-  }
-  // CALL FUNCTIONS BASED ON THOSE
+  // // Push data to Firebase
+  // Firebase.setFloat(fbdo, tempDataPath, json.getFloat("temperature"));
+  // Firebase.setFloat(fbdo, humDataPath, json.getFloat("humidity"));
+  // Firebase.setInt(fbdo, presDataPath, json.getInt("intruder"));
+  // Firebase.setFloat(fbdo, presDataPath, json.getFloat("soilMoisture"));
+  // Firebase.setFloat(fbdo, presDataPath, json.getFloat("light"));
+  // Firebase.setInt(fbdo, presDataPath, json.getInt("gas"));
+  // Firebase.setInt(fbdo, timeDataPath, timestamp);
 
-}
+
+
+
+
+
+ // Handle errors, if any
+//   if (Firebase.failed()) {
+//     Serial.print("Error sending data to Firebase: ");
+//     Serial.println(Firebase.error());
+//   } else {
+//   // SEND API REQUEST
+//   // Prepare your Firestore API request here
+  
+//   // For example, to send a POST request to add a document to a Firestore collection:
+//   // Replace "your-project-id" with your actual project ID
+//   // Replace "your-collection" with the name of your Firestore collection
+//   // Replace "your-auth-token" with your Firebase authentication token
+  
+//   String request = '{ "readings": {"gas": ' + gas + ', "temperature": ' + temperature + ', "humidity": ' + humidity + ', "intruder": ' + intruder + ', "lightIntensity": ' + lightintensity + ', "soilMoisture": ' + soilMoisture + ', "timestamp": ' + timestamp + '} }';
+
+//   Firebase.stream()
+//           .setToken("your-auth-token")
+//           .setProjectId("your-project-id")
+//           .addContentType(FIREBASE_JSON)
+//           .addHeader("X-HTTP-Method-Override: POST")
+//           .send("POST", "/v1/projects/your-project-id/databases/(default)/documents/your-collection", request);
+
+//   if (Firebase.success()) {
+//     Serial.println("API request sent to Firestore successfully!");
+//     Serial.print("Response code: ");
+//     Serial.println(Firebase.httpCode());
+//     Serial.print("Response: ");
+//     Serial.println(Firebase.responseString());
+//   } else {
+//     Serial.print("Error sending API request to Firestore: ");
+//     Serial.println(Firebase.error());
+//   }
+// }
+
+
+// // loop over all programs, apply each one
+
+//   for (int i = 0; i < programsLength; i++) {
+//     currProgram = programs[i];
+//     switch (currProgram.equipment) {
+//       case "pump":
+//       switch(currProgram.condition) {
+//         case 1:
+//           if (soilMoisture > currProgram.limit) {
+//             pumpToggle(currProgram.action);
+//           }
+//         break;
+//         case 2:
+//           if (soilMoisture < currProgram.limit) {
+//             pumpToggle(currProgram.action);
+//           }
+//         break;
+//       }
+//       break;
+//       case "fan":
+//       switch(currProgram.condition) {
+//         case 1:
+//           if (temprature > currProgram.limit) {
+//             fanToggle(currProgram.action);
+//           }
+//         break;
+//         case 2:
+//           if (soilMoisture < currProgram.limit) {
+//             pumpToggle(currProgram.action);
+//           }
+//         break;
+//       }
+//       break;
+//       case "lamp":
+//          switch(currProgram.condition) {
+//         case 1:
+//           if (phc > currProgram.limit) {
+//             LEDToggle(currProgram.action);
+//           }
+//         break;
+//         case 2:
+//           if (phc < currProgram.limit) {
+//             LEDToggle(currProgram.action);
+//           }
+//         break;
+//       }
+//       break;
+//     }
+//   }
+//   // CALL FUNCTIONS BASED ON THOSE
