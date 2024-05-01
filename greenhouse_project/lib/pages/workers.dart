@@ -56,6 +56,10 @@ class _WorkersPageState extends State<_WorkersPageContent> {
   // Custom theme
   final ThemeData customTheme = theme;
 
+  // Text Controllers
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+
   // Text controllers
   final TextEditingController _textController = TextEditingController();
 
@@ -226,8 +230,47 @@ class _WorkersPageState extends State<_WorkersPageContent> {
               }
             },
           ),
+          GreenElevatedButton(text: 'Add worker',
+           onPressed: (){
+            showDialog(context: context,
+             builder: (context){
+              return Dialog(
+                child: Column(
+                  //Textfields
+                  children: [
+                    TextField(
+                      controller: _usernameController,
+                    ),
+                    TextField(
+                      controller: _emailController,
+                    ),
+                    //Submit or Cancel
+                    Row(
+                      children: [
+                        GreenElevatedButton(
+                          text: 'Submit',
+                          onPressed: (){
+                            context
+                            .read<ManageWorkersCubit>()
+                            .createWorker(_emailController);
+                          }),
+                        GreenElevatedButton(
+                          text: 'Cancel',
+                           onPressed: (){
+                            Navigator.pop(context);
+                            _usernameController.clear();
+                            _emailController.clear();
+                           })
+                      ],
+                    )
+                  ],
+                ),
+              );
+             });
+           })
         ],
       ),
+
     );
   }
 }
