@@ -3,7 +3,7 @@
 /// TODO:
 /// - Error snackbar shows outside of dialogs
 ///   (either show a dialog for errors or fix this)
-/// - Add profile picture
+/// - Add profile picture (https://stackoverflow.com/questions/78159230/instance-of-clientexception-type-clientexception-is-not-a-subtype-of-type)
 /// - Revert controller text after "cancel" on edit dialogue
 ///
 library;
@@ -155,10 +155,10 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   }
 
 // Function to build profile content based on user data
-  Widget _buildProfileContent(Map<String, dynamic> userData) {
+  Widget _buildProfileContent(UserData userData) {
     // Assign user data to controllers
-    _emailController.text = userData['email'];
-    _nameController.text = userData['name'];
+    _emailController.text = userData.email;
+    _nameController.text = userData.name;
     _passwordController.text = "";
     return Scaffold(
       appBar: AppBar(
@@ -179,14 +179,20 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
       ),
       body: Column(
         children: [
-          // Profile picture (TODO: Implement profile picture functionality)
-          const Center(child: Text("PROFILE PIC")),
+          // Display user profile picture
+          // ClipOval(
+          //     child: Image.memory(
+          //   userData.picture,
+          //   fit: BoxFit.cover,
+          //   width: 100,
+          //   height: 100,
+          // )),
           // Display user name
-          _buildProfileField("Name", userData['name']),
+          _buildProfileField("Name", userData.name),
           // Display user email
-          _buildProfileField("Email", userData['email']),
+          _buildProfileField("Email", userData.email),
           // Display password (if user is viewing their own profile)
-          if (userData['email'] == widget.userCredential.user?.email)
+          if (userData.email == widget.userCredential.user?.email)
             _buildProfileField("Password", "*******"),
           // Action buttons based on user role and authorization
           _buildActionButtons(userData),
@@ -210,17 +216,17 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   }
 
 // Function to build action buttons based on user role and authorization
-  Widget _buildActionButtons(Map<String, dynamic> userData) {
+  Widget _buildActionButtons(UserData userData) {
     return Align(
       alignment: Alignment.bottomCenter,
-      child: userData['role'] == 'worker' && _userRole == 'manager'
+      child: userData.role == 'worker' && _userRole == 'manager'
           ? Row(
               children: [
                 GreenElevatedButton(text: "Message", onPressed: () {}),
                 GreenElevatedButton(text: "Delete", onPressed: () {}),
               ],
             )
-          : userData['email'] == widget.userCredential.user?.email
+          : userData.email == widget.userCredential.user?.email
               ? GreenElevatedButton(
                   text: "Edit",
                   onPressed: () {
