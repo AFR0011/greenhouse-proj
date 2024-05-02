@@ -21,7 +21,7 @@ class TaskCubit extends Cubit<TaskState> {
 
     //Get user Tasks
     tasks
-        .where(userData['role'], isEqualTo: userReference)
+        .where(userData['reference'], isEqualTo: userReference)
         .orderBy('dueDate', descending: true)
         .snapshots()
         .listen((snapshot) {
