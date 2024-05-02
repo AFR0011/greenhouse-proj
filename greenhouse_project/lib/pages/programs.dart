@@ -2,7 +2,8 @@
 ///
 /// TODO:
 /// - Update code to submit relevant data (line 311-*)
-/// - Fix async context usage
+/// - (then) make API call to sync databases
+/// - Fix context usage in async gaps
 ///
 library;
 

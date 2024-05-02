@@ -17,4 +17,3 @@ final class StatusError extends EquipmentStatusState {
   final String error;
   StatusError(this.error);
 }
-

@@ -1,7 +1,6 @@
 /// Chat Page - allows communication between 2 users
 ///
 /// TODO:
-/// - Refresh messages for receiver after sending a message
 /// - Check cubit usage (lines 129-200?)
 library;
 

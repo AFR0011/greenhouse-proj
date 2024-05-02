@@ -1,7 +1,7 @@
 /// Plants page - view plants and sensor readings
 ///
 /// TODO:
-/// -
+/// - Chat graphs
 ///
 library;
 

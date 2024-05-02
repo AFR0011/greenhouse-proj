@@ -7,8 +7,6 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(AuthInitial());
 
   void authLoginRequest(String email, String password) async {
-    /* CHECK INPUT VALIDITY*/
-
     emit(AuthLoading());
     try {
       FirebaseAuth auth = FirebaseAuth.instance;
@@ -24,8 +22,8 @@ class AuthCubit extends Cubit<AuthState> {
 
   void authLogoutRequest() async {
     try {
+      await FirebaseAuth.instance.signOut();
       emit(AuthLoading());
-      /* ATTEMPT FIREBASE LOGOUT*/
       return emit(AuthInitial());
     } catch (e) {
       return emit(AuthFailure("Logout Failed"));

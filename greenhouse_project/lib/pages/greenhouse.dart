@@ -231,7 +231,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
             // Equipment status subheading and details button
             _buildSubheadingRow(
               "Equipment Status",
-              EquipmentStatusPage(userCredential: widget.userCredential),
+              EquipmentPage(userCredential: widget.userCredential),
             ),
           ],
         ),
