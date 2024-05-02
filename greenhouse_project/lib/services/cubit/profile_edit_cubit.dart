@@ -14,6 +14,4 @@ class ProfileEditCubit extends Cubit<List<bool>> {
       return true;
     }
   }
-
-  checkValidation() {}
 }

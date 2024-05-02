@@ -65,6 +65,10 @@ class _TasksPageState extends State<_TasksPageContent> {
 
   // Text controllers
   final TextEditingController _textController = TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descController = TextEditingController();
+  final TextEditingController _workerController = TextEditingController();
+  final TextEditingController _duedateController = TextEditingController();
 
   // Index of footer nav selection
   final int _selectedIndex = 0;
@@ -247,6 +251,51 @@ class _TasksPageState extends State<_TasksPageContent> {
               }
             },
           ),
+          //Add new tasks
+          GreenElevatedButton(
+            text: 'Add Task',
+             onPressed: (){
+              showDialog(
+                context: context,
+                 builder: (context){
+                  return Dialog(
+                    child: Column(
+                      //Textfield
+                      children: [
+                        TextField(
+                          controller: _titleController,
+                        ),
+                        TextField(
+                          controller: _descController,
+                        ),
+                        TextField(
+                          controller: _workerController,
+                        ),
+                        TextField(
+                          controller: _duedateController,
+                        ),
+                        //Submit & Cancel
+                        Row(
+                          children: [
+                            GreenElevatedButton(
+                              text: 'Submit',
+                              onPressed: (){}),
+                              GreenElevatedButton(
+                                text: 'Cancel',
+                                onPressed: (){
+                                  Navigator.pop(context);
+                                  _titleController.clear();
+                                  _descController.clear();
+                                  _workerController.clear();
+                                  _duedateController.clear();
+                                })
+                          ],
+                        )
+                      ],
+                    )
+                  );
+                 });
+             })
         ],
       ),
 

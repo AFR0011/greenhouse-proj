@@ -31,3 +31,31 @@ class GreenElevatedButton extends StatelessWidget {
     );
   }
 }
+
+class RedElevatedButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+
+  const RedElevatedButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0), // Adjust as needed
+          ),
+        ),
+        child: Text(text, style: buttonTextStyle),
+      ),
+    );
+  }
+}

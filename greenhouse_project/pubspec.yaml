@@ -47,6 +47,8 @@ dependencies:
   firebase_database: ^10.4.10
   list_utilities: ^1.0.3
   mailer: ^6.1.0
+  firebase_storage: ^11.7.4
+  firebase_messaging: ^14.9.1
 
 
 dev_dependencies:
