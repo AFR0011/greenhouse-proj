@@ -46,7 +46,7 @@ class ManageWorkersCubit extends ManagementCubit {
 
       // Create our message.
       final message = Message()
-            ..from = const Address('noreply@greenmonitor.co', 'Greenhouse Co.')
+            ..from = const Address('itec229.gr1.21008639@gmail.com', 'Greenhouse Co.')
             ..recipients.add(email)
             // ..ccRecipients.addAll(['abc@gmail.com', 'xyz@gmail.com']) // For Adding Multiple Recipients
             // ..bccRecipients.add(Address('a@gmail.com')) For Binding Carbon Copy of Sent Email
