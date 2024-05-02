@@ -1,13 +1,13 @@
 part of 'management_cubit.dart';
 
-
-
 class ManageWorkersCubit extends ManagementCubit {
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
 
   final UserCredential? user;
-
+  final String mailerUsername = 'itec229.gr1.21008639@gmail.com'; //Your Email
+  final String mailerPassword =
+      'pnvt twlg mrru dmus'; // 16 Digits App Password Generated From Google Account
   ManageWorkersCubit(this.user) : super(ManageWorkersLoading()) {
     if (user != null) {
       _fetchWorkers();
@@ -24,61 +24,75 @@ class ManageWorkersCubit extends ManagementCubit {
       emit(ManageWorkersError(error));
     });
   }
-Future<void> createWorker(email) async{
-    FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: '12345678');
-    try{
+
+  // Create worker account and send credentials via email
+  Future<void> createWorker(String email) async {
+    try {
+      // Create user profile
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: '12345678');
+
+      // Create user document in Firestore
       await users.add({
         "creationDate": Timestamp.now(),
-        "emai":email,
-        "name":email,
-        "surname":email,
-        "role":"worker"
+        "email": email,
+        "name": email,
+        "surname": email,
+        "role": "worker"
       });
-  } catch (error){
-    emit(ManageWorkersError(error.toString()));
-  }
-  }
 
-  String username = 'itec229.gr1.21008639@gmail.com'; //Your Email
-  String password =
-      'pnvt twlg mrru dmus'; // 16 Digits App Password Generated From Google Account
+      // Mail transfer server
+      final smtpServer = gmail(mailerUsername, mailerPassword);
 
-  final smtpServer = gmail(username,password);
-  // Use the SmtpServer class to configure an SMTP server:
-  // final smtpServer = SmtpServer('smtp.domain.com');
-  // See the named arguments of SmtpServer for further configuration
-  // options.
-
-  // Create our message.
-  final message = Message()
-        ..from = Address(username, 'Greenhouse Co.')
-        ..recipients.add('recipient-email@gmail.com')
-        // ..ccRecipients.addAll(['abc@gmail.com', 'xyz@gmail.com']) // For Adding Multiple Recipients
-        // ..bccRecipients.add(Address('a@gmail.com')) For Binding Carbon Copy of Sent Email
-        ..subject = 'Mail from Mailer'
-        ..text = 'Hello dear, An account with the following pass'
-      // ..html = "<h1>Test</h1>\n<p>Hey! Here's some HTML content</p>"; // For Adding Html in email
-      // ..attachments = [
-      //   FileAttachment(File('image.png'))  //For Adding Attachments
-      //     ..location = Location.inline
-      //     ..cid = '<myimg@3.141>'
-      // ]
-      ;
-
-  try {
-    final sendReport = await send(message, smtpServer);
-    print('Message sent: ' + sendReport.toString());
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Mail Send Successfully")));
-  } on MailerException catch (e) {
-    print('Message not sent.');
-    print(e.message);
-    for (var p in e.problems) {
-      print('Problem: ${p.code}: ${p.msg}');
+      // Create our message.
+      final message = Message()
+            ..from = const Address('noreply@greenmonitor.co', 'Greenhouse Co.')
+            ..recipients.add(email)
+            // ..ccRecipients.addAll(['abc@gmail.com', 'xyz@gmail.com']) // For Adding Multiple Recipients
+            // ..bccRecipients.add(Address('a@gmail.com')) For Binding Carbon Copy of Sent Email
+            ..subject = 'Greenhouse Account Created'
+            ..text =
+                "Oh well hello there!\n Your email was used by a manager to create an account in the greenhouse control system. You can now login using your email and the following password:\n 12345678\n Please make sure to change this password as soon as possible!"
+          // ..html = "<h1>Test</h1>\n<p>Hey! Here's some HTML content</p>"; // For Adding Html in email
+          // ..attachments = [
+          //   FileAttachment(File('image.png'))  //For Adding Attachments
+          //     ..location = Location.inline
+          //     ..cid = '<myimg@3.141>'
+          // ]
+          ;
+      try {
+        final sendReport = await send(message, smtpServer);
+        print('Message sent: ' + sendReport.toString());
+      } on MailerException catch (e) {
+        print('Message not sent.');
+        print(e.toString());
+      }
+    } catch (error) {
+      emit(ManageWorkersError(error.toString()));
     }
   }
 
+  // Future<void> deleteWorker(WorkerData workerData) async {
+  //   try {
+  //     // Get user email
+  //     await FirebaseAuth.instance.currentUser!.delete();
+
+  //     // Create user document in Firestore
+  //     await workerData.reference.delete();
+
+  //     try {
+
+  //       print('Message sent: ' + sendReport.toString());
+  //     } on MailerException catch (e) {
+  //       print('Message not sent.');
+  //       print(e.toString());
+  //     }
+  //   } catch (error) {
+  //     emit(ManageWorkersError(error.toString()));
+  //   }
+  // }
 }
+
 class WorkerData {
   final String email;
   final DateTime creationDate;

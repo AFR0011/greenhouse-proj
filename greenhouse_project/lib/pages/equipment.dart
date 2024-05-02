@@ -1,8 +1,7 @@
 /// Equipment page - view and modify equipment status
 ///
 /// TODO:
-/// - Change equipment status references to equipment
-///
+/// -
 ///
 library;
 
@@ -16,10 +15,10 @@ import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
-class EquipmentStatusPage extends StatelessWidget {
+class EquipmentPage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
 
-  const EquipmentStatusPage({super.key, required this.userCredential});
+  const EquipmentPage({super.key, required this.userCredential});
 
   @override
   Widget build(BuildContext context) {

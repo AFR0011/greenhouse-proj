@@ -1,7 +1,7 @@
 /// Tasks page - CRUD for worker tasks
 ///
 /// TODO:
-/// -
+/// - Add task creation option
 ///
 library;
 
