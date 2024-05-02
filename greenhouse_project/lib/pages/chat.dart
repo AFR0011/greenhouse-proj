@@ -12,6 +12,7 @@ import 'package:greenhouse_project/services/cubit/chat_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/message_bubble.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatPage extends StatelessWidget {
@@ -178,7 +179,7 @@ class _ChatPageState extends State<_ChatPageContent> {
     );
   }
 
-// Build the list of chat messages
+  // Build the list of chat messages
   Widget _buildChatMessages(List<MessageData?> messages) {
     if (messages.isEmpty) {
       return const Center(child: Text("Write your first message!"));
@@ -188,14 +189,11 @@ class _ChatPageState extends State<_ChatPageContent> {
         itemCount: messages.length,
         itemBuilder: (context, index) {
           MessageData? message = messages[index];
-          Alignment alignment = message?.receiver == _userReference
-              ? Alignment.centerLeft
-              : Alignment.centerRight;
-          return ListTile(
-            title: Align(
-              alignment: alignment,
-              child: Text("${message?.message}"),
-            ),
+          bool isSender = message?.receiver != _userReference;
+          return MessageBubble(
+            message: message?.message ?? "",
+            isSender: isSender,
+            theme: customTheme,
           );
         },
       );
