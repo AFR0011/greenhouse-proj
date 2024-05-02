@@ -279,6 +279,8 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                     onPressed: () async {
                                       await manageWorkersCubit
                                           .createWorker(_emailController.text);
+                                          Navigator.pop(context);
+                                      _emailController.clear();
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
                                               content: Text(
