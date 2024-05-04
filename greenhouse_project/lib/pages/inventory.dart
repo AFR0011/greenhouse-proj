@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
+import 'package:greenhouse_project/services/cubit/inventory_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
@@ -41,6 +42,9 @@ class InventoryPage extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => InventoryCubit(),
+        ),
+        BlocProvider(
+          create: (context) => InventoryEditCubit(),
         ),
       ],
       child: _InventoryPageContent(userCredential: userCredential),
@@ -250,23 +254,41 @@ class _InventoryPageState extends State<_InventoryPageContent> {
               return ListTile(
                 title: Text(inventory.name),
                 subtitle: Text(inventory.timeAdded.toString()),
-                trailing: _userRole == 'manager' ? FittedBox(child: Row(children: [GreenElevatedButton(text:"Approve", onPressed: (){context.read<InventoryCubit>().approveItem(inventory.reference);}), GreenElevatedButton(text: "Deny", onPressed: (){context.read<InventoryCubit>().removeInventory(inventory.reference);})],)):Text(inventory.amount.toString()),
+                trailing: _userRole == 'manager'
+                    ? FittedBox(
+                        child: Row(
+                        children: [
+                          GreenElevatedButton(
+                              text: "Approve",
+                              onPressed: () {
+                                context
+                                    .read<InventoryCubit>()
+                                    .approveItem(inventory.reference);
+                              }),
+                          GreenElevatedButton(
+                              text: "Deny",
+                              onPressed: () {
+                                context
+                                    .read<InventoryCubit>()
+                                    .removeInventory(inventory.reference);
+                              })
+                        ],
+                      ))
+                    : Text(inventory.amount.toString()),
               );
             },
           ),
         ),
 
         // Add item button
-        Row(
-          children: [
-            GreenElevatedButton(
-                text: "Add Item",
+        Center(
+          child: GreenElevatedButton(
+              text: "Add Item",
 
-                // Display addition form
-                onPressed: () {
-                  _showAdditionForm(context);
-                })
-          ],
+              // Display addition form
+              onPressed: () {
+                _showAdditionForm(context);
+              }),
         )
       ],
     );
@@ -276,62 +298,100 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   void _showAdditionForm(BuildContext context) {
     // Get instance of inventory cubit from main context
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
+    InventoryEditCubit inventoryEditCubit =
+        BlocProvider.of<InventoryEditCubit>(context);
 
     // Display item addition form
     showDialog(
         context: context,
         builder: (context) {
           return Dialog(
-            child: Column(
-              children: [
-                TextField(
-                  controller: _equipmentController,
-                ),
-                TextField(
-                  controller: _descController,
-                ),
-                TextFormField(
-                  controller: _amountController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                ),
-
-                // Submit and cancel buttons
-                Row(
+            child: BlocBuilder<InventoryEditCubit, List<bool>>(
+              bloc: inventoryEditCubit,
+              builder: (context, state) {
+                return Column(
                   children: [
-                    GreenElevatedButton(
-                        text: "Submit",
-                        onPressed: () async {
-                          Map<String, dynamic> data = {
-                            "amount": num.parse(_amountController.text),
-                            "description": _descController.text,
-                            "name": _equipmentController.text,
-                            "timeAdded": DateTime.now(),
-                            "pending": _userRole == 'manager' ? false : true,
-                          };
-                          await inventoryCubit.addInventory(data).then((value) {
-                            Navigator.pop(context);
-                            _equipmentController.clear();
-                            _descController.clear();
-                            _amountController.clear();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("Item added succesfully")));
-                          });
-                        }),
-                    GreenElevatedButton(
-                        text: "Cancel",
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _equipmentController.clear();
-                          _descController.clear();
-                          _amountController.clear();
-                        })
+                    TextField(
+                      controller: _equipmentController,
+                      decoration: InputDecoration(
+                          errorText: state[0]
+                              ? ""
+                              : "Name should be longer than 1 characters."),
+                    ),
+                    TextField(
+                      controller: _descController,
+                      decoration: InputDecoration(
+                          errorText: state[1]
+                              ? ""
+                              : "Description should be longer than 2 characters."),
+                    ),
+                    TextFormField(
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
+                      decoration: InputDecoration(
+                          errorText:
+                              state[2] ? "" : "Amount should be more than 0."),
+                    ),
+
+                    // Submit and cancel buttons
+                    Row(
+                      children: [
+                        GreenElevatedButton(
+                            text: "Submit",
+                            onPressed: () async {
+                              List<bool> validation = [true, true, true];
+                              if (_equipmentController.text.length < 1) {
+                                validation[0] = !validation[0];
+                              }
+                              if (_descController.text.length < 2) {
+                                validation[1] = !validation[1];
+                              }
+                              if (int.parse(_amountController.text) > 0) {
+                                validation[2] = !validation[2];
+                              }
+
+                              bool isValid = context
+                                  .read<InventoryEditCubit>()
+                                  .updateState(validation);
+                              if(!isValid){}
+                              else {
+                              Map<String, dynamic> data = {
+                                "amount": num.parse(_amountController.text),
+                                "description": _descController.text,
+                                "name": _equipmentController.text,
+                                "timeAdded": DateTime.now(),
+                                "pending":
+                                    _userRole == 'manager' ? false : true,
+                              };
+                              await inventoryCubit
+                                  .addInventory(data)
+                                  .then((value) {
+                                Navigator.pop(context);
+                                _equipmentController.clear();
+                                _descController.clear();
+                                _amountController.clear();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content:
+                                            Text("Item added succesfully")));
+                              });
+                            }}),
+                        GreenElevatedButton(
+                            text: "Cancel",
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _equipmentController.clear();
+                              _descController.clear();
+                              _amountController.clear();
+                            })
+                      ],
+                    )
                   ],
-                )
-              ],
+                );
+              },
             ),
           );
         });
@@ -341,6 +401,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   void _showEditForm(BuildContext context, InventoryData inventory) {
     // Get instance of inventory cubit from main context
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
+    InventoryEditCubit inventoryEditCubit =
+    BlocProvider.of<InventoryEditCubit>(context);
 
     showDialog(
         context: context,
@@ -351,58 +413,94 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           _amountController.text = inventory.amount.toString();
 
           return Dialog(
-            child: Column(
-              // Textfields
-              children: [
-                TextField(
-                  controller: _equipmentController,
-                ),
-                TextField(
-                  controller: _descController,
-                ),
-                TextFormField(
-                  controller: _amountController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.digitsOnly
-                  ],
-                ),
-                // Submit and Cancel buttons
-                Row(
+            child: BlocBuilder<InventoryEditCubit, List<bool>>(
+              bloc: inventoryEditCubit,
+              builder: (context, state) {
+                return Column(
+                  // Textfields
                   children: [
-                    GreenElevatedButton(
-                        text: "Submit",
-                        onPressed: () async {
-                          Map<String, dynamic> data = {
-                            "amount": num.parse(_amountController.text),
-                            "description": _descController.text,
-                            "name": _equipmentController.text,
-                            "timeAdded": DateTime.now(),
-                            "pending": _userRole == 'manager' ? false : true,
-                          };
-                          inventoryCubit
-                              .updateInventory(inventory.reference, data)
-                              .then((value) {
-                            Navigator.pop(context);
-                            _equipmentController.clear();
-                            _descController.clear();
-                            _amountController.clear();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("Item Edited succesfully")));
-                          });
-                        }),
-                    GreenElevatedButton(
-                        text: "Cancel",
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _equipmentController.clear();
-                          _descController.clear();
-                          _amountController.clear();
-                        })
+                    TextField(
+                      controller: _equipmentController,
+                      decoration: InputDecoration(
+                          errorText: state[0]
+                              ? ""
+                              : "Name should be longer than 1 characters."),
+                    ),
+                    TextField(
+                      controller: _descController,
+                      decoration: InputDecoration(
+                          errorText: state[1]
+                              ? ""
+                              : "Description should be longer than 2 characters."),
+                    ),
+                    TextFormField(
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
+                      decoration: InputDecoration(
+                          errorText:
+                              state[2] ? "" : "Amount should be more than 0."),
+                    ),
+                    // Submit and Cancel buttons
+                    Row(
+                      children: [
+                        GreenElevatedButton(
+                            text: "Submit",
+                            onPressed: () async {
+                              List<bool> validation = [true, true, true];
+                              if (_equipmentController.text.length < 1) {
+                                validation[0] = !validation[0];
+                              }
+                              if (_descController.text.length < 2) {
+                                validation[1] = !validation[1];
+                              }
+                              if (int.parse(_amountController.text) > 0) {
+                                validation[2] = !validation[2];
+                              }
+
+                              bool isValid = context
+                                  .read<InventoryEditCubit>()
+                                  .updateState(validation);
+                              if (!isValid) {
+                              } else {
+                                Map<String, dynamic> data = {
+                                  "amount": num.parse(_amountController.text),
+                                  "description": _descController.text,
+                                  "name": _equipmentController.text,
+                                  "timeAdded": DateTime.now(),
+                                  "pending":
+                                      _userRole == 'manager' ? false : true,
+                                };
+
+                                inventoryCubit
+                                    .updateInventory(inventory.reference, data)
+                                    .then((value) {
+                                  Navigator.pop(context);
+                                  _equipmentController.clear();
+                                  _descController.clear();
+                                  _amountController.clear();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text("Item Edited succesfully")));
+                                });
+                              }
+                            }),
+                        GreenElevatedButton(
+                            text: "Cancel",
+                            onPressed: () {
+                              Navigator.pop(context);
+                              _equipmentController.clear();
+                              _descController.clear();
+                              _amountController.clear();
+                            })
+                      ],
+                    )
                   ],
-                )
-              ],
+                );
+              },
             ),
           );
         });
