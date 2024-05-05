@@ -21,7 +21,7 @@ class TaskCubit extends Cubit<TaskState> {
 
     //Get user Tasks
     tasks
-        .where(userData['reference'], isEqualTo: userReference)
+        .where(userData['role'], isEqualTo: userReference)
         .orderBy('dueDate', descending: true)
         .snapshots()
         .listen((snapshot) {
@@ -39,6 +39,21 @@ class TaskCubit extends Cubit<TaskState> {
           {'status': 'waiting'}
         ] as Map<String, dynamic>,
         SetOptions(merge: true));
+  }
+
+  void addTask(title, desc, worker, dueDate) async{
+    try{
+      await tasks.add({
+        "title" : title,
+        "description" : desc,
+        "status" : 'incomplete',
+        "dueDate" : dueDate,
+        "manager" : userReference,
+        "worker" : worker
+      });
+    } catch (error) {
+      emit(TaskError(error: error.toString()));
+    }
   }
 }
 

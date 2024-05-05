@@ -7,6 +7,10 @@ part 'chat_state.dart';
 class ChatCubit extends Cubit<ChatState> {
   final CollectionReference messages =
       FirebaseFirestore.instance.collection('messages');
+
+      final CollectionReference logs =
+      FirebaseFirestore.instance.collection('logs');
+
   final DocumentReference? reference;
   bool _isActive = true; // Flag to track the status of the ChatCubit
 
@@ -39,13 +43,22 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     try {
-      await messages.add({
+     DocumentReference externalId = await messages.add({
         "chat": chat,
         "message": message,
         "receiver": receiver,
         "sender": sender,
         "timestamp": Timestamp.now()
       });
+
+      logs.add({
+        "action": "create",
+        "description": "message sent by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "message",
+        "userId": reference,
+        "externalId": externalId,
+        });
     } catch (error) {
       emit(ChatError(
           error.toString())); // Emit an error state if an error occurs
