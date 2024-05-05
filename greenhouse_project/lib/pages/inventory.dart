@@ -263,14 +263,14 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                               onPressed: () {
                                 context
                                     .read<InventoryCubit>()
-                                    .approveItem(inventory.reference);
+                                    .approveItem(inventory.reference, _userReference);
                               }),
                           GreenElevatedButton(
                               text: "Deny",
                               onPressed: () {
                                 context
                                     .read<InventoryCubit>()
-                                    .removeInventory(inventory.reference);
+                                    .removeInventory(inventory.reference, _userReference);
                               })
                         ],
                       ))
@@ -367,7 +367,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                     _userRole == 'manager' ? false : true,
                               };
                               await inventoryCubit
-                                  .addInventory(data)
+                                  .addInventory(data, _userReference)
                                   .then((value) {
                                 Navigator.pop(context);
                                 _equipmentController.clear();
@@ -475,7 +475,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                 };
 
                                 inventoryCubit
-                                    .updateInventory(inventory.reference, data)
+                                    .updateInventory(inventory.reference, data, _userReference)
                                     .then((value) {
                                   Navigator.pop(context);
                                   _equipmentController.clear();
@@ -522,7 +522,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                         text: "Submit",
                         onPressed: () async {
                           inventoryCubit
-                              .removeInventory(inventory.reference)
+                              .removeInventory(inventory.reference, _userReference)
                               .then((value) {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(

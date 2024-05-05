@@ -8,6 +8,9 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
   final CollectionReference equipment =
       FirebaseFirestore.instance.collection('equipment');
 
+  final CollectionReference logs =
+      FirebaseFirestore.instance.collection('logs');
+
   EquipmentStatusCubit() : super(StatusLoading()) {
     _getEquipmentStatus();
   }
@@ -26,8 +29,18 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
     });
   }
 
-  void toggleStatus(DocumentReference reference, bool currentStatus) async {
+   void toggleStatus(DocumentReference userReference,
+   DocumentReference reference, bool currentStatus) async {
     reference.update({'status': !currentStatus});
+    
+    logs.add({
+        "action": "create",
+        "description": "equipment toggled by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "equipment status",
+        "userId": userReference,
+        "externalId": reference,
+        });
   }
 }
 
