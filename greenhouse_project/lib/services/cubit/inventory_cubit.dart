@@ -1,12 +1,17 @@
 import "package:cloud_firestore/cloud_firestore.dart";
+import "package:firebase_storage/firebase_storage.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter/foundation.dart";
 
 part 'inventory_state.dart';
 
 class InventoryCubit extends Cubit<InventoryState> {
+
   final CollectionReference inventory =
       FirebaseFirestore.instance.collection('inventory');
+
+      final CollectionReference logs =
+      FirebaseFirestore.instance.collection('logs');
 
   InventoryCubit() : super(InventoryLoading()) {
     _getInventory();
@@ -22,35 +27,76 @@ class InventoryCubit extends Cubit<InventoryState> {
     });
   }
 
-  Future<void> addInventory(Map<String, dynamic> data) async {
+  Future<void> addInventory(Map<String, dynamic> data,
+   DocumentReference userReference) async {
     try {
-      await inventory.add(data);
+      DocumentReference externalId = await inventory.add(data);
+
+      logs.add({
+        "action": "create",
+        "description": "inventory added by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "inventory",
+        "userId": userReference,
+        "externalId": externalId,
+        });    
+
     } catch (error) {
       emit(InventoryError(error.toString()));
     }
   }
 
-  Future<void> removeInventory(DocumentReference item) async {
+  Future<void> removeInventory(DocumentReference item, DocumentReference userReference) async {
     try {
+      logs.add({
+        "action": "Delete",
+        "description": "Item deleted by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "Inventory Item",
+        "userId": userReference,
+        "externalId": item,
+        });
+
       await item.delete();
-      // _getInventory();
+
     } catch (error) {
       emit(InventoryError(error.toString()));
     }
   }
 
   Future<void> updateInventory(
-      DocumentReference item, Map<String, dynamic> data) async {
+      DocumentReference item, Map<String, dynamic> data,
+       DocumentReference userReference) async {
     try {
       await item.set(data, SetOptions(merge: true));
-      // _getInventory();
+
+      logs.add({
+        "action": "Update",
+        "description": "Item updated by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "Inventory Item",
+        "userId": userReference,
+        "externalId": item,
+        });
+
     } catch (error) {
       emit(InventoryError(error.toString()));
     }
   }
-  Future<void> approveItem(DocumentReference itemRef) async {
+
+  Future<void> approveItem(DocumentReference itemRef, userReference) async {
   try {
     await itemRef.set({"pending": false}, SetOptions(merge: true));
+
+    logs.add({
+        "action": "Approve",
+        "description": "Inventory approved by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "Inventory Item",
+        "userId": userReference,
+        "externalId": itemRef,
+        });
+
   }
   catch (error){
     emit(InventoryError(error.toString()));
