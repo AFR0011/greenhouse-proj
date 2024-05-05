@@ -5,6 +5,7 @@
 ///
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -44,15 +45,18 @@ class WorkersPage extends StatelessWidget {
 
 class _WorkersPageContent extends StatefulWidget {
   final UserCredential userCredential; // user auth credentials
+  
+
 
   const _WorkersPageContent({required this.userCredential});
 
   @override
   State<_WorkersPageContent> createState() => _WorkersPageState();
-}
+  }
 
 // Main page content
 class _WorkersPageState extends State<_WorkersPageContent> {
+  late DocumentReference userReference;
   // Custom theme
   final ThemeData customTheme = theme;
 
@@ -90,6 +94,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
           // Function call to create workers page
+          state.userReference;
           return Theme(data: customTheme, child: _createWorkersPage());
         } else {
           return const Center(
@@ -278,7 +283,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                     text: 'Submit',
                                     onPressed: () async {
                                       await manageWorkersCubit
-                                          .createWorker(_emailController.text);
+                                          .createWorker(_emailController.text, userReference);
                                           Navigator.pop(context);
                                       _emailController.clear();
                                       ScaffoldMessenger.of(context)
