@@ -8,6 +8,9 @@ class ProgramsCubit extends Cubit<ProgramsState> {
   final CollectionReference programs =
       FirebaseFirestore.instance.collection('programs');
 
+  final CollectionReference logs =
+      FirebaseFirestore.instance.collection('logs');
+
   ProgramsCubit() : super(ProgramsLoading()) {
     _getPrograms();
   }
@@ -25,31 +28,58 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     });
   }
 
-  Future<void> addProgram(Map<String, dynamic> data) async {
+  Future<void> addProgram(Map<String, dynamic> data, DocumentReference userReference) async {
     emit(ProgramsLoading());
     try {
-      await programs.add(data);
-    } catch (error) {
+      DocumentReference externalId = await programs.add(data);
+    
+    logs.add({
+        "action": "create",
+        "description": "Program added by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "Program",
+        "userId": userReference,
+        "externalId": externalId,
+        });
+    }catch (error) {
       emit(ProgramsError(error.toString()));
     }
   }
 
-  Future<void> removeProgram(DocumentReference item) async {
+  Future<void> removeProgram(DocumentReference item, DocumentReference userReference) async {
     emit(ProgramsLoading());
     try {
-      await item.delete();
+      Map<String, dynamic> data =item.get().then((doc) => doc.data() ) as Map<String, dynamic>;
+     logs.add({
+        "action": "delete",
+        "description": "Program removed by user at ${Timestamp.now().toString()} program details: ${data["title"]}",
+        "timestamp": Timestamp.now(),
+        "type": "Program",
+        "userId": userReference,
+        });
+
+     await item.delete();
       _getPrograms();
+      
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }
   }
 
   Future<void> updatePrograms(
-      DocumentReference item, Map<String, dynamic> data) async {
+      DocumentReference item, Map<String, dynamic> data, DocumentReference userReference) async {
     emit(ProgramsLoading());
     try {
       await item.set(data, SetOptions(merge: true));
       _getPrograms();
+      logs.add({
+        "action": "update",
+        "description": "Program updated by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "Program",
+        "userId": userReference,
+        "externalId": item,
+        });
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }

@@ -6,6 +6,10 @@ part 'task_state.dart';
 class TaskCubit extends Cubit<TaskState> {
   final CollectionReference tasks =
       FirebaseFirestore.instance.collection('tasks');
+
+  final CollectionReference logs =
+      FirebaseFirestore.instance.collection('logs');
+
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
 
@@ -43,7 +47,7 @@ class TaskCubit extends Cubit<TaskState> {
 
   void addTask(title, desc, worker, dueDate) async{
     try{
-      await tasks.add({
+      DocumentReference externalId = await tasks.add({
         "title" : title,
         "description" : desc,
         "status" : 'incomplete',
@@ -51,6 +55,14 @@ class TaskCubit extends Cubit<TaskState> {
         "manager" : userReference,
         "worker" : worker
       });
+      logs.add({
+        "action": "create",
+        "description": "Task added by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "task",
+        "userId": userReference,
+        "externalId": externalId,
+        });
     } catch (error) {
       emit(TaskError(error: error.toString()));
     }

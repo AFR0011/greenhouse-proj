@@ -4,6 +4,9 @@ class ManageWorkersCubit extends ManagementCubit {
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
 
+  final CollectionReference logs =
+      FirebaseFirestore.instance.collection('logs');
+
   final UserCredential? user;
   final String mailerUsername = 'itec229.gr1.21008639@gmail.com'; //Your Email
   final String mailerPassword =
@@ -26,20 +29,29 @@ class ManageWorkersCubit extends ManagementCubit {
   }
 
   // Create worker account and send credentials via email
-  Future<void> createWorker(String email) async {
+  Future<void> createWorker(String email, DocumentReference userReference) async {
     try {
       // Create user profile
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: '12345678');
 
       // Create user document in Firestore
-      await users.add({
+      DocumentReference externalId = await users.add({
         "creationDate": Timestamp.now(),
         "email": email,
         "name": email,
         "surname": email,
         "role": "worker"
       });
+
+      logs.add({
+        "action": "create",
+        "description": "message sent by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "message",
+        "userId": userReference,
+        "externalId": externalId,
+        });
 
       // Mail transfer server
       final smtpServer = gmail(mailerUsername, mailerPassword);

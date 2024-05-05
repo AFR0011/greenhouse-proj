@@ -7,6 +7,7 @@
 ///
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -55,6 +56,7 @@ class _ProgramsPageContent extends StatefulWidget {
 // Main page content
 class _ProgramsPageState extends State<_ProgramsPageContent> {
   // User info local variables
+  late DocumentReference userReference;
   late String _userRole = "";
 
   // Custom theme
@@ -93,6 +95,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
         else if (state is UserInfoLoaded) {
           // Assign user info to local variables
           _userRole = state.userRole;
+          state.userReference;
 
           // Function call to create programs page
           return Theme(data: customTheme, child: _createProgramsPage());
@@ -315,7 +318,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                             "timeAdded": DateTime.now(),
                             "pending": _userRole == 'manager' ? false : true,
                           };
-                          await programsCubit.addProgram(data);
+                          await programsCubit.addProgram(data, userReference);
                           _titleController.clear();
                           _limitController.clear();
                           Navigator.pop(context);
@@ -374,7 +377,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                             "pending": _userRole == 'manager' ? false : true,
                           };
                           await programsCubit.updatePrograms(
-                              program.reference, data);
+                              program.reference, data,userReference);
                           _titleController.clear();
                           _limitController.clear();
                           Navigator.pop(context);
@@ -411,7 +414,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                     GreenElevatedButton(
                         text: "Submit",
                         onPressed: () async {
-                          await programsCubit.removeProgram(program.reference);
+                          await programsCubit.removeProgram(program.reference, userReference);
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
