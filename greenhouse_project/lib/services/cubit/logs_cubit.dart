@@ -9,27 +9,37 @@ class LogsCubit extends Cubit<LogsState> {
   final CollectionReference log = 
       FirebaseFirestore.instance.collection('logs');
 
-  LogsCubit() : super(LogsLoading()){
-    _getLogs();
+  final DocumentReference userReference;
+
+  LogsCubit(this.userReference) : super(LogsLoading()){
+    
   }
    
-   _getLogs() {
+   _getLogs() async {
+    
     log
       .orderBy('timestamp', descending: true)
       .snapshots()
-      .listen(() { })
+      .listen((snapshot) {
+        if (snapshot.docs.isNotEmpty) {
+          final List<LogsData> logs = snapshot.docs
+          .map((doc) => LogsData.fromFirestore(doc))
+          .toList();
+          emit(LogsLoaded([...logs]));
+        }
+       });
    }
 }
 
-class Logs {
+class LogsData {
   final String action;
   final String description;
   final DocumentReference externalId;
   final DateTime timeStamp;
   final String type;
-  final DocumentReference userId;
+  final DocumentReference userId; 
 
-  Logs(
+  LogsData(
    {required this.action,
     required this.description,
     required this.externalId,
@@ -37,7 +47,15 @@ class Logs {
     required this.type,
     required this.userId});
 
-  factory Logs.fromFirestore(DocumentSnapshot doc) {
-
+  factory LogsData.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return LogsData(
+      action: data['action'],
+      description: data['description'],
+      externalId: doc.reference,
+      timeStamp: (data['timestamp'] as Timestamp).toDate(),
+      type: data['type'],
+      userId: doc.reference
+      );
   }
 }
