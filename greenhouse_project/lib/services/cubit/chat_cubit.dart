@@ -8,7 +8,7 @@ class ChatCubit extends Cubit<ChatState> {
   final CollectionReference messages =
       FirebaseFirestore.instance.collection('messages');
 
-      final CollectionReference logs =
+  final CollectionReference logs =
       FirebaseFirestore.instance.collection('logs');
 
   final DocumentReference? reference;
@@ -43,7 +43,7 @@ class ChatCubit extends Cubit<ChatState> {
     }
 
     try {
-     DocumentReference externalId = await messages.add({
+      DocumentReference externalId = await messages.add({
         "chat": chat,
         "message": message,
         "receiver": receiver,
@@ -58,7 +58,7 @@ class ChatCubit extends Cubit<ChatState> {
         "type": "message",
         "userId": reference,
         "externalId": externalId,
-        });
+      });
     } catch (error) {
       emit(ChatError(
           error.toString())); // Emit an error state if an error occurs

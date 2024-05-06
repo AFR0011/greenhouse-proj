@@ -1,3 +1,7 @@
+/// TODO:
+/// - Check _getTasks();
+library;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
@@ -20,12 +24,9 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   void _getTasks() async {
-    DocumentSnapshot userSnapshot = await userReference.get();
-    Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
-
     //Get user Tasks
     tasks
-        .where(userData['role'], isEqualTo: userReference)
+        .where('manager', isEqualTo: userReference)
         .orderBy('dueDate', descending: true)
         .snapshots()
         .listen((snapshot) {
@@ -45,15 +46,15 @@ class TaskCubit extends Cubit<TaskState> {
         SetOptions(merge: true));
   }
 
-  void addTask(title, desc, worker, dueDate) async{
-    try{
+  void addTask(title, desc, worker, dueDate) async {
+    try {
       DocumentReference externalId = await tasks.add({
-        "title" : title,
-        "description" : desc,
-        "status" : 'incomplete',
-        "dueDate" : dueDate,
-        "manager" : userReference,
-        "worker" : worker
+        "title": title,
+        "description": desc,
+        "status": 'incomplete',
+        "dueDate": dueDate,
+        "manager": userReference,
+        "worker": worker
       });
       logs.add({
         "action": "create",
@@ -62,7 +63,7 @@ class TaskCubit extends Cubit<TaskState> {
         "type": "task",
         "userId": userReference,
         "externalId": externalId,
-        });
+      });
     } catch (error) {
       emit(TaskError(error: error.toString()));
     }

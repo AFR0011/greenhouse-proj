@@ -1,3 +1,6 @@
+/// TODO:
+/// - Add default pfp storage reference to create_ worker
+
 part of 'management_cubit.dart';
 
 class ManageWorkersCubit extends ManagementCubit {
@@ -29,7 +32,8 @@ class ManageWorkersCubit extends ManagementCubit {
   }
 
   // Create worker account and send credentials via email
-  Future<void> createWorker(String email, DocumentReference userReference) async {
+  Future<void> createWorker(
+      String email, String role, DocumentReference userReference) async {
     try {
       // Create user profile
       await FirebaseAuth.instance
@@ -41,7 +45,8 @@ class ManageWorkersCubit extends ManagementCubit {
         "email": email,
         "name": email,
         "surname": email,
-        "role": "worker"
+        "role": role,
+        "picture": <Uint8List>[],
       });
 
       logs.add({
@@ -51,14 +56,15 @@ class ManageWorkersCubit extends ManagementCubit {
         "type": "message",
         "userId": userReference,
         "externalId": externalId,
-        });
+      });
 
       // Mail transfer server
       final smtpServer = gmail(mailerUsername, mailerPassword);
 
       // Create our message.
       final message = Message()
-            ..from = const Address('itec229.gr1.21008639@gmail.com', 'Greenhouse Co.')
+            ..from = const Address(
+                'itec229.gr1.21008639@gmail.com', 'Greenhouse Co.')
             ..recipients.add(email)
             // ..ccRecipients.addAll(['abc@gmail.com', 'xyz@gmail.com']) // For Adding Multiple Recipients
             // ..bccRecipients.add(Address('a@gmail.com')) For Binding Carbon Copy of Sent Email
@@ -72,37 +78,26 @@ class ManageWorkersCubit extends ManagementCubit {
           //     ..cid = '<myimg@3.141>'
           // ]
           ;
-      try {
-        final sendReport = await send(message, smtpServer);
-        print('Message sent: ' + sendReport.toString());
-      } on MailerException catch (e) {
-        print('Message not sent.');
-        print(e.toString());
-      }
+      final sendReport = await send(message, smtpServer);
+      print('Message sent: ' + sendReport.toString());
+    } on MailerException catch (e) {
+      print('Message not sent.');
+      print(e.toString());
     } catch (error) {
+      print(error);
       emit(ManageWorkersError(error.toString()));
     }
   }
 
-  // Future<void> deleteWorker(WorkerData workerData) async {
-  //   try {
-  //     // Get user email
-  //     await FirebaseAuth.instance.currentUser!.delete();
-
-  //     // Create user document in Firestore
-  //     await workerData.reference.delete();
-
-  //     try {
-
-  //       print('Message sent: ' + sendReport.toString());
-  //     } on MailerException catch (e) {
-  //       print('Message not sent.');
-  //       print(e.toString());
-  //     }
-  //   } catch (error) {
-  //     emit(ManageWorkersError(error.toString()));
-  //   }
-  // }
+  Future<void> disableWorker(WorkerData workerData) async {
+    try {
+      await workerData.reference
+          .set({"status": "disabled"}, SetOptions(merge: true));
+    } catch (error) {
+      emit(ManageWorkersError(error.toString()));
+    }
+    return;
+  }
 }
 
 class WorkerData {
