@@ -58,7 +58,7 @@ class _EquipmentPageContent extends StatefulWidget {
 
 // Main page content goes here
 class _EquipmentPageContentState extends State<_EquipmentPageContent> {
-  late DocumentReference userReference;
+  late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
 
@@ -89,7 +89,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
         // Initiate page creation once user info is loaded
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
-          state.userReference;
+          _userReference = state.userReference;
           // Call function to create equipment page
           return Theme(data: customTheme, child: _createEquipmentPage());
         }
@@ -159,7 +159,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                               onChanged: (value) {
                                 context
                                     .read<EquipmentStatusCubit>()
-                                    .toggleStatus(userReference,
+                                    .toggleStatus(_userReference,
                                         equipment.reference, equipment.status);
                               }),
                         );

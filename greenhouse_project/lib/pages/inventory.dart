@@ -261,16 +261,14 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                           GreenElevatedButton(
                               text: "Approve",
                               onPressed: () {
-                                context
-                                    .read<InventoryCubit>()
-                                    .approveItem(inventory.reference, _userReference);
+                                context.read<InventoryCubit>().approveItem(
+                                    inventory.reference, _userReference);
                               }),
                           GreenElevatedButton(
                               text: "Deny",
                               onPressed: () {
-                                context
-                                    .read<InventoryCubit>()
-                                    .removeInventory(inventory.reference, _userReference);
+                                context.read<InventoryCubit>().removeInventory(
+                                    inventory.reference, _userReference);
                               })
                         ],
                       ))
@@ -343,42 +341,43 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                             text: "Submit",
                             onPressed: () async {
                               List<bool> validation = [true, true, true];
-                              if (_equipmentController.text.length < 1) {
+                              if (_equipmentController.text.isEmpty) {
                                 validation[0] = !validation[0];
                               }
-                              if (_descController.text.length < 2) {
+                              if (_descController.text.isEmpty) {
                                 validation[1] = !validation[1];
                               }
-                              if (int.parse(_amountController.text) > 0) {
+                              if (_amountController.text.isEmpty ||
+                                  int.parse(_amountController.text) <= 0) {
                                 validation[2] = !validation[2];
                               }
 
-                              bool isValid = context
-                                  .read<InventoryEditCubit>()
-                                  .updateState(validation);
-                              if(!isValid){}
-                              else {
-                              Map<String, dynamic> data = {
-                                "amount": num.parse(_amountController.text),
-                                "description": _descController.text,
-                                "name": _equipmentController.text,
-                                "timeAdded": DateTime.now(),
-                                "pending":
-                                    _userRole == 'manager' ? false : true,
-                              };
-                              await inventoryCubit
-                                  .addInventory(data, _userReference)
-                                  .then((value) {
-                                Navigator.pop(context);
-                                _equipmentController.clear();
-                                _descController.clear();
-                                _amountController.clear();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content:
-                                            Text("Item added succesfully")));
-                              });
-                            }}),
+                              bool isValid =
+                                  inventoryEditCubit.updateState(validation);
+                              if (!isValid) {
+                              } else {
+                                Map<String, dynamic> data = {
+                                  "amount": num.parse(_amountController.text),
+                                  "description": _descController.text,
+                                  "name": _equipmentController.text,
+                                  "timeAdded": DateTime.now(),
+                                  "pending":
+                                      _userRole == 'manager' ? false : true,
+                                };
+                                await inventoryCubit
+                                    .addInventory(data, _userReference)
+                                    .then((value) {
+                                  Navigator.pop(context);
+                                  _equipmentController.clear();
+                                  _descController.clear();
+                                  _amountController.clear();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text("Item added succesfully")));
+                                });
+                              }
+                            }),
                         GreenElevatedButton(
                             text: "Cancel",
                             onPressed: () {
@@ -402,7 +401,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     // Get instance of inventory cubit from main context
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
     InventoryEditCubit inventoryEditCubit =
-    BlocProvider.of<InventoryEditCubit>(context);
+        BlocProvider.of<InventoryEditCubit>(context);
 
     showDialog(
         context: context,
@@ -456,13 +455,13 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                               if (_descController.text.length < 2) {
                                 validation[1] = !validation[1];
                               }
-                              if (int.parse(_amountController.text) > 0) {
+                              if (_amountController.text.isEmpty ||
+                                  int.parse(_amountController.text) <= 0) {
                                 validation[2] = !validation[2];
                               }
 
-                              bool isValid = context
-                                  .read<InventoryEditCubit>()
-                                  .updateState(validation);
+                              bool isValid =
+                                  inventoryEditCubit.updateState(validation);
                               if (!isValid) {
                               } else {
                                 Map<String, dynamic> data = {
@@ -475,7 +474,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                 };
 
                                 inventoryCubit
-                                    .updateInventory(inventory.reference, data, _userReference)
+                                    .updateInventory(inventory.reference, data,
+                                        _userReference)
                                     .then((value) {
                                   Navigator.pop(context);
                                   _equipmentController.clear();
@@ -522,7 +522,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                         text: "Submit",
                         onPressed: () async {
                           inventoryCubit
-                              .removeInventory(inventory.reference, _userReference)
+                              .removeInventory(
+                                  inventory.reference, _userReference)
                               .then((value) {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(

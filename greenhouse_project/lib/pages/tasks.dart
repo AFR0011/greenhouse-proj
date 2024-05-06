@@ -2,6 +2,7 @@
 ///
 /// TODO:
 /// - Add task creation option
+/// - Delete task
 ///
 library;
 
@@ -253,49 +254,47 @@ class _TasksPageState extends State<_TasksPageContent> {
           ),
           //Add new tasks
           GreenElevatedButton(
-            text: 'Add Task',
-             onPressed: (){
-              showDialog(
-                context: context,
-                 builder: (context){
-                  return Dialog(
-                    child: Column(
-                      //Textfield
-                      children: [
-                        TextField(
-                          controller: _titleController,
-                        ),
-                        TextField(
-                          controller: _descController,
-                        ),
-                        TextField(
-                          controller: _workerController,
-                        ),
-                        TextField(
-                          controller: _duedateController,
-                        ),
-                        //Submit & Cancel
-                        Row(
-                          children: [
-                            GreenElevatedButton(
-                              text: 'Submit',
-                              onPressed: (){}),
+              text: 'Add Task',
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return Dialog(
+                          child: Column(
+                        //Textfield
+                        children: [
+                          TextField(
+                            controller: _titleController,
+                          ),
+                          TextField(
+                            controller: _descController,
+                          ),
+                          TextField(
+                            controller: _workerController,
+                          ),
+                          TextField(
+                            controller: _duedateController,
+                          ),
+                          //Submit & Cancel
+                          Row(
+                            children: [
                               GreenElevatedButton(
-                                text: 'Cancel',
-                                onPressed: (){
-                                  Navigator.pop(context);
-                                  _titleController.clear();
-                                  _descController.clear();
-                                  _workerController.clear();
-                                  _duedateController.clear();
-                                })
-                          ],
-                        )
-                      ],
-                    )
-                  );
-                 });
-             })
+                                  text: 'Submit', onPressed: () {}),
+                              GreenElevatedButton(
+                                  text: 'Cancel',
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    _titleController.clear();
+                                    _descController.clear();
+                                    _workerController.clear();
+                                    _duedateController.clear();
+                                  })
+                            ],
+                          )
+                        ],
+                      ));
+                    });
+              })
         ],
       ),
 

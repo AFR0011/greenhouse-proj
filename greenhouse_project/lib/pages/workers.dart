@@ -14,6 +14,7 @@ import 'package:greenhouse_project/pages/tasks.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
+import 'package:greenhouse_project/services/cubit/worker_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -37,6 +38,7 @@ class WorkersPage extends StatelessWidget {
           create: (context) => UserInfoCubit(),
         ),
         BlocProvider(create: (context) => ManageWorkersCubit(userCredential)),
+        BlocProvider(create: (context) => WorkerEditCubit()),
       ],
       child: _WorkersPageContent(userCredential: userCredential),
     );
@@ -45,31 +47,26 @@ class WorkersPage extends StatelessWidget {
 
 class _WorkersPageContent extends StatefulWidget {
   final UserCredential userCredential; // user auth credentials
-  
-
 
   const _WorkersPageContent({required this.userCredential});
 
   @override
   State<_WorkersPageContent> createState() => _WorkersPageState();
-  }
+}
 
 // Main page content
 class _WorkersPageState extends State<_WorkersPageContent> {
-  late DocumentReference userReference;
+  late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
 
   // Text Controllers
   final TextEditingController _emailController = TextEditingController();
 
-  // Text controllers
-  final TextEditingController _textController = TextEditingController();
-
   // Dispose (destructor)
   @override
   void dispose() {
-    _textController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -94,7 +91,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
           // Function call to create workers page
-          state.userReference;
+          _userReference = state.userReference;
           return Theme(data: customTheme, child: _createWorkersPage());
         } else {
           return const Center(
@@ -109,6 +106,8 @@ class _WorkersPageState extends State<_WorkersPageContent> {
   Widget _createWorkersPage() {
     final ManageWorkersCubit manageWorkersCubit =
         BlocProvider.of<ManageWorkersCubit>(context);
+    final WorkerEditCubit workerEditCubit =
+        BlocProvider.of<WorkerEditCubit>(context);
     return Scaffold(
       // Appbar (header)
       appBar: AppBar(
@@ -191,40 +190,40 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                                           userReference: worker
                                                               .reference)));
                                         }),
-                                    // GreenElevatedButton(
-                                    //     text: "Remove worker",
-                                    //     onPressed: () {
-                                    //       showDialog(
-                                    //           context: context,
-                                    //           builder: (context) {
-                                    //             return Dialog(
-                                    //                 child: Column(
-                                    //               children: [
-                                    //                 Center(
-                                    //                   child: Text(
-                                    //                       "Are you sure? This action is cannot be undone."),
-                                    //                 ),
-                                    //                 Center(
-                                    //                   child: Row(
-                                    //                     children: [
-                                    //                       GreenElevatedButton(
-                                    //                           text: "Confirm",
-                                    //                           onPressed: () =>
-                                    //                               manageWorkersCubit
-                                    //                                   .deleteWorker(
-                                    //                                       worker)),
-                                    //                       GreenElevatedButton(
-                                    //                           text: "Go Back",
-                                    //                           onPressed: () =>
-                                    //                               Navigator.pop(
-                                    //                                   context)),
-                                    //                     ],
-                                    //                   ),
-                                    //                 ),
-                                    //               ],
-                                    //             ));
-                                    //           });
-                                    //     }),
+                                    GreenElevatedButton(
+                                        text: "Disable account",
+                                        onPressed: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return Dialog(
+                                                    child: Column(
+                                                  children: [
+                                                    Center(
+                                                      child: Text(
+                                                          "Are you sure? This action is cannot be undone."),
+                                                    ),
+                                                    Center(
+                                                      child: Row(
+                                                        children: [
+                                                          GreenElevatedButton(
+                                                              text: "Confirm",
+                                                              onPressed: () =>
+                                                                  manageWorkersCubit
+                                                                      .disableWorker(
+                                                                          worker)),
+                                                          GreenElevatedButton(
+                                                              text: "Go Back",
+                                                              onPressed: () =>
+                                                                  Navigator.pop(
+                                                                      context)),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ));
+                                              });
+                                        }),
                                   ],
                                 );
                                 return Dialog(
@@ -263,44 +262,68 @@ class _WorkersPageState extends State<_WorkersPageContent> {
               }
             },
           ),
+
           GreenElevatedButton(
               text: 'Add worker',
               onPressed: () {
                 showDialog(
                     context: context,
                     builder: (context) {
-                      return Dialog(
-                        child: Column(
-                          //Textfields
-                          children: [
-                            TextField(
-                              controller: _emailController,
-                            ),
-                            //Submit or Cancel
-                            Row(
+                      return BlocBuilder<WorkerEditCubit, String>(
+                        bloc: workerEditCubit,
+                        builder: (context, state) {
+                          return Dialog(
+                            child: Column(
+                              //Textfields
                               children: [
-                                GreenElevatedButton(
-                                    text: 'Submit',
-                                    onPressed: () async {
-                                      await manageWorkersCubit
-                                          .createWorker(_emailController.text, userReference);
-                                          Navigator.pop(context);
-                                      _emailController.clear();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text(
-                                                  "HI THERE, THIS WORKED!!!")));
+                                TextField(
+                                  controller: _emailController,
+                                ),
+                                DropdownButton(
+                                    value: state != '' ? state : "admin",
+                                    items: const [
+                                      DropdownMenuItem(
+                                        value: 'worker',
+                                        child: Text('worker'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: 'admin',
+                                        child: Text('admin'),
+                                      ),
+                                    ],
+                                    onChanged: (selection) {
+                                      String newValue = selection!;
+                                      workerEditCubit.updateDropdown(newValue);
                                     }),
-                                GreenElevatedButton(
-                                    text: 'Cancel',
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      _emailController.clear();
-                                    })
+                                //Submit or Cancel
+                                Row(
+                                  children: [
+                                    GreenElevatedButton(
+                                        text: 'Submit',
+                                        onPressed: () async {
+                                          await manageWorkersCubit.createWorker(
+                                              _emailController.text,
+                                              state,
+                                              _userReference);
+                                          Navigator.pop(context);
+                                          _emailController.clear();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                                  content: Text(
+                                                      "HI THERE, THIS WORKED!!!")));
+                                        }),
+                                    GreenElevatedButton(
+                                        text: 'Cancel',
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          _emailController.clear();
+                                        })
+                                  ],
+                                )
                               ],
-                            )
-                          ],
-                        ),
+                            ),
+                          );
+                        },
                       );
                     });
               })

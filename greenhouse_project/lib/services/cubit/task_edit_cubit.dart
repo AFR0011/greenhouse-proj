@@ -1,7 +1,4 @@
-import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
-
-part 'task_edit_state.dart';
+import "package:flutter_bloc/flutter_bloc.dart";
 
 class TaskEditCubit extends Cubit<List<bool>> {
   TaskEditCubit() : super([true, true, true, true]);
