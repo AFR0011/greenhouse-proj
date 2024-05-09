@@ -20,10 +20,10 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  void authLogoutRequest() async {
+  Future<void> authLogoutRequest() async {
     try {
-      await FirebaseAuth.instance.signOut();
       emit(AuthLoading());
+      await FirebaseAuth.instance.signOut();
       return emit(AuthInitial());
     } catch (e) {
       return emit(AuthFailure("Logout Failed"));

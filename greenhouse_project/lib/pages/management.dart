@@ -40,9 +40,6 @@ class ManagementPage extends StatelessWidget {
           create: (context) => UserInfoCubit(),
         ),
         BlocProvider(
-          create: (context) => ManageTasksCubit(userCredential),
-        ),
-        BlocProvider(
           create: (context) => ManageWorkersCubit(userCredential),
         ),
       ],
@@ -186,47 +183,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                 ),
               ],
             ),
-          ),
-          // BlocBuilder for tasks
-          BlocBuilder<ManageTasksCubit, ManagementState>(
-            builder: (context, state) {
-              // Show "loading screen" if processing manageTasks state
-              if (state is ManageTasksLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              // Show inventory items once manageTasks state is loaded
-              else if (state is ManageTasksLoaded) {
-                List<TaskData> tasksList = state.tasks;
-
-                // Display nothing if no tasks
-                if (tasksList.isEmpty) {
-                  return const Center(child: Text("No Tasks..."));
-                }
-                // List of tasks
-                else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: state.tasks.length,
-                    itemBuilder: (context, index) {
-                      TaskData task = state.tasks[index];
-                      return ListTile(
-                        title: Text(task.title),
-                        subtitle: Text(task.status),
-                      );
-                    },
-                  );
-                }
-              }
-              // Show error message once an error occurs
-              else if (state is ManageTasksError) {
-                return Text(state.error.toString());
-              }
-              // If the state is not any of the predefined states;
-              // never happens; but, anything can happen
-              else {
-                return const Text("Something went wrong...");
-              }
-            },
           ),
 
           // Workers subsection

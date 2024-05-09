@@ -19,8 +19,9 @@ class UserInfoCubit extends HomeCubit {
         final String userRole = userData?['role'] ?? 'Unknown';
         final String userName = userData?['name'] ?? 'Unknown';
         final DocumentReference userReference = userSnapshot.reference;
+        final bool enabled = userData?['enabled'];
 
-        emit(UserInfoLoaded(userRole, userName, userReference));
+        emit(UserInfoLoaded(userRole, userName, userReference, enabled));
       } else {
         emit(UserInfoError("User not found"));
       }
@@ -44,6 +45,16 @@ class UserInfoCubit extends HomeCubit {
       getUserInfo(userCredential);
     } catch (error) {
       emit(UserInfoError(error.toString()));
+    }
+  }
+
+  void deleteUserAccount(
+      UserCredential userCredential, DocumentReference userReference) {
+    try {
+      userCredential.user?.delete();
+      userReference.delete();
+    } catch (e) {
+      emit(UserInfoError(e.toString()));
     }
   }
 }

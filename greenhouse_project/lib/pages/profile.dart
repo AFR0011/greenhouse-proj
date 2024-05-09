@@ -301,8 +301,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                             .read<ProfileEditCubit>()
                             .updateState(validation);
 
-                        if (!isValid) {
-                        } else {
+                        if (isValid) {
                           showDialog(
                               context: context,
                               builder: (context) {

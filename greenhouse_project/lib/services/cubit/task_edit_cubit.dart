@@ -1,11 +1,13 @@
 import "package:flutter_bloc/flutter_bloc.dart";
+// import "package:flutter/foundation.dart";
+// part "task_edit_state.dart";
 
-class TaskEditCubit extends Cubit<List<bool>> {
-  TaskEditCubit() : super([true, true, true, true]);
+class TaskEditCubit extends Cubit<List<dynamic>> {
+  TaskEditCubit() : super([true, true, true, null]);
 
-  bool updateState(List<bool> validation) {
+  bool updateState(List<dynamic> validation) {
     emit([...validation]);
-    if (validation.contains(false)) {
+    if (validation.contains(false) || validation.contains(null)) {
       return false;
     } else {
       return true;

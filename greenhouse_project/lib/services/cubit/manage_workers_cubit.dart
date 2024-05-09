@@ -1,9 +1,11 @@
 /// TODO:
-/// - Add default pfp storage reference to create_ worker
+/// - Add default pfp storage reference to create_worker
+/// - Create remote config and a new email for mailer setup
 
 part of 'management_cubit.dart';
 
 class ManageWorkersCubit extends ManagementCubit {
+  // final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
 
@@ -14,6 +16,8 @@ class ManageWorkersCubit extends ManagementCubit {
   final String mailerUsername = 'itec229.gr1.21008639@gmail.com'; //Your Email
   final String mailerPassword =
       'pnvt twlg mrru dmus'; // 16 Digits App Password Generated From Google Account
+  bool _isActive = true;
+
   ManageWorkersCubit(this.user) : super(ManageWorkersLoading()) {
     if (user != null) {
       _fetchWorkers();
@@ -25,7 +29,9 @@ class ManageWorkersCubit extends ManagementCubit {
       final List<WorkerData> workers =
           snapshot.docs.map((doc) => WorkerData.fromFirestore(doc)).toList();
 
-      emit(ManageWorkersLoaded([...workers]));
+      if (_isActive) {
+        emit(ManageWorkersLoaded([...workers]));
+      }
     }, onError: (error) {
       emit(ManageWorkersError(error));
     });
@@ -47,6 +53,7 @@ class ManageWorkersCubit extends ManagementCubit {
         "surname": email,
         "role": role,
         "picture": <Uint8List>[],
+        "enabled": true,
       });
 
       logs.add({
@@ -90,13 +97,35 @@ class ManageWorkersCubit extends ManagementCubit {
   }
 
   Future<void> disableWorker(WorkerData workerData) async {
+    if (!_isActive) {
+      return;
+    }
     try {
       await workerData.reference
-          .set({"status": "disabled"}, SetOptions(merge: true));
+          .set({"enabled": false}, SetOptions(merge: true));
     } catch (error) {
       emit(ManageWorkersError(error.toString()));
     }
     return;
+  }
+
+  Future<void> enableWorker(WorkerData workerData) async {
+    if (!_isActive) {
+      return;
+    }
+    try {
+      await workerData.reference
+          .set({"enabled": true}, SetOptions(merge: true));
+    } catch (error) {
+      emit(ManageWorkersError(error.toString()));
+    }
+    return;
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 
@@ -105,14 +134,17 @@ class WorkerData {
   final DateTime creationDate;
   final String name;
   final String surname;
+  final bool enabled;
   final DocumentReference reference;
 
-  WorkerData(
-      {required this.email,
-      required this.creationDate,
-      required this.name,
-      required this.surname,
-      required this.reference});
+  WorkerData({
+    required this.email,
+    required this.creationDate,
+    required this.name,
+    required this.surname,
+    required this.reference,
+    required this.enabled,
+  });
 
   factory WorkerData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -121,6 +153,7 @@ class WorkerData {
         surname: data['surname'],
         email: data['email'],
         creationDate: (data['creationDate'] as Timestamp).toDate(),
+        enabled: data['enabled'],
         reference: doc.reference);
   }
 }
