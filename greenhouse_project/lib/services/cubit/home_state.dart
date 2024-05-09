@@ -36,8 +36,10 @@ class UserInfoLoaded extends HomeState {
   final String userRole;
   final String userName;
   final DocumentReference userReference;
+  final bool enabled;
 
-  UserInfoLoaded(this.userRole, this.userName, this.userReference);
+  UserInfoLoaded(
+      this.userRole, this.userName, this.userReference, this.enabled);
 }
 
 class UserInfoError extends HomeState {

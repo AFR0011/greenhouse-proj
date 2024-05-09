@@ -28,9 +28,7 @@ class ChatCubit extends Cubit<ChatState> {
       final List<MessageData> messages =
           snapshot.docs.map((doc) => MessageData.fromFirestore(doc)).toList();
 
-      if (_isActive) {
-        emit(ChatLoaded([...messages]));
-      }
+      emit(ChatLoaded([...messages]));
     }, onError: (error) {
       emit(ChatError(error.toString()));
     });

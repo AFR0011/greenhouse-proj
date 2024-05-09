@@ -155,6 +155,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                       WorkerData worker = workerList[index]; // worker info
                       return ListTile(
                         title: Text(worker.name),
+                        subtitle: Text(worker.enabled ? "Active" : "Inactive"),
                         trailing: GreenElevatedButton(
                           text: 'Details',
                           onPressed: () {
@@ -191,7 +192,9 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                                               .reference)));
                                         }),
                                     GreenElevatedButton(
-                                        text: "Disable account",
+                                        text: worker.enabled
+                                            ? "Disable account"
+                                            : "Enable account",
                                         onPressed: () {
                                           showDialog(
                                               context: context,
@@ -199,19 +202,63 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                                 return Dialog(
                                                     child: Column(
                                                   children: [
-                                                    Center(
-                                                      child: Text(
-                                                          "Are you sure? This action is cannot be undone."),
+                                                    const Center(
+                                                      child:
+                                                          Text("Are you sure?"),
                                                     ),
                                                     Center(
                                                       child: Row(
                                                         children: [
                                                           GreenElevatedButton(
                                                               text: "Confirm",
-                                                              onPressed: () =>
+                                                              onPressed: () {
+                                                                if (worker
+                                                                    .enabled) {
                                                                   manageWorkersCubit
                                                                       .disableWorker(
-                                                                          worker)),
+                                                                          worker)
+                                                                      .then((_) => showDialog(
+                                                                          context: context,
+                                                                          builder: (context) {
+                                                                            return Dialog(
+                                                                              child: Column(
+                                                                                children: [
+                                                                                  const Center(child: Text("Account disabled successfuly!")),
+                                                                                  GreenElevatedButton(
+                                                                                      text: "OK",
+                                                                                      onPressed: () {
+                                                                                        Navigator.pop(context);
+                                                                                        Navigator.pop(context);
+                                                                                        Navigator.pop(context);
+                                                                                      }),
+                                                                                ],
+                                                                              ),
+                                                                            );
+                                                                          }));
+                                                                } else {
+                                                                  manageWorkersCubit
+                                                                      .enableWorker(
+                                                                          worker)
+                                                                      .then((_) => showDialog(
+                                                                          context: context,
+                                                                          builder: (context) {
+                                                                            return Dialog(
+                                                                              child: Column(
+                                                                                children: [
+                                                                                  const Center(child: Text("Account enabled successfuly!")),
+                                                                                  GreenElevatedButton(
+                                                                                      text: "OK",
+                                                                                      onPressed: () {
+                                                                                        Navigator.pop(context);
+                                                                                        Navigator.pop(context);
+                                                                                        Navigator.pop(context);
+                                                                                      }),
+                                                                                ],
+                                                                              ),
+                                                                            );
+                                                                          }));
+                                                                }
+                                                              }),
                                                           GreenElevatedButton(
                                                               text: "Go Back",
                                                               onPressed: () =>

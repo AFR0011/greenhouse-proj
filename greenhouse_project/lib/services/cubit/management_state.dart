@@ -16,17 +16,3 @@ final class ManageWorkersError extends ManagementState {
 
   ManageWorkersError(this.error);
 }
-
-final class ManageTasksLoading extends ManagementState {}
-
-final class ManageTasksLoaded extends ManagementState {
-  final List<TaskData> tasks;
-
-  ManageTasksLoaded(this.tasks);
-}
-
-final class ManageTasksError extends ManagementState {
-  final String error;
-
-  ManageTasksError(this.error);
-}

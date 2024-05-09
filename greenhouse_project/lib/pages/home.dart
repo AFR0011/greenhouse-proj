@@ -9,8 +9,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/pages/login.dart';
+import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
+import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
@@ -56,11 +59,12 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   late String _userRole = "";
   late String _userName = "";
   late DocumentReference _userReference;
+  late bool _enabled;
 
   // Custom theme
   final ThemeData customTheme = theme;
 
-// Text controllers
+  // Text controllers
   final TextEditingController _searchController = TextEditingController();
 
   // Index of footer nav selection
@@ -103,9 +107,16 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             _userRole = state.userRole;
             _userName = state.userName;
             _userReference = state.userReference;
+            _enabled = state.enabled;
 
             // Call function to create home page
-            return Theme(data: customTheme, child: _createHomePage());
+            if (_enabled) {
+              return Theme(data: customTheme, child: _createHomePage());
+            } else {
+              return Center(
+                  child: Theme(
+                      data: customTheme, child: _createHomePageDisabled()));
+            }
           }
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {
@@ -216,6 +227,55 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           },
         ),
       ],
+    );
+  }
+
+  _createHomePageDisabled() {
+    UserInfoCubit userInfoCubit = context.read<UserInfoCubit>();
+    AuthCubit authCubit = context.read<AuthCubit>();
+
+    // Page content
+    return Scaffold(
+      // Main appbar (header)
+      appBar: AppBar(),
+
+      // Call function to build notificaitons list
+      body: Column(
+        children: [
+          const Text(
+              "Your account has been disabled by the greenhouse administration.\n If you don't work here anymore, please delete your account."),
+          Row(
+            children: [
+              GreenElevatedButton(
+                  text: "Delete Account",
+                  onPressed: () {
+                    userInfoCubit.deleteUserAccount(
+                        widget.userCredential, _userReference);
+                    showDialog(
+                        context: context,
+                        builder: (context) => Dialog(
+                              child: Column(
+                                children: [
+                                  const Text("All done!"),
+                                  Center(
+                                      child: GreenElevatedButton(
+                                          text: "OK",
+                                          onPressed: () => authCubit
+                                              .authLogoutRequest()
+                                              .then((value) =>
+                                                  Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const LoginPage())))))
+                                ],
+                              ),
+                            ));
+                  })
+            ],
+          )
+        ],
+      ),
     );
   }
 }

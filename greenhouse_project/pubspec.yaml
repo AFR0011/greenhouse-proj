@@ -49,6 +49,7 @@ dependencies:
   mailer: ^6.1.0
   firebase_storage: ^11.7.4
   firebase_messaging: ^14.9.1
+  firebase_remote_config: ^4.4.4
 
 
 dev_dependencies:
