@@ -12,7 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
+import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/task_cubit.dart';
+import 'package:greenhouse_project/services/cubit/task_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
@@ -40,6 +42,7 @@ class TasksPage extends StatelessWidget {
           create: (context) => UserInfoCubit(),
         ),
         BlocProvider(create: (context) => TaskCubit(userReference!)),
+        BlocProvider(create: (context) => ManageWorkersCubit(userCredential)),
       ],
       child: _TasksPageContent(userCredential: userCredential),
     );
@@ -65,10 +68,8 @@ class _TasksPageState extends State<_TasksPageContent> {
   final ThemeData customTheme = theme;
 
   // Text controllers
-  final TextEditingController _textController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
-  final TextEditingController _workerController = TextEditingController();
   final TextEditingController _duedateController = TextEditingController();
 
   // Index of footer nav selection
@@ -77,7 +78,9 @@ class _TasksPageState extends State<_TasksPageContent> {
   // Dispose (destructor)
   @override
   void dispose() {
-    _textController.dispose();
+    _titleController.dispose();
+    _descController.dispose();
+    _duedateController.dispose();
     super.dispose();
   }
 
@@ -131,8 +134,9 @@ class _TasksPageState extends State<_TasksPageContent> {
 
   Widget _createTasksPage() {
     // Get instance of footer nav cubit from main context
-    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
-
+    final FooterNavCubit footerNavCubit =
+        BlocProvider.of<FooterNavCubit>(context);
+    final TaskCubit taskCubit = BlocProvider.of<TaskCubit>(context);
     return Scaffold(
       // Appbar (header)
       appBar: _userRole == "worker"
@@ -148,7 +152,6 @@ class _TasksPageState extends State<_TasksPageContent> {
       // Tasks section
       body: Column(
         children: [
-          const SizedBox(height: 40),
           SizedBox(
             width: MediaQuery.of(context).size.width - 20,
             child: const Text(
@@ -253,48 +256,145 @@ class _TasksPageState extends State<_TasksPageContent> {
             },
           ),
           //Add new tasks
-          GreenElevatedButton(
-              text: 'Add Task',
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return Dialog(
-                          child: Column(
-                        //Textfield
-                        children: [
-                          TextField(
-                            controller: _titleController,
+          BlocListener<ManageWorkersCubit, ManagementState>(
+            listener: (context, state) {
+              List<WorkerData> workers =
+                  state is ManageWorkersLoaded ? state.workers : [];
+              List<DropdownMenuItem> workersDropdown = workers
+                  .map(
+                    (e) => DropdownMenuItem(
+                        value: e.reference,
+                        child: Text("${e.name} ${e.surname}")),
+                  )
+                  .toList();
+            },
+            child: GreenElevatedButton(
+                text: 'Add Task',
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return BlocProvider(
+                          create: (context) => TaskEditCubit(),
+                          child: BlocBuilder<TaskEditCubit, List<dynamic>>(
+                            builder: (context, state) {
+                              DocumentReference worker =
+                                  workersDropdown.first.value;
+                              return Dialog(
+                                  child: Column(
+                                children: [
+                                  TextField(
+                                    controller: _titleController,
+                                    decoration: InputDecoration(
+                                        errorText: state[0]
+                                            ? ""
+                                            : "Title should not be empty"),
+                                  ),
+                                  TextField(
+                                    controller: _descController,
+                                    decoration: InputDecoration(
+                                        errorText: state[1]
+                                            ? ""
+                                            : "Description should not be empty"),
+                                  ),
+                                  DropdownButton(
+                                      value: state[3],
+                                      items: workersDropdown,
+                                      onChanged: (selection) {
+                                        worker = selection;
+                                        context
+                                            .read<TaskEditCubit>()
+                                            .updateState(
+                                                [true, true, true, worker]);
+                                      }),
+                                  TextField(
+                                    controller: _duedateController,
+                                    decoration: InputDecoration(
+                                        errorText: state[2]
+                                            ? ""
+                                            : "Due date should not be empty"),
+                                  ),
+                                  //Submit & Cancel
+                                  Row(
+                                    children: [
+                                      GreenElevatedButton(
+                                          text: 'Submit',
+                                          onPressed: () {
+                                            List<dynamic> validation = [
+                                              true,
+                                              true,
+                                              true,
+                                              worker
+                                            ];
+                                            if (_titleController.text.isEmpty) {
+                                              validation[0] = false;
+                                            }
+                                            if (_descController.text.isEmpty) {
+                                              validation[1] = false;
+                                            }
+                                            if (_duedateController
+                                                .text.isEmpty) {
+                                              validation[2] = false;
+                                            }
+                                            bool isValid = context
+                                                .read<TaskEditCubit>()
+                                                .updateState(validation);
+                                            if (isValid) {
+                                              taskCubit.addTask(
+                                                _titleController.text,
+                                                _descController.text,
+                                                worker,
+                                                _duedateController.text,
+                                              );
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) => Dialog(
+                                                        child: Column(
+                                                          children: [
+                                                            const Center(
+                                                              child: Text(
+                                                                  "Task has been created!"),
+                                                            ),
+                                                            Center(
+                                                              child:
+                                                                  GreenElevatedButton(
+                                                                      text:
+                                                                          "OK",
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      }),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ));
+                                            } else {
+                                              context
+                                                  .read<TaskEditCubit>()
+                                                  .updateState(state);
+                                            }
+                                          }),
+                                      GreenElevatedButton(
+                                          text: 'Cancel',
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            _titleController.clear();
+                                            _descController.clear();
+                                            _duedateController.clear();
+                                          })
+                                    ],
+                                  )
+                                ],
+                              ));
+                            },
                           ),
-                          TextField(
-                            controller: _descController,
-                          ),
-                          TextField(
-                            controller: _workerController,
-                          ),
-                          TextField(
-                            controller: _duedateController,
-                          ),
-                          //Submit & Cancel
-                          Row(
-                            children: [
-                              GreenElevatedButton(
-                                  text: 'Submit', onPressed: () {}),
-                              GreenElevatedButton(
-                                  text: 'Cancel',
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    _titleController.clear();
-                                    _descController.clear();
-                                    _workerController.clear();
-                                    _duedateController.clear();
-                                  })
-                            ],
-                          )
-                        ],
-                      ));
-                    });
-              })
+                        );
+                      });
+                }),
+          ),
         ],
       ),
 
