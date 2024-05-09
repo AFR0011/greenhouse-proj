@@ -3,7 +3,7 @@ import "package:flutter_bloc/flutter_bloc.dart";
 // part "task_edit_state.dart";
 
 class TaskEditCubit extends Cubit<List<dynamic>> {
-  TaskEditCubit() : super([true, true, true, null]);
+  TaskEditCubit() : super([true, true, DateTime.now(), null]);
 
   bool updateState(List<dynamic> validation) {
     emit([...validation]);
