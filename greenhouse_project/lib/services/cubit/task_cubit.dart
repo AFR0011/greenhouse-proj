@@ -19,6 +19,8 @@ class TaskCubit extends Cubit<TaskState> {
 
   final DocumentReference userReference;
 
+  bool _isActive = true;
+
   TaskCubit(this.userReference) : super(TaskLoading()) {
     _getTasks();
   }
@@ -46,16 +48,22 @@ class TaskCubit extends Cubit<TaskState> {
         SetOptions(merge: true));
   }
 
-  void addTask(title, desc, worker, dueDate) async {
+  void addTask(String title, String desc, DateTime dueDate,
+      DocumentReference worker) async {
+    if (!_isActive) {
+      return;
+    }
     try {
       DocumentReference externalId = await tasks.add({
         "title": title,
         "description": desc,
         "status": 'incomplete',
-        "dueDate": dueDate,
+        "dueDate":
+            Timestamp((dueDate.millisecondsSinceEpoch / 1000).round(), 0),
         "manager": userReference,
         "worker": worker
       });
+
       logs.add({
         "action": "create",
         "description": "Task added by user at ${Timestamp.now().toString()}",
@@ -67,6 +75,12 @@ class TaskCubit extends Cubit<TaskState> {
     } catch (error) {
       emit(TaskError(error: error.toString()));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 

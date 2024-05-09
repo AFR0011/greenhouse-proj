@@ -8,6 +8,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
@@ -137,6 +138,8 @@ class _TasksPageState extends State<_TasksPageContent> {
     final FooterNavCubit footerNavCubit =
         BlocProvider.of<FooterNavCubit>(context);
     final TaskCubit taskCubit = BlocProvider.of<TaskCubit>(context);
+    late List<DropdownMenuItem> dropdownItems;
+    late List<WorkerData> workers;
     return Scaffold(
       // Appbar (header)
       appBar: _userRole == "worker"
@@ -255,12 +258,12 @@ class _TasksPageState extends State<_TasksPageContent> {
               }
             },
           ),
-          //Add new tasks
+
+          // Get workers list
           BlocListener<ManageWorkersCubit, ManagementState>(
             listener: (context, state) {
-              List<WorkerData> workers =
-                  state is ManageWorkersLoaded ? state.workers : [];
-              List<DropdownMenuItem> workersDropdown = workers
+              workers = state is ManageWorkersLoaded ? state.workers : [];
+              dropdownItems = workers
                   .map(
                     (e) => DropdownMenuItem(
                         value: e.reference,
@@ -278,8 +281,6 @@ class _TasksPageState extends State<_TasksPageContent> {
                           create: (context) => TaskEditCubit(),
                           child: BlocBuilder<TaskEditCubit, List<dynamic>>(
                             builder: (context, state) {
-                              DocumentReference worker =
-                                  workersDropdown.first.value;
                               return Dialog(
                                   child: Column(
                                 children: [
@@ -299,20 +300,29 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   ),
                                   DropdownButton(
                                       value: state[3],
-                                      items: workersDropdown,
+                                      items: dropdownItems,
                                       onChanged: (selection) {
-                                        worker = selection;
+                                        DocumentReference worker = selection;
                                         context
                                             .read<TaskEditCubit>()
                                             .updateState(
-                                                [true, true, true, worker]);
+                                                [true, true, state[2], worker]);
                                       }),
-                                  TextField(
-                                    controller: _duedateController,
-                                    decoration: InputDecoration(
-                                        errorText: state[2]
-                                            ? ""
-                                            : "Due date should not be empty"),
+                                  SizedBox(
+                                    height: MediaQuery.of(context).size.height /
+                                        2.5,
+                                    child: CupertinoDatePicker(
+                                        minimumDate: DateTime.now(),
+                                        onDateTimeChanged: (selection) {
+                                          context
+                                              .read<TaskEditCubit>()
+                                              .updateState([
+                                            true,
+                                            true,
+                                            selection,
+                                            state[3]
+                                          ]);
+                                        }),
                                   ),
                                   //Submit & Cancel
                                   Row(
@@ -323,18 +333,14 @@ class _TasksPageState extends State<_TasksPageContent> {
                                             List<dynamic> validation = [
                                               true,
                                               true,
-                                              true,
-                                              worker
+                                              state[2],
+                                              state[3],
                                             ];
                                             if (_titleController.text.isEmpty) {
                                               validation[0] = false;
                                             }
                                             if (_descController.text.isEmpty) {
                                               validation[1] = false;
-                                            }
-                                            if (_duedateController
-                                                .text.isEmpty) {
-                                              validation[2] = false;
                                             }
                                             bool isValid = context
                                                 .read<TaskEditCubit>()
@@ -343,8 +349,8 @@ class _TasksPageState extends State<_TasksPageContent> {
                                               taskCubit.addTask(
                                                 _titleController.text,
                                                 _descController.text,
-                                                worker,
-                                                _duedateController.text,
+                                                state[2],
+                                                state[3],
                                               );
                                               showDialog(
                                                   context: context,
@@ -371,10 +377,6 @@ class _TasksPageState extends State<_TasksPageContent> {
                                                           ],
                                                         ),
                                                       ));
-                                            } else {
-                                              context
-                                                  .read<TaskEditCubit>()
-                                                  .updateState(state);
                                             }
                                           }),
                                       GreenElevatedButton(
