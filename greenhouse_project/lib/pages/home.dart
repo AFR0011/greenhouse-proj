@@ -162,18 +162,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   Text("Welcome Back, $_userName!", style: headingTextStyle)),
         ),
 
-        // Search field
-        Padding(
-          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 40),
-          child: TextField(
-            controller: _searchController,
-            decoration: const InputDecoration(
-              icon: Icon(Icons.search, size: 24),
-              hintText: "Search...",
-            ),
-          ),
-        ),
-
         // Notifications subheading
         SizedBox(
           width: MediaQuery.of(context).size.width - 20,

@@ -16,6 +16,7 @@ import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/profile_cubit.dart';
 import 'package:greenhouse_project/services/cubit/profile_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -268,25 +269,24 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
         builder: (context, state) {
           return Column(
             children: [
-              TextField(
+              InputTextField(
                 controller: _nameController,
-                decoration: InputDecoration(
-                    errorText: state[0]
+                errorText: state[0]
                         ? ""
-                        : "Name should be longer than 4 characters."),
-              ),
-              TextField(
+                        : "Name should be longer than 4 characters.",
+                 hintText: "name"),
+
+              InputTextField(
                 controller: _emailController,
-                decoration: InputDecoration(
-                    errorText: state[1] ? "" : "Email format invalid."),
-              ),
-              TextField(
+                errorText: state[1] ? "" : "Email format invalid.",
+                 hintText: "email"),
+              InputTextField(
                 controller: _passwordController,
-                decoration: InputDecoration(
-                    errorText: state[2]
+                errorText: state[2]
                         ? ""
-                        : "Password should be longer than 8 characters."),
-              ),
+                        : "Password should be longer than 8 characters.",
+                 hintText: "password"),
+              
               Row(
                 children: [
                   GreenElevatedButton(

@@ -16,6 +16,7 @@ import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/worker_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class WorkersPage extends StatelessWidget {
@@ -326,22 +327,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                 TextField(
                                   controller: _emailController,
                                 ),
-                                DropdownButton(
-                                    value: state != '' ? state : "admin",
-                                    items: const [
-                                      DropdownMenuItem(
-                                        value: 'worker',
-                                        child: Text('worker'),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: 'admin',
-                                        child: Text('admin'),
-                                      ),
-                                    ],
-                                    onChanged: (selection) {
-                                      String newValue = selection!;
-                                      workerEditCubit.updateDropdown(newValue);
-                                    }),
+                                InputDropdown(items: const {"worker": "worker", "admin": "admin"}, value:state != '' ? state : "admin", onChanged: workerEditCubit.updateDropdown,),
                                 //Submit or Cancel
                                 Row(
                                   children: [
