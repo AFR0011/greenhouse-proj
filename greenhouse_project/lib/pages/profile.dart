@@ -181,13 +181,20 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
       body: Column(
         children: [
           // Display user profile picture
-          ClipOval(
+          GestureDetector(
+            child: ClipOval(
               child: Image.memory(
-            userData.picture!,
-            fit: BoxFit.cover,
-            width: 100,
-            height: 100,
-          )),
+              userData.picture!,
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+              )),
+            onTap:(){
+            
+            },
+          ),
+          
+          
           // Display user name
           _buildProfileField("Name", userData.name),
           // Display user email
