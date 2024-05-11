@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
@@ -19,16 +22,16 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   void _getUserProfile(Reference storageReference) async {
     try {
-      DocumentSnapshot? userSnapshot = await userReference?.get();
+      DocumentSnapshot? userSnapshot = 
+      await userReference?.get();
       final userSnapshotData = userSnapshot?.data();
       final firestoreData = userSnapshotData as Map<String, dynamic>;
-      // final picture =
-      //     await storageReference.child(firestoreData['picture']).getData();
-      // firestoreData['picture'] = picture;
-      UserData userData = UserData.fromFirestore(firestoreData, userReference!);
+      
+      UserData userData = 
+      await UserData.fromFirestore(firestoreData, userReference!, storageReference);
       emit(ProfileLoaded(userData));
-    } catch (error) {
-      emit(ProfileError(error.toString()));
+    } catch (error, stack) {
+      emit(ProfileError(stack.toString()));
     }
   }
 }
@@ -39,7 +42,7 @@ class UserData {
   final String name;
   final String surname;
   final String role;
-  final Uint8List picture;
+  final Uint8List? picture;
   final DocumentReference reference;
 
   UserData({
@@ -52,15 +55,17 @@ class UserData {
     required this.reference,
   });
 
-  factory UserData.fromFirestore(
-      Map<String, dynamic> data, DocumentReference userReference) {
-    return UserData(
+  static Future<UserData> fromFirestore (
+      Map<String, dynamic> data, DocumentReference userReference, Reference storageReference)async {
+         final Uint8List? picture = await storageReference.child(data['picture']).getData();
+         
+        return UserData(
       creationDate: (data['creationDate'] as Timestamp).toDate(),
       email: data['email'],
       name: data['name'],
       surname: data['surname'],
       role: data['role'],
-      picture: data['picture'],
+      picture: picture,
       reference: userReference,
     );
   }

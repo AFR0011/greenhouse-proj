@@ -145,6 +145,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           return _buildProfileContent(state.userData);
         } else if (state is ProfileError) {
           // Show error message if there's an error loading profile state
+          print(state.error);
           return Center(child: Text('Error: ${state.error}'));
         } else {
           // Handle unexpected state (should never happen)
@@ -180,13 +181,13 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
       body: Column(
         children: [
           // Display user profile picture
-          // ClipOval(
-          //     child: Image.memory(
-          //   userData.picture,
-          //   fit: BoxFit.cover,
-          //   width: 100,
-          //   height: 100,
-          // )),
+          ClipOval(
+              child: Image.memory(
+            userData.picture!,
+            fit: BoxFit.cover,
+            width: 100,
+            height: 100,
+          )),
           // Display user name
           _buildProfileField("Name", userData.name),
           // Display user email
