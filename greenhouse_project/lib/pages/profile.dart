@@ -8,6 +8,8 @@
 ///
 library;
 
+import 'dart:typed_data';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +70,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   // User info local variables
   late String _userRole = "";
   late DocumentReference _userReference;
+  Uint8List? _image;
 
   // Custom theme
   final ThemeData customTheme = theme;
@@ -162,6 +165,9 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     _emailController.text = userData.email;
     _nameController.text = userData.name;
     _passwordController.text = "";
+    // Get instance of cubit from main content
+    ProfileCubit profileCubit = BlocProvider.of<ProfileCubit>(context);
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -181,19 +187,20 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
       ),
       body: Column(
         children: [
-          // Display user profile picture
           GestureDetector(
-            child: ClipOval(
-              child: Image.memory(
-              userData.picture!,
-              fit: BoxFit.cover,
-              width: 100,
-              height: 100,
-              )),
-            onTap:(){
-            
-            },
+          child: ClipOval(
+          child: Image.memory(
+          userData.picture!,
+          fit: BoxFit.cover,
+          width: 100,
+          height: 100,
+          )),
+          onTap:(){
+            profileCubit.selectImage();
+          },
           ),
+          // Display user profile picture
+          
           
           
           // Display user name
@@ -353,6 +360,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
         },
       ),
     );
+    
   }
 
   // Function to submit profile edits
@@ -413,4 +421,5 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           );
         });
   }
+
 }
