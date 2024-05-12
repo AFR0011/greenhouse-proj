@@ -1,10 +1,12 @@
 import 'dart:async';
-
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 
 part 'profile_state.dart';
 
@@ -33,6 +35,37 @@ class ProfileCubit extends Cubit<ProfileState> {
     } catch (error, stack) {
       emit(ProfileError(stack.toString()));
     }
+  }
+  Future selectImage() async {
+    final ImagePicker  _imagePicker = ImagePicker();
+    XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if(_file != null){
+      Uint8List img = await _file.readAsBytes();
+      print("HI THERE");
+      
+    // Upload img to Storage storageReference.add)
+    UploadTask uploadTask = storageReference.child(Timestamp.now().toString()).putData(img);
+    TaskSnapshot snapshot = await uploadTask;
+    // Get url of uploaded image
+    String imageUrl = await snapshot.ref.getDownloadURL();
+    // Set "picture" for current user as url
+    try{
+      await userReference!.update({
+        'picture': imageUrl
+      });
+      DocumentSnapshot updatedSnapshot = await userReference!.get();
+      UserData userdata = await UserData.fromFirestore(
+        updatedSnapshot.data() as Map<String, dynamic>,
+        userReference!,storageReference);
+      emit(ProfileLoaded(userdata));
+    } catch (error) {
+      emit(ProfileError(error.toString()));
+    }
+    
+    }
+    
+
+    print('Image selection Failed'); 
   }
 }
 
@@ -69,4 +102,7 @@ class UserData {
       reference: userReference,
     );
   }
+
+
+   
 }
