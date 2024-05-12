@@ -12,6 +12,7 @@ import 'package:greenhouse_project/services/cubit/chat_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/message_bubble.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -208,9 +209,7 @@ class _ChatPageState extends State<_ChatPageContent> {
     return Row(
       children: [
         Expanded(
-          child: TextField(
-            controller: _textEditingController,
-          ),
+          child:InputTextField(controller: _textEditingController, errorText: "", hintText: "send a message") 
         ),
         Expanded(
           child: GreenElevatedButton(
