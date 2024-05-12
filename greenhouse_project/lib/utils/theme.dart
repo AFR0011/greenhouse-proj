@@ -7,7 +7,7 @@ final ThemeData theme = ThemeData(
   colorScheme: ColorScheme(
     primary: Colors.green[800]!,
     secondary: Colors.green[800]!,
-    surface: Colors.green[800]!,
+    surface: Colors.white,
     background: Colors.white,
     error: Colors.red,
     onPrimary: Colors.black,

@@ -14,13 +14,11 @@ class MessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth:
-            MediaQuery.of(context).size.width * 0.4, // 40% of screen width
-      ),
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
+        width: MediaQuery.of(context).size.width * 0.4,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
         decoration: BoxDecoration(
@@ -32,6 +30,10 @@ class MessageBubble extends StatelessWidget {
             bottomLeft: isSender ? const Radius.circular(12) : Radius.zero,
             bottomRight: isSender ? Radius.zero : const Radius.circular(12),
           ),
+          border: Border.all(
+              color: isSender
+                  ? theme.colorScheme.surface
+                  : theme.colorScheme.primary),
         ),
         child: Text(
           message,

@@ -190,10 +190,13 @@ class _ChatPageState extends State<_ChatPageContent> {
         itemBuilder: (context, index) {
           MessageData? message = messages[index];
           bool isSender = message?.receiver != _userReference;
-          return MessageBubble(
-            message: message?.message ?? "",
-            isSender: isSender,
-            theme: customTheme,
+          return Align(
+            alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
+            child: MessageBubble(
+              message: message?.message ?? "",
+              isSender: isSender,
+              theme: customTheme,
+            ),
           );
         },
       );
