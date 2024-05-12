@@ -32,8 +32,9 @@ class ProfileCubit extends Cubit<ProfileState> {
       UserData userData = 
       await UserData.fromFirestore(firestoreData, userReference!, storageReference);
       emit(ProfileLoaded(userData));
-    } catch (error, stack) {
-      emit(ProfileError(stack.toString()));
+    } catch (error) {
+      print(error.toString());
+      emit(ProfileError(error.toString()));
     }
   }
   Future selectImage() async {
@@ -41,13 +42,12 @@ class ProfileCubit extends Cubit<ProfileState> {
     XFile? _file = await _imagePicker.pickImage(source: ImageSource.gallery);
     if(_file != null){
       Uint8List img = await _file.readAsBytes();
-      print("HI THERE");
       
     // Upload img to Storage storageReference.add)
     UploadTask uploadTask = storageReference.child(Timestamp.now().toString()).putData(img);
     TaskSnapshot snapshot = await uploadTask;
     // Get url of uploaded image
-    String imageUrl = await snapshot.ref.getDownloadURL();
+    String imageUrl = await snapshot.ref.name;
     // Set "picture" for current user as url
     try{
       await userReference!.update({
@@ -59,6 +59,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         userReference!,storageReference);
       emit(ProfileLoaded(userdata));
     } catch (error) {
+      print(error.toString());
       emit(ProfileError(error.toString()));
     }
     
@@ -89,7 +90,7 @@ class UserData {
   });
 
   static Future<UserData> fromFirestore (
-      Map<String, dynamic> data, DocumentReference userReference, Reference storageReference)async {
+      Map<String, dynamic> data, DocumentReference userReference, Reference storageReference) async {
          final Uint8List? picture = await storageReference.child(data['picture']).getData();
          
         return UserData(

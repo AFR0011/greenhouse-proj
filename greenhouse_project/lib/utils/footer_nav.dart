@@ -11,6 +11,7 @@ import "package:greenhouse_project/pages/inventory.dart";
 import "package:greenhouse_project/pages/management.dart";
 import "package:greenhouse_project/pages/tasks.dart";
 import "package:greenhouse_project/services/cubit/footer_nav_cubit.dart";
+import "package:greenhouse_project/utils/theme.dart";
 
 void navigateToPage(BuildContext context, int index, String userRole,
     UserCredential userCredential, {DocumentReference? userReference}) {
@@ -75,6 +76,8 @@ void navigateToPage(BuildContext context, int index, String userRole,
 BottomNavigationBar createFooterNav(
     int selectedIndex, FooterNavCubit footerNavCubit, String userRole) {
   final footerNav = BottomNavigationBar(
+    elevation:120,
+    backgroundColor: theme.colorScheme.background,
     type: BottomNavigationBarType.fixed,
     selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
     items: [
@@ -91,7 +94,7 @@ BottomNavigationBar createFooterNav(
       const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
       BottomNavigationBarItem(
           icon: Image.asset("lib/utils/Icons/Leaf.png", width: 24, height: 24),
-          label: "Greenhouse"),
+          label: "Grow"),
       const BottomNavigationBarItem(icon: Icon(Icons.message), label: "Chat"),
     ],
     currentIndex: selectedIndex,

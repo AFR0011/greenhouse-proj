@@ -223,13 +223,13 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     fit: BoxFit.scaleDown,
                     child: Row(
                       children: [
-                        GreenElevatedButton(
+                        WhiteElevatedButton(
                           text: "Edit",
                           onPressed: () {
                             _showEditForm(context, inventory);
                           },
                         ),
-                        GreenElevatedButton(
+                        RedElevatedButton(
                           text: "Delete",
                           onPressed: () {
                             _showDeleteForm(context, inventory);
@@ -378,7 +378,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                 });
                               }
                             }),
-                        GreenElevatedButton(
+                        WhiteElevatedButton(
                             text: "Cancel",
                             onPressed: () {
                               Navigator.pop(context);
@@ -488,7 +488,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                 });
                               }
                             }),
-                        GreenElevatedButton(
+                        WhiteElevatedButton(
                             text: "Cancel",
                             onPressed: () {
                               Navigator.pop(context);
@@ -531,7 +531,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                     content: Text("Item Deleted succesfully")));
                           });
                         }),
-                    GreenElevatedButton(
+                    WhiteElevatedButton(
                         text: "Cancel",
                         onPressed: () {
                           Navigator.pop(context);

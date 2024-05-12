@@ -156,7 +156,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                       return ListTile(
                         title: Text(plant.type),
                         subtitle: Text(plant.subtype),
-                        trailing: GreenElevatedButton(
+                        trailing:WhiteElevatedButton(
                           // Show details and sensor readings
                           text: 'Details',
                           onPressed: () {

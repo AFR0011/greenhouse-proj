@@ -177,13 +177,13 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                     fit: BoxFit.scaleDown,
                     child: Row(
                       children: [
-                        GreenElevatedButton(
+                        WhiteElevatedButton(
                           text: "Edit",
                           onPressed: () {
                             _showEditForm(program);
                           },
                         ),
-                        GreenElevatedButton(
+                        RedElevatedButton(
                           text: "Delete",
                           onPressed: () {
                             _showDeleteForm(program);
@@ -326,7 +326,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                               const SnackBar(
                                   content: Text("Item added succesfully")));
                         }),
-                    GreenElevatedButton(
+                    WhiteElevatedButton(
                         text: "Cancel",
                         onPressed: () {
                           _titleController.clear();
@@ -385,7 +385,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                               const SnackBar(
                                   content: Text("Program edited succesfully")));
                         }),
-                    GreenElevatedButton(
+                    WhiteElevatedButton(
                         text: "Cancel",
                         onPressed: () {
                           _titleController.clear();
@@ -421,7 +421,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                   content:
                                       Text("Program Deleted succesfully")));
                         }),
-                    GreenElevatedButton(
+                    WhiteElevatedButton(
                         text: "Cancel",
                         onPressed: () {
                           Navigator.pop(context);
