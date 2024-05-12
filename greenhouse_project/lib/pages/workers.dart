@@ -157,7 +157,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                       return ListTile(
                         title: Text(worker.name),
                         subtitle: Text(worker.enabled ? "Active" : "Inactive"),
-                        trailing: GreenElevatedButton(
+                        trailing: WhiteElevatedButton(
                           text: 'Details',
                           onPressed: () {
                             showDialog(
@@ -165,7 +165,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                               builder: (context) {
                                 Widget buttonRow = Row(
                                   children: [
-                                    GreenElevatedButton(
+                                    WhiteElevatedButton(
                                         text: "Tasks",
                                         onPressed: () {
                                           Navigator.push(
@@ -179,7 +179,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                                             worker.reference,
                                                       )));
                                         }),
-                                    GreenElevatedButton(
+                                    WhiteElevatedButton(
                                         text: "Show profile",
                                         onPressed: () {
                                           Navigator.push(
@@ -192,7 +192,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                                           userReference: worker
                                                               .reference)));
                                         }),
-                                    GreenElevatedButton(
+                                    RedElevatedButton(
                                         text: worker.enabled
                                             ? "Disable account"
                                             : "Enable account",
@@ -260,7 +260,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                                                           }));
                                                                 }
                                                               }),
-                                                          GreenElevatedButton(
+                                                          WhiteElevatedButton(
                                                               text: "Go Back",
                                                               onPressed: () =>
                                                                   Navigator.pop(
@@ -345,7 +345,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                                   content: Text(
                                                       "HI THERE, THIS WORKED!!!")));
                                         }),
-                                    GreenElevatedButton(
+                                    WhiteElevatedButton(
                                         text: 'Cancel',
                                         onPressed: () {
                                           Navigator.pop(context);

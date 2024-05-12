@@ -7,7 +7,6 @@
 /// - Revert controller text after "cancel" on edit dialogue
 ///
 library;
-
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -238,12 +237,12 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
       child: userData.role == 'worker' && _userRole == 'manager'
           ? Row(
               children: [
-                GreenElevatedButton(text: "Message", onPressed: () {}),
-                GreenElevatedButton(text: "Delete", onPressed: () {}),
+                WhiteElevatedButton(text: "Message", onPressed: () {}),
+                RedElevatedButton(text: "Delete", onPressed: () {}),
               ],
             )
           : userData.email == widget.userCredential.user?.email
-              ? GreenElevatedButton(
+              ? WhiteElevatedButton(
                   text: "Edit",
                   onPressed: () {
                     showDialog(
@@ -256,7 +255,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                     );
                   },
                 )
-              : GreenElevatedButton(text: "Message", onPressed: () {}),
+              : WhiteElevatedButton(text: "Message", onPressed: () {}),
     );
   }
 
@@ -348,7 +347,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                               });
                         }
                       }),
-                  GreenElevatedButton(
+                  WhiteElevatedButton(
                       text: "Cancel",
                       onPressed: () {
                         Navigator.pop(context);

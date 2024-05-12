@@ -169,7 +169,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                  child: GreenElevatedButton(
+                  child: WhiteElevatedButton(
                       text: "Details",
                       onPressed: () {
                         Navigator.push(
@@ -198,7 +198,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                 ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                  child: GreenElevatedButton(
+                  child: WhiteElevatedButton(
                       text: "Details",
                       onPressed: () {
                         Navigator.push(

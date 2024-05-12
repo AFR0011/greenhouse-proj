@@ -22,3 +22,10 @@ const TextStyle buttonTextStyle = TextStyle(
   fontWeight: FontWeight.bold,
   color: Colors.white,
 );
+
+const TextStyle lightButtonTextStyle = TextStyle(
+  fontSize: 12,
+  fontWeight: FontWeight.bold,
+  color: Colors.black,
+);
+

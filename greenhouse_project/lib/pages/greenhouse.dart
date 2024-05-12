@@ -165,7 +165,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(25, 15, 25, 15),
-            child: GreenElevatedButton(
+            child: WhiteElevatedButton(
               text: "Details",
               onPressed: () {
                 _navigateToDetailsPage(pageWidget);

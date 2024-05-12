@@ -5,7 +5,7 @@ class SeaPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blue // Set the color of the waves
+      ..color = Color.fromARGB(255, 33, 243, 72) // Set the color of the waves
       ..style = PaintingStyle.fill; // Use fill style
 
     final path = Path();

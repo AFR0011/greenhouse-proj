@@ -23,16 +23,16 @@ class InputTextField extends StatelessWidget {
       constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.75),
       hintText: hintText,
       errorText: errorText,
-      border: const OutlineInputBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(12),
-          bottomRight: Radius.circular(12)
-        ),
+      filled: true,
+      fillColor:Color.fromARGB(209, 235, 245, 231),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
     ),              
   );
   }
 }
+
 
 class InputDropdown extends StatelessWidget {
   Map<String, dynamic> items;
