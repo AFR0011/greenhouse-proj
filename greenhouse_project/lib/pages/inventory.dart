@@ -246,7 +246,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         const Text("Pending Updates", style: subheadingTextStyle),
         SizedBox(
           height: MediaQuery.of(context).size.height / 3,
-          child: ListView.builder(
+          child: pendingInventory != null && pendingInventory.isNotEmpty
+          ?  ListView.builder(
             shrinkWrap: true,
             itemCount: pendingInventory.length,
             itemBuilder: (context, index) {
@@ -275,6 +276,12 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     : Text(inventory.amount.toString()),
               );
             },
+          )
+          : Center(
+            child: Text(
+              "No pending updates",
+            style: TextStyle(color: Colors.grey),
+            ),
           ),
         ),
 
