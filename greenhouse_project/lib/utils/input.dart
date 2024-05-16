@@ -3,7 +3,12 @@
 /// Review program to add action, limit etc...
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/services/cubit/equipment_status_cubit.dart';
+import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/plants_cubit.dart';
@@ -448,6 +453,47 @@ class ProgramDetailsDialog extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+class ToggleButtonContainer extends StatelessWidget {
+  final EquipmentStatus equipment;
+  final Icon icon;
+  final BuildContext context;
+  final DocumentReference userReference;
+  ToggleButtonContainer({required this.icon,required this.equipment, required this.context, required this.userReference});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(8)), color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary ),
+        margin: EdgeInsets.all(MediaQuery.of(context).size.width*0.05),
+        // color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary,
+        width: MediaQuery.of(context).size.width*0.4,
+        height: MediaQuery.of(context).size.width*0.4,
+        child: Column(
+        children: [
+          Row(
+            children: [Expanded(child: Align(alignment: Alignment.centerLeft, child: ClipOval(child: icon,))),
+              Expanded(
+                child: Align(alignment: Alignment.centerRight,
+                  child: Switch(value: equipment.status, onChanged: (value) {
+                                                    context
+                                          .read<EquipmentStatusCubit>()
+                                          .toggleStatus(userReference,
+                                              equipment.reference, equipment.status);
+                  }),
+                ),
+              )
+        ]),
+          Align(alignment: Alignment.centerLeft,child: Text(equipment.type, style: subheadingTextStyle,))
+        ],
+        ),
       ),
     );
   }
