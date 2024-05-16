@@ -73,7 +73,7 @@ class ProgramsCubit extends Cubit<ProgramsState> {
       await item.set(data, SetOptions(merge: true));
       _getPrograms();
       logs.add({
-        "action": "update",
+        "action": "Update",
         "description": "Program updated by user at ${Timestamp.now().toString()}",
         "timestamp": Timestamp.now(),
         "type": "Program",

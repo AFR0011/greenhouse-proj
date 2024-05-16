@@ -1,15 +1,17 @@
+
 /// Tasks page - CRUD for worker tasks
 ///
 /// TODO:
 /// - Add task creation option
 /// - Delete task
-///
+/// - add dropdown list for task edit status
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -212,9 +214,13 @@ class _TasksPageState extends State<_TasksPageContent> {
                                       )
                                     : Row(children: [
                                         GreenElevatedButton(
-                                            text: "Delete", onPressed: () {}),
+                                            text: "Delete", onPressed: () {
+                                              showDeleteForm(task);
+                                            }),
                                         GreenElevatedButton(
-                                            text: "Edit", onPressed: () {}),
+                                            text: "Edit", onPressed: () {
+                                              showEditForm(task);
+                                            }),
                                         task.status == "waiting"
                                             ? GreenElevatedButton(
                                                 text: "Approve",
@@ -400,6 +406,7 @@ class _TasksPageState extends State<_TasksPageContent> {
         ],
       ),
 
+
       // Footer nav bar
       bottomNavigationBar: _userRole == "worker"
           ? createFooterNav(
@@ -409,5 +416,82 @@ class _TasksPageState extends State<_TasksPageContent> {
             )
           : const SizedBox(),
     );
+  }
+
+  void showEditForm(TaskData task){
+    // Get instance of programs cubit from main context
+    TaskCubit taskCubit = BlocProvider.of<TaskCubit>(context);
+
+    showDialog(
+      context: context,
+      builder: (context){
+        _titleController.text = task.title;
+        _descController.text = task.description;
+        //make duedate editabale by choosing the  date&time from a panel
+        _duedateController.text = task.dueDate.toString();
+        return Dialog(
+          child: Column(
+            children: [
+              TextField(
+                controller: _titleController,
+              ),
+              TextField(
+                controller: _descController,
+              ),
+              TextField(
+                controller: _duedateController,
+              ),
+              TextFormField(
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+              ),
+              Row(
+                children: [
+                  GreenElevatedButton(
+                    text: 'Submit',
+                     onPressed: () async {
+                      Map<String, dynamic> data = {
+                        "title": _titleController,
+                        "creationDate": DateTime.now(),
+                        "pending": _userRole == 'manager' ? false : true,
+                      };
+                      await taskCubit.updateTask(task.taskReference, data, _userReference);
+                      _titleController.clear();
+                      _descController.clear();
+                      _duedateController.clear();
+                      Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Task edited succesfully")));
+                     } )
+                ],
+              )
+            ],),
+        );
+      });
+  }
+
+  void showDeleteForm(TaskData task) {
+    TaskCubit taskCubit = BlocProvider.of<TaskCubit>(context);
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          child: Column (
+            children: [
+              const Text("Are you sure?"),
+              Row (
+                children: [
+                  GreenElevatedButton(
+                    text: "Submit",
+                     onPressed: () async {
+                      await taskCubit.removeTask(task.taskReference, _userReference);
+                     })
+                ],)
+            ],),
+        );
+      });
   }
 }
