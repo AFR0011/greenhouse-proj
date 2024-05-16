@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 final ThemeData theme = ThemeData(
   colorScheme: ColorScheme(
     primary: Colors.green[800]!,
-    secondary: Colors.green[800]!,
+    secondary: Colors.white,
     surface: Colors.green[200]!,
     background: Colors.green[200]!,
     error: Colors.red,

@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/equipment_status_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
-import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -34,9 +34,6 @@ class EquipmentPage extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => NotificationsCubit(userCredential),
-        ),
-        BlocProvider(
-          create: (context) => EquipmentCubit(),
         ),
         BlocProvider(
           create: (context) => EquipmentStatusCubit(),
@@ -143,26 +140,29 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   }
                   // Display equipment
                   else {
-                    return ListView.builder(
+                    
+                    return GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
                       shrinkWrap: true,
                       itemCount: equipmentList.length,
                       itemBuilder: (context, index) {
                         EquipmentStatus equipment =
                             equipmentList[index]; //equipment data
                         // Display equipment info
-                        return ListTile(
-                          title: Text(equipment.type),
-                          subtitle: Text(equipment.status.toString()),
-                          // Toggle equipment status
-                          trailing: Switch(
-                              value: equipment.status,
-                              onChanged: (value) {
-                                context
-                                    .read<EquipmentStatusCubit>()
-                                    .toggleStatus(_userReference,
-                                        equipment.reference, equipment.status);
-                              }),
-                        );
+                        return ToggleButtonContainer(context: context, equipment: equipment, userReference: _userReference, icon: const Icon(Icons.accessibility),);
+                        // ListTile(
+                        //   title: Text(equipment.type),
+                        //   subtitle: Text(equipment.status.toString()),
+                        //   // Toggle equipment status
+                        //   trailing: Switch(
+                        //       value: equipment.status,
+                        //       onChanged: (value) {
+                        //         context
+                        //             .read<EquipmentStatusCubit>()
+                        //             .toggleStatus(_userReference,
+                        //                 equipment.reference, equipment.status);
+                        //       }),
+                        // );
                       },
                     );
                   }
