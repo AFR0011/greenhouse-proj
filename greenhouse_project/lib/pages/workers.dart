@@ -161,6 +161,7 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                           text: 'Details',
                           onPressed: () {
                             showDialog(
+                              
                               context: context,
                               builder: (context) {
                                 Widget buttonRow = Row(
@@ -274,22 +275,8 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                         }),
                                   ],
                                 );
-                                return Dialog(
-                                    child: Column(
-                                  children: [
-                                    IconButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        icon: const Icon(Icons.close)),
-                                    Text("Title: ${worker.name}"),
-                                    Text("Description: ${worker.surname}"),
-                                    Text("Due Date: ${worker.email}"),
-                                    Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: buttonRow)
-                                  ],
-                                ));
+                            return WorkerDetailsDialog(worker: worker);
+                                
                               },
                             );
                           },

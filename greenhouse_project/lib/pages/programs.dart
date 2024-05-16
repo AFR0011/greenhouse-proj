@@ -16,6 +16,7 @@ import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/programs_cubit.dart';
 import 'package:greenhouse_project/services/cubit/program_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -175,22 +176,11 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                 subtitle: Text(program.creationDate.toString()),
                 trailing: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Row(
-                      children: [
-                        WhiteElevatedButton(
-                          text: "Edit",
-                          onPressed: () {
-                            _showEditForm(program);
-                          },
-                        ),
-                        RedElevatedButton(
-                          text: "Delete",
-                          onPressed: () {
-                            _showDeleteForm(program);
-                          },
-                        ),
-                      ],
-                    )),
+                    child:WhiteElevatedButton(onPressed: () {
+                      showDialog(context: context, builder: (context) => ProgramDetailsDialog(program: program));
+                    },
+                    text: "details",) 
+                    ),
               );
             },
           ),

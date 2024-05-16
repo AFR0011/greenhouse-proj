@@ -20,6 +20,7 @@ import 'package:greenhouse_project/services/cubit/task_cubit.dart';
 import 'package:greenhouse_project/services/cubit/task_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -190,7 +191,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                       return ListTile(
                         title: Text(task.title),
                         subtitle: Text(task.dueDate.toString()),
-                        trailing: GreenElevatedButton(
+                        trailing: WhiteElevatedButton(
                           text: 'Details',
                           onPressed: () {
                             showDialog(
@@ -199,10 +200,10 @@ class _TasksPageState extends State<_TasksPageContent> {
                                 Widget buttonRow = _userRole == "worker"
                                     ? Row(
                                         children: [
-                                          GreenElevatedButton(
+                                          WhiteElevatedButton(
                                               text: "Contact Manager",
                                               onPressed: () {}),
-                                          GreenElevatedButton(
+                                          WhiteElevatedButton(
                                               text: "Mark as Complete",
                                               onPressed: () {
                                                 context
@@ -213,37 +214,18 @@ class _TasksPageState extends State<_TasksPageContent> {
                                         ],
                                       )
                                     : Row(children: [
-                                        GreenElevatedButton(
-                                            text: "Delete", onPressed: () {
-                                              showDeleteForm(task);
-                                            }),
-                                        GreenElevatedButton(
-                                            text: "Edit", onPressed: () {
-                                              showEditForm(task);
-                                            }),
+                                        RedElevatedButton(
+                                            text: "Delete", onPressed: () {}),
+                                        WhiteElevatedButton(
+                                            text: "Edit", onPressed: () {}),
                                         task.status == "waiting"
                                             ? GreenElevatedButton(
                                                 text: "Approve",
                                                 onPressed: () {})
                                             : const SizedBox(),
                                       ]);
-                                return Dialog(
-                                    child: Column(
-                                  children: [
-                                    IconButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        icon: const Icon(Icons.close)),
-                                    Text("Title: ${task.title}"),
-                                    Text("Description: ${task.description}"),
-                                    Text("Due Date: ${task.dueDate}"),
-                                    Text("Status: ${task.status}"),
-                                    Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: buttonRow)
-                                  ],
-                                ));
+                                      return TaskDetailsDialog(task:task);
+                                
                               },
                             );
                           },
@@ -385,7 +367,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                                       ));
                                             }
                                           }),
-                                      GreenElevatedButton(
+                                      WhiteElevatedButton(
                                           text: 'Cancel',
                                           onPressed: () {
                                             Navigator.pop(context);
