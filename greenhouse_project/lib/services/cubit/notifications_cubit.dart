@@ -10,11 +10,17 @@ class NotificationsCubit extends HomeCubit {
 
   NotificationsCubit(this.user) : super(NotificationsLoading()) {
     if (user != null) {
-      _subscribeToNotifications();
+      initNotifications();
     }
   }
 
-  void _subscribeToNotifications() async {
+  void initNotifications() async {
+    String? deviceToken = await FirebaseMessaging.instance.getToken();
+
+    // Get user notifications
+    // Display or something?
+    // Push notifications??
+
     // Get user reference
     QuerySnapshot userQuery = await FirebaseFirestore.instance
         .collection('users')

@@ -30,17 +30,11 @@ class _LoginPageState extends State<LoginPage>
   // Firebase authentication init
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  // Gradient animation variables
-  late AnimationController _animController;
-  late Animation<Alignment> _topAlignmentAnimation;
-  late Animation<Alignment> _bottomAlignmentAnimation;
-
   // Dispose of controllers for better performance
   @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
-    _animController.dispose();
     super.dispose();
   }
 
