@@ -51,6 +51,7 @@ dependencies:
   firebase_messaging: ^14.9.1
   firebase_remote_config: ^4.4.4
   image_picker: ^1.1.1
+  glassmorphism: ^3.0.0
 
 
 dev_dependencies:

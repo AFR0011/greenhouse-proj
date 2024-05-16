@@ -16,6 +16,7 @@ import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
 import 'package:greenhouse_project/services/cubit/inventory_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
@@ -221,22 +222,11 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                 // Buttons for edit and deleting items
                 trailing: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child: Row(
-                      children: [
-                        WhiteElevatedButton(
-                          text: "Edit",
-                          onPressed: () {
-                            _showEditForm(context, inventory);
-                          },
-                        ),
-                        RedElevatedButton(
-                          text: "Delete",
-                          onPressed: () {
-                            _showDeleteForm(context, inventory);
-                          },
-                        ),
-                      ],
-                    )),
+                    child:WhiteElevatedButton(onPressed: () {
+                      showDialog(context: context, builder: (context) => InventoryDetailsDialog(inventory:inventory));
+                    },
+                    text: "details",) 
+                    ),
               );
             },
           ),
@@ -277,7 +267,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
               );
             },
           )
-          : Center(
+          : const Center(
             child: Text(
               "No pending updates",
             style: TextStyle(color: Colors.grey),
@@ -519,10 +509,10 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     showDialog(
         context: context,
         builder: (context) {
-          return Dialog(
-            child: Column(
+          return SimpleDialog(
+            title: Expanded(child:  Text("Are you Sure?",textAlign:TextAlign.center, style:  TextStyle(fontSize: 15,fontWeight: FontWeight.bold),)),
+            children: [Column(
               children: [
-                const Text("Are you Sure?"),
                 Row(
                   children: [
                     GreenElevatedButton(
@@ -547,7 +537,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                 )
               ],
             ),
-          );
+          ]);
         });
   }
 }

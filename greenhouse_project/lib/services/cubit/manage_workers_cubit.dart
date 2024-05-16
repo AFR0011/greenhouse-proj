@@ -136,6 +136,7 @@ class WorkerData {
   final String surname;
   final bool enabled;
   final DocumentReference reference;
+  final String role;
 
   WorkerData({
     required this.email,
@@ -144,6 +145,7 @@ class WorkerData {
     required this.surname,
     required this.reference,
     required this.enabled,
+    required this.role
   });
 
   factory WorkerData.fromFirestore(DocumentSnapshot doc) {
@@ -154,6 +156,7 @@ class WorkerData {
         email: data['email'],
         creationDate: (data['creationDate'] as Timestamp).toDate(),
         enabled: data['enabled'],
-        reference: doc.reference);
+        reference: doc.reference,
+        role: data["role"]);
   }
 }

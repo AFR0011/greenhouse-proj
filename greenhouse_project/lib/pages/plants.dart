@@ -12,6 +12,7 @@ import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/plants_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -160,7 +161,8 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                           // Show details and sensor readings
                           text: 'Details',
                           onPressed: () {
-                            _showPlantDetails(plant);
+                            // _showPlantDetails(plant);
+                            showDialog(context: context, builder: (context) => PlantDetailsDialog(plant:plant));
                           },
                         ),
                       );

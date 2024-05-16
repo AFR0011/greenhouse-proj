@@ -43,7 +43,7 @@ class _LoginPageState extends State<LoginPage>
   void initState() {
     super.initState();
   }
-
+  bool _isSecurePassword = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,50 +61,55 @@ class _LoginPageState extends State<LoginPage>
             // Content
             Padding(
               padding: const EdgeInsets.all(25.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 60),
-                    child: Text(
-                      "Greenhouse Control System",
-                      style: headingTextStyle,
-                      textAlign: TextAlign.center,
+              child:SafeArea(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset("lib/utils/Icons/Logo.png", width: 90, height: 90),
+                  
+                    const Padding(
+                      padding: EdgeInsets.only(bottom: 60),
+                      child: Text(
+                        "Greenhouse Control System",
+                        style: headingTextStyle,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white70,
-                      labelText: 'Email',
-                      border: OutlineInputBorder(),
+                    TextField(
+                      controller: emailController,
+                      decoration: const InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white70,
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20.0),
-                  TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      filled: true,
-                      fillColor: Colors.white70,
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
+                    const SizedBox(height: 20.0),
+                    TextField(
+                      controller: passwordController,
+                      obscureText:  _isSecurePassword,
+                      decoration:  InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white70,
+                        labelText: 'Password',
+                        border: OutlineInputBorder(),
+                        suffixIcon: togglePassword(),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20.0),
-                  ElevatedButton(
-                    onPressed: () {
-                      context.read<AuthCubit>().authLoginRequest(
-                          emailController.text.trim(), passwordController.text);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 50, vertical: 15),
+                    const SizedBox(height: 20.0),
+                    ElevatedButton(
+                      onPressed: () {
+                        context.read<AuthCubit>().authLoginRequest(
+                            emailController.text.trim(), passwordController.text);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50, vertical: 15),
+                      ),
+                      child: const Text('Login'),
                     ),
-                    child: const Text('Login'),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ]);
@@ -131,4 +136,14 @@ class _LoginPageState extends State<LoginPage>
       ),
     );
   }
+  Widget togglePassword(){
+      
+      return IconButton(onPressed: (){
+        setState(() {
+      _isSecurePassword = !_isSecurePassword;
+      });
+      }, icon: _isSecurePassword ? Icon(Icons.visibility) : Icon(Icons.visibility_off),
+      color: Colors.grey ); 
+
+    }
 }
