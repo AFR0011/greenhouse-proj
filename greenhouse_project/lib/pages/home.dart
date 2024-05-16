@@ -7,6 +7,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/login.dart';
@@ -81,6 +82,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   @override
   void initState() {
     context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
+    context.read<NotificationsCubit>().initNotifications();
     super.initState();
   }
 
@@ -108,6 +110,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             _userName = state.userName;
             _userReference = state.userReference;
             _enabled = state.enabled;
+
+            // Get device token for notifications
 
             // Call function to create home page
             if (_enabled) {

@@ -7,6 +7,7 @@
 /// - Revert controller text after "cancel" on edit dialogue
 ///
 library;
+
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -69,7 +70,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   // User info local variables
   late String _userRole = "";
   late DocumentReference _userReference;
-  Uint8List? _image;
+  Uint8List? image;
 
   // Custom theme
   final ThemeData customTheme = theme;
@@ -187,21 +188,19 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
       body: Column(
         children: [
           GestureDetector(
-          child: ClipOval(
-          child: Image.memory(
-          userData.picture!,
-          fit: BoxFit.cover,
-          width: 100,
-          height: 100,
-          )),
-          onTap:(){
-            profileCubit.selectImage();
-          },
+            child: ClipOval(
+                child: Image.memory(
+              userData.picture!,
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+            )),
+            onTap: () {
+              profileCubit.selectImage();
+            },
           ),
           // Display user profile picture
-          
-          
-          
+
           // Display user name
           _buildProfileField("Name", userData.name),
           // Display user email
@@ -276,23 +275,21 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           return Column(
             children: [
               InputTextField(
-                controller: _nameController,
-                errorText: state[0]
-                        ? ""
-                        : "Name should be longer than 4 characters.",
-                 hintText: "name"),
-
+                  controller: _nameController,
+                  errorText: state[0]
+                      ? ""
+                      : "Name should be longer than 4 characters.",
+                  hintText: "name"),
               InputTextField(
-                controller: _emailController,
-                errorText: state[1] ? "" : "Email format invalid.",
-                 hintText: "email"),
+                  controller: _emailController,
+                  errorText: state[1] ? "" : "Email format invalid.",
+                  hintText: "email"),
               InputTextField(
-                controller: _passwordController,
-                errorText: state[2]
-                        ? ""
-                        : "Password should be longer than 8 characters.",
-                 hintText: "password"),
-              
+                  controller: _passwordController,
+                  errorText: state[2]
+                      ? ""
+                      : "Password should be longer than 8 characters.",
+                  hintText: "password"),
               Row(
                 children: [
                   GreenElevatedButton(
@@ -359,7 +356,6 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
         },
       ),
     );
-    
   }
 
   // Function to submit profile edits
@@ -420,5 +416,4 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           );
         });
   }
-
 }
