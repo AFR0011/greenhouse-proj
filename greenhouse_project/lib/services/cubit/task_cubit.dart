@@ -3,8 +3,10 @@
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
+import 'package:greenhouse_project/services/cubit/programs_cubit.dart';
 part 'task_state.dart';
 
 class TaskCubit extends Cubit<TaskState> {
@@ -36,7 +38,7 @@ class TaskCubit extends Cubit<TaskState> {
           snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
       emit(TaskLoaded(tasks: [...tasks]));
     }, onError: (error) {
-      emit(TaskError(error: error.toString()));
+      emit(TaskError(error.toString()));
     });
   }
 
@@ -73,9 +75,52 @@ class TaskCubit extends Cubit<TaskState> {
         "externalId": externalId,
       });
     } catch (error) {
-      emit(TaskError(error: error.toString()));
+      emit(TaskError(error.toString()));
     }
   }
+
+  Future<void> removeTask(DocumentReference item,
+   DocumentReference userReference) async {
+    emit(TaskLoading());
+    try {
+      Map<String, dynamic> data = item.get().then((doc) => doc.data() )
+      as Map<String, dynamic>;
+      logs.add({
+        "action": "Delete",
+        "description": "Task deleted by user at ${Timestamp.now().toString()} program details: ${data["title"]}",
+        "timestamp": Timestamp.now(),
+        "type": "task",
+        "userId": userReference,
+        "externalId": item,
+      });
+
+      await item.delete();
+      _getTasks();
+
+    } catch (error) {
+      emit(TaskError(error.toString()));
+    }
+   }
+
+  Future<void> updateTask(
+    DocumentReference item, Map<String, dynamic> data,
+     DocumentReference userReference) async{
+      emit(TaskLoading());
+      try {
+        await item.set(data, SetOptions(merge: true));
+        _getTasks();
+        logs.add({
+        "action": "Update",
+        "description": "Task updated by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "Task",
+        "userId": userReference,
+        "externalId": item,
+        });
+      } catch (error) {
+        emit(TaskError(error.toString()));
+      }
+     }
 
   @override
   Future<void> close() {
