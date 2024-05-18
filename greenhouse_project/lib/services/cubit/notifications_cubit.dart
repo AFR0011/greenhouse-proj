@@ -5,6 +5,7 @@ class NotificationsCubit extends HomeCubit {
       FirebaseFirestore.instance.collection('notifications');
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   final UserCredential? user;
 
@@ -15,11 +16,10 @@ class NotificationsCubit extends HomeCubit {
   }
 
   void initNotifications() async {
-    String? deviceToken = await FirebaseMessaging.instance.getToken();
+    // _firebaseMessaging.requestPermission();
 
-    // Get user notifications
-    // Display or something?
-    // Push notifications??
+    // String? fcmToken = await _firebaseMessaging.getToken();
+    // print("Device Token: $fcmToken");
 
     // Get user reference
     QuerySnapshot userQuery = await FirebaseFirestore.instance
@@ -29,6 +29,7 @@ class NotificationsCubit extends HomeCubit {
     DocumentReference userReference = userQuery.docs.first.reference;
 
     //Get user notifications
+    // Get user notifications
     notifications
         .where('user', isEqualTo: userReference)
         .orderBy('timestamp', descending: true)
@@ -41,17 +42,18 @@ class NotificationsCubit extends HomeCubit {
     }, onError: (error) {
       emit(NotificationsError(error.toString()));
     });
-    // You may set the permission requests to "provisional" which allows the user to choose what type
-// of notifications they would like to receive once the user receives a notification.
-    final notificationSettings =
-        await FirebaseMessaging.instance.requestPermission(provisional: true);
-
-// For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
-    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-    if (apnsToken != null) {
-      // APNS token is available, make FCM plugin API requests...
-    }
   }
+
+  void handleNotification(RemoteMessage? message) {
+    if (message == null) return;
+  }
+
+// // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+//     final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+//     if (apnsToken != null) {
+//       // APNS token is available, make FCM plugin API requests...
+//     }
+//   }
 }
 
 class NotificationData {

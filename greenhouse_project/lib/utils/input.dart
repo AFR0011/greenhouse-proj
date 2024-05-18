@@ -5,10 +5,8 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/equipment_status_cubit.dart';
-import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/plants_cubit.dart';
@@ -23,27 +21,28 @@ class InputTextField extends StatelessWidget {
   final String errorText;
   final String hintText;
 
-  const InputTextField({
-    super.key,
-    required this.controller,
-    required this.errorText,
-    required this.hintText
-  });
+  const InputTextField(
+      {super.key,
+      required this.controller,
+      required this.errorText,
+      required this.hintText});
 
   @override
   Widget build(BuildContext context) {
-  return TextField(                
-    decoration: InputDecoration(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.75),
-      hintText: hintText,
-      errorText: errorText,
-      filled: true,
-      fillColor:Color.fromARGB(209, 235, 245, 231),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+        hintText: hintText,
+        errorText: errorText,
+        filled: true,
+        fillColor: Color.fromARGB(209, 235, 245, 231),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
-    ),              
-  );
+    );
   }
 }
 
@@ -51,47 +50,44 @@ class LoginTextField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
 
-  const LoginTextField({
-    super.key,
-    required this.controller,
-    required this.labelText
-  });
+  const LoginTextField(
+      {super.key, required this.controller, required this.labelText});
 
   @override
   Widget build(BuildContext context) {
-  return TextField(                
-    decoration: InputDecoration(
-      filled: true,
-      fillColor:Colors.white70,
-      label: Text(labelText),
-      border: const OutlineInputBorder(),
-    ),              
-  );
+    return TextField(
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.white70,
+        label: Text(labelText),
+        border: const OutlineInputBorder(),
+      ),
+    );
   }
 }
-
-
 
 class InputDropdown extends StatelessWidget {
   Map<String, dynamic> items;
   String? value;
   final Function onChanged;
-  
-  InputDropdown({
-    super.key,
-    required this.items,
-    required this.value,
-    required this.onChanged  });
+
+  InputDropdown(
+      {super.key,
+      required this.items,
+      required this.value,
+      required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-  List<DropdownMenuItem<String>> itemsList = [];
-  items.forEach((text, value) { DropdownMenuItem<String> menuItem = DropdownMenuItem(
-              value: value,
-              child: Text(text),
-            );
-            itemsList.add(menuItem);});
-  return Padding(
+    List<DropdownMenuItem<String>> itemsList = [];
+    items.forEach((text, value) {
+      DropdownMenuItem<String> menuItem = DropdownMenuItem(
+        value: value,
+        child: Text(text),
+      );
+      itemsList.add(menuItem);
+    });
+    return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Center(
         child: DropdownButtonFormField<String>(
@@ -111,15 +107,16 @@ class InputDropdown extends StatelessWidget {
 class TaskDetailsDialog extends StatelessWidget {
   final TaskData task;
 
-  const TaskDetailsDialog({super.key, required this.task}); 
+  const TaskDetailsDialog({super.key, required this.task});
 
   @override
   Widget build(BuildContext context) {
-    
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(color: Colors.transparent, width: 2.0), // Add border color and width
+        side: BorderSide(
+            color: Colors.transparent,
+            width: 2.0), // Add border color and width
       ),
       title: Text("Task Details"),
       content: Container(
@@ -130,7 +127,11 @@ class TaskDetailsDialog extends StatelessWidget {
           children: [
             _buildDetailRow("Title:", task.title),
             _buildDetailRow("Description:", task.description),
-            _buildDetailRow("Due Date:", task.dueDate.toString().substring(0, task.dueDate.toString().length-7)),
+            _buildDetailRow(
+                "Due Date:",
+                task.dueDate
+                    .toString()
+                    .substring(0, task.dueDate.toString().length - 7)),
             _buildDetailRow("Status:", task.status),
             SizedBox(height: 20), // Add spacing between details and buttons
             Align(
@@ -158,7 +159,8 @@ class TaskDetailsDialog extends StatelessWidget {
             label,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onPrimary, // Optional: Customize label color
+              color: theme
+                  .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
           SizedBox(width: 10),
@@ -167,7 +169,8 @@ class TaskDetailsDialog extends StatelessWidget {
               value,
               textAlign: TextAlign.right,
               style: TextStyle(
-                color: theme.colorScheme.onPrimary, // Optional: Customize value color
+                color: theme
+                    .colorScheme.onPrimary, // Optional: Customize value color
               ),
             ),
           ),
@@ -177,7 +180,6 @@ class TaskDetailsDialog extends StatelessWidget {
   }
 }
 
-
 class WorkerDetailsDialog extends StatelessWidget {
   final WorkerData worker;
 
@@ -185,11 +187,12 @@ class WorkerDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(color: Colors.transparent, width: 2.0), // Add border color and width
+        side: BorderSide(
+            color: Colors.transparent,
+            width: 2.0), // Add border color and width
       ),
       title: Text("Worker Details"),
       content: Container(
@@ -199,11 +202,15 @@ class WorkerDetailsDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDetailRow("Name:", worker.name),
-            _buildDetailRow("Surname:", worker.surname ),
+            _buildDetailRow("Surname:", worker.surname),
             _buildDetailRow("Email:", worker.email),
             _buildDetailRow("Role:", worker.role),
-            _buildDetailRow("Start Date:", worker.creationDate.toString().substring(0, worker.creationDate.toString().length-12) ),
-            _buildDetailRow("Status:", worker.enabled? "Enabled" : "Disabled"),
+            _buildDetailRow(
+                "Start Date:",
+                worker.creationDate
+                    .toString()
+                    .substring(0, worker.creationDate.toString().length - 12)),
+            _buildDetailRow("Status:", worker.enabled ? "Enabled" : "Disabled"),
             SizedBox(height: 20), // Add spacing between details and buttons
             Align(
               alignment: Alignment.center,
@@ -230,7 +237,8 @@ class WorkerDetailsDialog extends StatelessWidget {
             label,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onPrimary, // Optional: Customize label color
+              color: theme
+                  .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
           SizedBox(width: 10),
@@ -239,7 +247,8 @@ class WorkerDetailsDialog extends StatelessWidget {
               value,
               textAlign: TextAlign.right,
               style: TextStyle(
-                color: theme.colorScheme.onPrimary, // Optional: Customize value color
+                color: theme
+                    .colorScheme.onPrimary, // Optional: Customize value color
               ),
             ),
           ),
@@ -249,20 +258,19 @@ class WorkerDetailsDialog extends StatelessWidget {
   }
 }
 
-
-
 class InventoryDetailsDialog extends StatelessWidget {
   final InventoryData inventory;
 
-  const InventoryDetailsDialog({ super.key, required this.inventory});
+  const InventoryDetailsDialog({super.key, required this.inventory});
 
   @override
   Widget build(BuildContext context) {
-    
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(color: Colors.transparent, width: 2.0), // Add border color and width
+        side: BorderSide(
+            color: Colors.transparent,
+            width: 2.0), // Add border color and width
       ),
       title: Text("Inventory Details"),
       content: Container(
@@ -272,9 +280,13 @@ class InventoryDetailsDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDetailRow("Name:", inventory.name),
-            _buildDetailRow("Description:", inventory.description  ),
+            _buildDetailRow("Description:", inventory.description),
             _buildDetailRow("Amount:", inventory.amount.toString()),
-            _buildDetailRow("Time Added", inventory.timeAdded.toString().substring(0, inventory.timeAdded.toString().length-7)),
+            _buildDetailRow(
+                "Time Added",
+                inventory.timeAdded
+                    .toString()
+                    .substring(0, inventory.timeAdded.toString().length - 7)),
             SizedBox(height: 20), // Add spacing between details and buttons
             Align(
               alignment: Alignment.center,
@@ -301,7 +313,8 @@ class InventoryDetailsDialog extends StatelessWidget {
             label,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onPrimary, // Optional: Customize label color
+              color: theme
+                  .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
           SizedBox(width: 10),
@@ -310,7 +323,8 @@ class InventoryDetailsDialog extends StatelessWidget {
               value,
               textAlign: TextAlign.right,
               style: TextStyle(
-                color: theme.colorScheme.onPrimary, // Optional: Customize value color
+                color: theme
+                    .colorScheme.onPrimary, // Optional: Customize value color
               ),
             ),
           ),
@@ -320,19 +334,19 @@ class InventoryDetailsDialog extends StatelessWidget {
   }
 }
 
-
 class PlantDetailsDialog extends StatelessWidget {
   final PlantData plant;
 
-  const PlantDetailsDialog({ super.key, required this.plant});
+  const PlantDetailsDialog({super.key, required this.plant});
 
   @override
   Widget build(BuildContext context) {
-    
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(color: Colors.transparent, width: 2.0), // Add border color and width
+        side: BorderSide(
+            color: Colors.transparent,
+            width: 2.0), // Add border color and width
       ),
       title: Text("Plant Details"),
       content: Container(
@@ -342,9 +356,13 @@ class PlantDetailsDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDetailRow("Type:", plant.type),
-            _buildDetailRow("Subtype:", plant.subtype ),
+            _buildDetailRow("Subtype:", plant.subtype),
             _buildDetailRow("Bord No:", plant.boardNo.toString()),
-            _buildDetailRow("Birthdate", plant.birthdate.toString().substring(0, plant.birthdate.toString().length-7)),
+            _buildDetailRow(
+                "Birthdate",
+                plant.birthdate
+                    .toString()
+                    .substring(0, plant.birthdate.toString().length - 7)),
             SizedBox(height: 20), // Add spacing between details and buttons
             Align(
               alignment: Alignment.center,
@@ -371,7 +389,8 @@ class PlantDetailsDialog extends StatelessWidget {
             label,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onPrimary, // Optional: Customize label color
+              color: theme
+                  .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
           SizedBox(width: 10),
@@ -380,7 +399,8 @@ class PlantDetailsDialog extends StatelessWidget {
               value,
               textAlign: TextAlign.right,
               style: TextStyle(
-                color: theme.colorScheme.onPrimary, // Optional: Customize value color
+                color: theme
+                    .colorScheme.onPrimary, // Optional: Customize value color
               ),
             ),
           ),
@@ -393,15 +413,16 @@ class PlantDetailsDialog extends StatelessWidget {
 class ProgramDetailsDialog extends StatelessWidget {
   final ProgramData program;
 
-  const ProgramDetailsDialog({ super.key, required this.program});
+  const ProgramDetailsDialog({super.key, required this.program});
 
   @override
   Widget build(BuildContext context) {
-    
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(color: Colors.transparent, width: 2.0), // Add border color and width
+        side: BorderSide(
+            color: Colors.transparent,
+            width: 2.0), // Add border color and width
       ),
       title: Text("Program Details"),
       content: Container(
@@ -411,8 +432,12 @@ class ProgramDetailsDialog extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildDetailRow("Equipment:", program.equipment),
-            _buildDetailRow("Title", program.title ),
-            _buildDetailRow("Creation Date:", program.creationDate.toString().substring(0, program.creationDate.toString().length-7)),
+            _buildDetailRow("Title", program.title),
+            _buildDetailRow(
+                "Creation Date:",
+                program.creationDate
+                    .toString()
+                    .substring(0, program.creationDate.toString().length - 7)),
             SizedBox(height: 20), // Add spacing between details and buttons
             Align(
               alignment: Alignment.center,
@@ -439,7 +464,8 @@ class ProgramDetailsDialog extends StatelessWidget {
             label,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: theme.colorScheme.onPrimary, // Optional: Customize label color
+              color: theme
+                  .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
           SizedBox(width: 10),
@@ -448,7 +474,8 @@ class ProgramDetailsDialog extends StatelessWidget {
               value,
               textAlign: TextAlign.right,
               style: TextStyle(
-                color: theme.colorScheme.onPrimary, // Optional: Customize value color
+                color: theme
+                    .colorScheme.onPrimary, // Optional: Customize value color
               ),
             ),
           ),
@@ -458,41 +485,61 @@ class ProgramDetailsDialog extends StatelessWidget {
   }
 }
 
-
 class ToggleButtonContainer extends StatelessWidget {
   final EquipmentStatus equipment;
   final Icon icon;
   final BuildContext context;
   final DocumentReference userReference;
-  ToggleButtonContainer({required this.icon,required this.equipment, required this.context, required this.userReference});
+  ToggleButtonContainer(
+      {required this.icon,
+      required this.equipment,
+      required this.context,
+      required this.userReference});
 
   @override
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(8)), color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary ),
-        margin: EdgeInsets.all(MediaQuery.of(context).size.width*0.05),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+            color: equipment.status
+                ? theme.colorScheme.primary
+                : theme.colorScheme.secondary),
+        margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
         // color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary,
-        width: MediaQuery.of(context).size.width*0.4,
-        height: MediaQuery.of(context).size.width*0.4,
+        width: MediaQuery.of(context).size.width * 0.4,
+        height: MediaQuery.of(context).size.width * 0.4,
         child: Column(
-        children: [
-          Row(
-            children: [Expanded(child: Align(alignment: Alignment.centerLeft, child: ClipOval(child: icon,))),
+          children: [
+            Row(children: [
               Expanded(
-                child: Align(alignment: Alignment.centerRight,
-                  child: Switch(value: equipment.status, onChanged: (value) {
-                                                    context
-                                          .read<EquipmentStatusCubit>()
-                                          .toggleStatus(userReference,
-                                              equipment.reference, equipment.status);
-                  }),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: ClipOval(
+                        child: icon,
+                      ))),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Switch(
+                      value: equipment.status,
+                      onChanged: (value) {
+                        context.read<EquipmentStatusCubit>().toggleStatus(
+                            userReference,
+                            equipment.reference,
+                            equipment.status);
+                      }),
                 ),
               )
-        ]),
-          Align(alignment: Alignment.centerLeft,child: Text(equipment.type, style: subheadingTextStyle,))
-        ],
+            ]),
+            Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  equipment.type,
+                  style: subheadingTextStyle,
+                ))
+          ],
         ),
       ),
     );

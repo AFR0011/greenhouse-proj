@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -70,7 +71,13 @@ class ChatsData {
     final snapshot = await receiverReference.get();
     final receiverSnapshotData = snapshot.data();
     final receiverData = receiverSnapshotData as Map<String, dynamic>;
+
+    final Uint8List? receiverPicture = await FirebaseStorage.instance
+        .refFromURL(receiverData['picture'])
+        .getData();
+
     receiverData['reference'] = receiverReference;
+    receiverData['picture'] = receiverPicture;
 
     return ChatsData(
         receiverData: receiverData,
