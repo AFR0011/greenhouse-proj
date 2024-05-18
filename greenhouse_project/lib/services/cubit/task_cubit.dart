@@ -26,18 +26,37 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   void _getTasks() async {
+    DocumentSnapshot userSnapshot = await userReference.get();
+    Map<String, dynamic> userData =
+        await userSnapshot.data() as Map<String, dynamic>;
+    String userRole = userData['role'];
+
     //Get user Tasks
-    tasks
-        .where('manager', isEqualTo: userReference)
-        .orderBy('dueDate', descending: true)
-        .snapshots()
-        .listen((snapshot) {
-      final List<TaskData> tasks =
-          snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
-      emit(TaskLoaded(tasks: [...tasks]));
-    }, onError: (error) {
-      emit(TaskError(error.toString()));
-    });
+    if (userRole == "manager") {
+      tasks
+          .where('manager', isEqualTo: userReference)
+          .orderBy('dueDate', descending: true)
+          .snapshots()
+          .listen((snapshot) {
+        final List<TaskData> tasks =
+            snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
+        emit(TaskLoaded([...tasks]));
+      }, onError: (error) {
+        emit(TaskError(error.toString()));
+      });
+    } else if (userRole == "worker") {
+      tasks
+          .where('worker', isEqualTo: userReference)
+          .orderBy('dueDate', descending: true)
+          .snapshots()
+          .listen((snapshot) {
+        final List<TaskData> tasks =
+            snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
+        emit(TaskLoaded([...tasks]));
+      }, onError: (error) {
+        emit(TaskError(error.toString()));
+      });
+    }
   }
 
   void completeTask(DocumentReference taskReference) async {

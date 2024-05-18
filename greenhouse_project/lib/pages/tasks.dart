@@ -139,9 +139,6 @@ class _TasksPageState extends State<_TasksPageContent> {
     // Get instance of footer nav cubit from main context
     final FooterNavCubit footerNavCubit =
         BlocProvider.of<FooterNavCubit>(context);
-    final TaskCubit taskCubit = BlocProvider.of<TaskCubit>(context);
-    late List<DropdownMenuItem> dropdownItems;
-    late List<WorkerData> workers;
     return Scaffold(
       // Appbar (header)
       appBar: _userRole == "worker"
@@ -244,7 +241,7 @@ class _TasksPageState extends State<_TasksPageContent> {
               }
             },
           ),
-          _userRole == "manager" ? _createAddButton() : Container(),
+          _userRole == "manager" ? _createAddButton() : const SizedBox(),
         ],
       ),
 
@@ -341,12 +338,12 @@ class _TasksPageState extends State<_TasksPageContent> {
         });
   }
 
-  _createAddButton() {
+  Widget _createAddButton() {
     TaskCubit taskCubit = context.read<TaskCubit>();
     ManageWorkersCubit manageWorkersCubit = context.read<ManageWorkersCubit>();
     List<DropdownMenuItem> dropdownItems = [];
     // Get workers list
-    BlocListener<ManageWorkersCubit, ManagementState>(
+    return BlocListener<ManageWorkersCubit, ManagementState>(
       bloc: manageWorkersCubit,
       listener: (context, state) {
         List workers = state is ManageWorkersLoaded ? state.workers : [];
