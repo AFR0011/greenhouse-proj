@@ -32,6 +32,9 @@ class _LoginPageState extends State<LoginPage>
   // Firebase authentication init
   FirebaseAuth auth = FirebaseAuth.instance;
 
+  // Show/hide password
+  bool _isSecurePassword = true;
+
   // Dispose of controllers for better performance
   @override
   void dispose() {
@@ -45,9 +48,12 @@ class _LoginPageState extends State<LoginPage>
   void initState() {
     super.initState();
   }
-  bool _isSecurePassword = true;
+
   @override
   Widget build(BuildContext context) {
+    passwordController.text = "12345678";
+    emailController.text = "admin@admin.com";
+
     return Scaffold(
       body: Stack(
         children: [
@@ -162,15 +168,18 @@ class _LoginPageState extends State<LoginPage>
      ] ),
     );
   }
-  Widget togglePassword(){
-      
-      return IconButton(onPressed: (){
-        setState(() {
-      _isSecurePassword = !_isSecurePassword;
-      });
-      }, icon: _isSecurePassword ? Icon(Icons.visibility) : Icon(Icons.visibility_off),
-      color: Colors.grey ); 
 
-    }
+  Widget togglePassword() {
+    return IconButton(
+        onPressed: () {
+          setState(() {
+            _isSecurePassword = !_isSecurePassword;
+          });
+        },
+        icon: _isSecurePassword
+            ? Icon(Icons.visibility)
+            : Icon(Icons.visibility_off),
+        color: Colors.grey);
+  }
 }
 
