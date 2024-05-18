@@ -30,6 +30,9 @@ class _LoginPageState extends State<LoginPage>
   // Firebase authentication init
   FirebaseAuth auth = FirebaseAuth.instance;
 
+  // Show/hide password
+  bool _isSecurePassword = true;
+
   // Dispose of controllers for better performance
   @override
   void dispose() {
@@ -43,9 +46,12 @@ class _LoginPageState extends State<LoginPage>
   void initState() {
     super.initState();
   }
-  bool _isSecurePassword = true;
+
   @override
   Widget build(BuildContext context) {
+    passwordController.text = "12345678";
+    emailController.text = "admin@admin.com";
+
     return Scaffold(
       body: BlocConsumer<AuthCubit, AuthState>(
         builder: (context, state) {
@@ -61,12 +67,12 @@ class _LoginPageState extends State<LoginPage>
             // Content
             Padding(
               padding: const EdgeInsets.all(25.0),
-              child:SafeArea(
+              child: SafeArea(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset("lib/utils/Icons/Logo.png", width: 90, height: 90),
-                  
+                    Image.asset("lib/utils/Icons/Logo.png",
+                        width: 90, height: 90),
                     const Padding(
                       padding: EdgeInsets.only(bottom: 60),
                       child: Text(
@@ -87,8 +93,8 @@ class _LoginPageState extends State<LoginPage>
                     const SizedBox(height: 20.0),
                     TextField(
                       controller: passwordController,
-                      obscureText:  _isSecurePassword,
-                      decoration:  InputDecoration(
+                      obscureText: _isSecurePassword,
+                      decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white70,
                         labelText: 'Password',
@@ -100,7 +106,8 @@ class _LoginPageState extends State<LoginPage>
                     ElevatedButton(
                       onPressed: () {
                         context.read<AuthCubit>().authLoginRequest(
-                            emailController.text.trim(), passwordController.text);
+                            emailController.text.trim(),
+                            passwordController.text);
                       },
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
@@ -136,14 +143,17 @@ class _LoginPageState extends State<LoginPage>
       ),
     );
   }
-  Widget togglePassword(){
-      
-      return IconButton(onPressed: (){
-        setState(() {
-      _isSecurePassword = !_isSecurePassword;
-      });
-      }, icon: _isSecurePassword ? Icon(Icons.visibility) : Icon(Icons.visibility_off),
-      color: Colors.grey ); 
 
-    }
+  Widget togglePassword() {
+    return IconButton(
+        onPressed: () {
+          setState(() {
+            _isSecurePassword = !_isSecurePassword;
+          });
+        },
+        icon: _isSecurePassword
+            ? Icon(Icons.visibility)
+            : Icon(Icons.visibility_off),
+        color: Colors.grey);
+  }
 }
