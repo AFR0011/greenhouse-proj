@@ -168,7 +168,7 @@ class _ChatPageState extends State<_ChatPageContent> {
           if (state is ChatLoading) {
             return const CircularProgressIndicator();
           } else if (state is ChatLoaded) {
-            return _buildChatMessages(state.messages);
+            return _buildChatContent(state.messages);
           } else if (state is ChatError) {
             return const Text("Something went wrong...");
           } else {
@@ -176,52 +176,63 @@ class _ChatPageState extends State<_ChatPageContent> {
           }
         },
       ),
-      bottomNavigationBar: _buildMessageInput(chat),
     );
   }
 
   // Build the list of chat messages
-  Widget _buildChatMessages(List<MessageData?> messages) {
+  Widget _buildChatContent(List<MessageData?> messages) {
     if (messages.isEmpty) {
       return const Center(child: Text("Write your first message!"));
     } else {
-      return ListView.builder(
-        shrinkWrap: true,
-        itemCount: messages.length,
-        itemBuilder: (context, index) {
-          MessageData? message = messages[index];
-          bool isSender = message?.receiver != _userReference;
-          return Align(
-            alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-            child: MessageBubble(
-              message: message?.message ?? "",
-              isSender: isSender,
-              theme: customTheme,
+      return Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                MessageData? message = messages[index];
+                bool isSender = message?.receiver != _userReference;
+                return Align(
+                  alignment:
+                      isSender ? Alignment.centerRight : Alignment.centerLeft,
+                  child: MessageBubble(
+                    message: message?.message ?? "",
+                    isSender: isSender,
+                    theme: customTheme,
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+          Container(
+              // ADD INPUT FIELD
+              ),
+        ],
       );
     }
   }
 
 // Build the message input box
-  Widget _buildMessageInput(ChatsData? chat) {
-    return Row(
-      children: [
-        Expanded(
-          child:InputTextField(controller: _textEditingController, errorText: "", hintText: "send a message") 
-        ),
-        Expanded(
-          child: GreenElevatedButton(
-            text: "Send",
-            onPressed: () {
-              _sendMessage(chat);
-            },
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _buildMessageInput(ChatsData? chat) {
+  //   return Row(
+  //     children: [
+  //       Expanded(
+  //           child: InputTextField(
+  //               controller: _textEditingController,
+  //               errorText: "",
+  //               hintText: "send a message")),
+  //       Expanded(
+  //         child: GreenElevatedButton(
+  //           text: "Send",
+  //           onPressed: () {
+  //             _sendMessage(chat);
+  //           },
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
 // Function to send a message
   void _sendMessage(ChatsData? chat) {
