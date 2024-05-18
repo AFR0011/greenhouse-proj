@@ -18,7 +18,6 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   void _getUserProfile(FirebaseStorage storage) async {
     try {
-      print(await storage.ref().child("Default.jpg").getDownloadURL());
       DocumentSnapshot userSnapshot = await userReference.get();
       final userSnapshotData = userSnapshot.data();
       final firestoreData = userSnapshotData as Map<String, dynamic>;

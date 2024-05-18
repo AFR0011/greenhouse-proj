@@ -20,6 +20,7 @@ class UserInfoCubit extends HomeCubit {
         final String userName = userData?['name'] ?? 'Unknown';
         final DocumentReference userReference = userSnapshot.reference;
         final bool enabled = userData?['enabled'];
+        print("USER DATA: ${userData}\n\n");
 
         emit(UserInfoLoaded(userRole, userName, userReference, enabled));
       } else {
@@ -34,16 +35,17 @@ class UserInfoCubit extends HomeCubit {
       String email, String password) async {
     emit(UserInfoLoading());
     try {
-      userReference.set({
+      userReference.update({
         "name": name,
         "email": email,
-      }, SetOptions(merge: true));
+      });
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       userCredential.user?.updatePassword(password);
 
       getUserInfo(userCredential);
     } catch (error) {
+      print(error.toString());
       emit(UserInfoError(error.toString()));
     }
   }

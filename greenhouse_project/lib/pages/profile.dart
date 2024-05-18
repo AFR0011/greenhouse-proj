@@ -9,7 +9,6 @@
 library;
 
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -190,7 +189,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           GestureDetector(
             child: ClipOval(
                 child: Image.memory(
-              userData.picture!,
+              userData.picture,
               fit: BoxFit.cover,
               width: 100,
               height: 100,
