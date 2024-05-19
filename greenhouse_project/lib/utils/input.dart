@@ -547,8 +547,10 @@ class PlantDetailsDialog extends StatelessWidget {
 
 class ProgramDetailsDialog extends StatelessWidget {
   final ProgramData program;
+  final Function editProgram;
+  final Function deleteProgram;
 
-  const ProgramDetailsDialog({super.key, required this.program});
+  const ProgramDetailsDialog({super.key, required this.program, required this.editProgram, required this.deleteProgram});
 
   @override
   Widget build(BuildContext context) {
@@ -574,6 +576,28 @@ class ProgramDetailsDialog extends StatelessWidget {
                     .toString()
                     .substring(0, program.creationDate.toString().length - 7)),
             SizedBox(height: 20), // Add spacing between details and buttons
+            Row(
+                                  children: [
+                                    Expanded(
+                                      child: WhiteElevatedButton(
+                                          text: "Edit",
+                                          onPressed: () {
+                                           editProgram();
+                                          }),
+                                    ),
+                                    
+                                    Expanded(
+                                      child: RedElevatedButton(
+                                          text:
+                                               "Delete",
+                                          onPressed: () {
+                                            deleteProgram();
+                                          }),
+                                    ),
+                                  ],
+                                ),
+              SizedBox(height: 20),
+            
             Align(
               alignment: Alignment.center,
               child: WhiteElevatedButton(

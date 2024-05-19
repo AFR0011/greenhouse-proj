@@ -61,7 +61,7 @@ class _ProgramsPageContent extends StatefulWidget {
 // Main page content
 class _ProgramsPageState extends State<_ProgramsPageContent> {
   // User info local variables
-  late DocumentReference userReference;
+  late DocumentReference _userReference;
   late String _userRole = "";
 
   // Custom theme
@@ -100,7 +100,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
         else if (state is UserInfoLoaded) {
           // Assign user info to local variables
           _userRole = state.userRole;
-          state.userReference;
+          _userReference = state.userReference;
 
           // Function call to create programs page
           return Theme(data: customTheme, child: _createProgramsPage());
@@ -141,6 +141,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
           return _createProgramsList(programsList);
         } // Show error if there is an issues with user info
         else if (state is ProgramsError) {
+          print(state.error);
           return Center(child: Text('Error: ${state.error}'));
         }
         // If somehow state doesn't match predefined states;
@@ -176,7 +177,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                         showDialog(
                             context: context,
                             builder: (context) =>
-                                ProgramDetailsDialog(program: program));
+                                ProgramDetailsDialog(program: program, editProgram: () => _showEditForm(program), deleteProgram: () => _showDeleteForm(program)));
                       },
                       text: "details",
                     )),
@@ -321,7 +322,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                 "timeAdded": DateTime.now(),
                                 "pending": _userRole == 'manager' ? false : true,
                               };
-                              await programsCubit.addProgram(data, userReference);
+                              await programsCubit.addProgram(data, _userReference);
                               _titleController.clear();
                               _limitController.clear();
                               Navigator.pop(context);
@@ -358,8 +359,19 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
         builder: (context) {
           _titleController.text = program.title;
           _limitController.text = program.creationDate.toString();
-          return Dialog(
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: BorderSide(
+                        color: Colors.transparent,
+                        width: 2.0), // Add border color and width
+                  ),
+                  title: const Text("Edit program"),
+            content: SizedBox(
+              width: double.maxFinite,
             child: Column(
+              mainAxisSize: MainAxisSize.min, // Set column to minimum size
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 TextField(
                   controller: _titleController,
@@ -375,35 +387,39 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                 ),
                 Row(
                   children: [
-                    GreenElevatedButton(
-                        text: "Submit",
-                        onPressed: () async {
-                          Map<String, dynamic> data = {
-                            "title": _limitController.text,
-                            "creationDate": DateTime.now(),
-                            "pending": _userRole == 'manager' ? false : true,
-                          };
-                          await programsCubit.updatePrograms(
-                              program.reference, data, userReference);
-                          _titleController.clear();
-                          _limitController.clear();
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Program edited succesfully")));
-                        }),
-                    WhiteElevatedButton(
-                        text: "Cancel",
-                        onPressed: () {
-                          _titleController.clear();
-                          _limitController.clear();
-                          Navigator.pop(context);
-                        })
+                    Expanded(
+                      child: GreenElevatedButton(
+                          text: "Submit",
+                          onPressed: () async {
+                            Map<String, dynamic> data = {
+                              "title": _limitController.text,
+                              "creationDate": DateTime.now(),
+                              "pending": _userRole == 'manager' ? false : true,
+                            };
+                            await programsCubit.updatePrograms(
+                                program.reference, data, _userReference);
+                            _titleController.clear();
+                            _limitController.clear();
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Program edited succesfully")));
+                          }),
+                    ),
+                    Expanded(
+                      child: WhiteElevatedButton(
+                          text: "Cancel",
+                          onPressed: () {
+                            _titleController.clear();
+                            _limitController.clear();
+                            Navigator.pop(context);
+                          }),
+                    )
                   ],
                 )
               ],
             ),
-          );
+          ));
         });
   }
 
@@ -412,33 +428,48 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
     showDialog(
         context: context,
         builder: (context) {
-          return Dialog(
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: BorderSide(
+                        color: Colors.transparent,
+                        width: 2.0), // Add border color and width
+                  ),
+                  title: const Text("Are you Sure?"),
+            content: SizedBox(
+              width: double.maxFinite,
             child: Column(
+              mainAxisSize: MainAxisSize.min, // Set column to minimum size
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Are you Sure?"),
                 Row(
                   children: [
-                    GreenElevatedButton(
-                        text: "Submit",
-                        onPressed: () async {
-                          await programsCubit.removeProgram(
-                              program.reference, userReference);
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text("Program Deleted succesfully")));
-                        }),
-                    WhiteElevatedButton(
-                        text: "Cancel",
-                        onPressed: () {
-                          Navigator.pop(context);
-                        })
+                    Expanded(
+                      child: GreenElevatedButton(
+                          text: "Submit",
+                          onPressed: () {
+                            programsCubit.removeProgram(
+                                program.reference, _userReference);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text("Program Deleted succesfully")));
+                          }),
+                    ),
+                    Expanded(
+                      child: WhiteElevatedButton(
+                          text: "Cancel",
+                          onPressed: () {
+                            Navigator.pop(context);
+                          }),
+                    )
                   ],
                 )
               ],
             ),
-          );
+          ));
         });
   }
 }

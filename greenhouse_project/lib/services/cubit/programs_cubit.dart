@@ -21,11 +21,9 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     if (!_isActive) return;
     programs.orderBy('creationDate', descending: true).snapshots().listen(
         (snapshot) {
-      if (snapshot.docs.isNotEmpty) {
         final List<ProgramData> programs =
             snapshot.docs.map((doc) => ProgramData.fromFirestore(doc)).toList();
         emit(ProgramsLoaded([...programs]));
-      }
     }, onError: (error) {
       emit(ProgramsError(error));
     });
@@ -52,14 +50,14 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     }
   }
 
-  Future<void> removeProgram(
+  void removeProgram(
       DocumentReference item, DocumentReference userReference) async {
     if (!_isActive) return;
 
     emit(ProgramsLoading());
     try {
-      Map<String, dynamic> data =
-          item.get().then((doc) => doc.data()) as Map<String, dynamic>;
+      DocumentSnapshot docSnapshot = await item.get();
+      Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
       logs.add({
         "action": "delete",
         "description":
@@ -69,8 +67,7 @@ class ProgramsCubit extends Cubit<ProgramsState> {
         "userId": userReference,
       });
 
-      await item.delete();
-      _getPrograms();
+      item.delete();
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }

@@ -357,30 +357,11 @@ class _TasksPageState extends State<_TasksPageContent> {
                                             state[2],
                                             state[3],
                                           );
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) => Dialog(
-                                                    child: Column(
-                                                      children: [
-                                                        const Center(
-                                                          child: Text(
-                                                              "Task has been created!"),
-                                                        ),
-                                                        Center(
-                                                          child:
-                                                              GreenElevatedButton(
-                                                                  text: "OK",
-                                                                  onPressed:
-                                                                      () {
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                    Navigator.pop(
-                                                                        context);
-                                                                  }),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ));
+                                         Navigator.pop(context);Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text("Task edited succesfully")));
                                         }
                                       }),
                                   WhiteElevatedButton(
@@ -565,29 +546,12 @@ class _TasksPageState extends State<_TasksPageContent> {
                                                   state[2],
                                                   state[3],
                                                 );
-                                                showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (context) => Dialog(
-                                                              child: Column(
-                                                                children: [
-                                                                  const Center(
-                                                                    child: Text(
-                                                                        "Task has been created!"),
-                                                                  ),
-                                                                  Center(
-                                                                    child: GreenElevatedButton(
-                                                                        text: "OK",
-                                                                        onPressed: () {
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                          Navigator.pop(
-                                                                              context);
-                                                                        }),
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            ));
+                                                Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text("Task has been created!")));
+                                        
                                               }
                                             }),
                                         WhiteElevatedButton(
