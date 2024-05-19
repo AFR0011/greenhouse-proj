@@ -182,49 +182,47 @@ class _ChatsPageState extends State<_ChatsPageContent> {
           MaterialPageRoute(
             builder: (context) => ChatPage(
               userCredential: widget.userCredential,
-              chatReference: chat?.reference,
+              chatReference: chat.reference,
             ),
           ),
         );
       },
       child: Container(
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black, ))),
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide())),
         child: Row(
           children: [
             Container(
-              margin: EdgeInsets.only(top: 5, bottom: 5),
+              margin: const EdgeInsets.only(top: 5, bottom: 5),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: ClipOval(
                     child: Image.memory(
                   chat!.receiverPicture,
-                  width: 40,
-                  height: 40,
+                  width: 50,
+                  height: 50,
                 )),
               ),
             ),
             Container(
                 margin: const EdgeInsets.only(left: 5),
                 child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text.rich(
-                    TextSpan(
-                    text:"${receiverData?['name']} ${receiverData?['surname']}",
-                    style: bodyTextStyle,
-                    children: <TextSpan>[
+                    alignment: Alignment.centerLeft,
+                    child: Text.rich(
                       TextSpan(
-                        text: "     ("+receiverData!['role']+")",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w300,
-                          color: Colors.grey,
-                          fontSize: 14.0,
-                        ),
-                      ),
-                    ]
-                    ),
-                  
-                )
-                ))
+                          text:
+                              "${receiverData?['name']} ${receiverData?['surname']}",
+                          style: bodyTextStyle,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: "     (" + receiverData!['role'] + ")",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w300,
+                                color: Colors.grey,
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          ]),
+                    )))
           ],
         ),
       ),
