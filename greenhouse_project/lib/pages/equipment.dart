@@ -148,7 +148,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                           context: context,
                           equipment: equipment,
                           userReference: _userReference,
-                          icon: const Icon(Icons.accessibility),
+                          imgPath: "lib/utils/Icons/bulb.png",
                         );
                         // ListTile(
                         //   title: Text(equipment.type),
