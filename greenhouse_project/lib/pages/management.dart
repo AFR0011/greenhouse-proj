@@ -146,10 +146,10 @@ class _ManagementPageState extends State<_ManagementPageContent> {
       {'route': MaterialPageRoute(
           builder: (context) => TasksPage(
               userCredential: widget.userCredential,
-              userReference: _userReference)), "title": "Tasks", "icon": "lib/utils/Icons/bulb.png"},
+              userReference: _userReference)), "title": "Tasks", "icon": "lib/utils/Icons/tasks.png"},
       {'route': MaterialPageRoute(
           builder: (context) =>
-              EmployeesPage(userCredential: widget.userCredential)),"title": "Employees", "icon": "lib/utils/Icons/bulb.png"}
+              EmployeesPage(userCredential: widget.userCredential)),"title": "Employees", "icon": "lib/utils/Icons/worker.png"}
     ] as List<Map<String, dynamic>>;
     // Page content;
     return Scaffold(

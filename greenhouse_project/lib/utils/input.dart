@@ -622,11 +622,11 @@ class ProgramDetailsDialog extends StatelessWidget {
 
 class ToggleButtonContainer extends StatelessWidget {
   final EquipmentStatus equipment;
-  final Icon icon;
+  final String imgPath;
   final BuildContext context;
   final DocumentReference userReference;
   ToggleButtonContainer(
-      {required this.icon,
+      {required this.imgPath,
       required this.equipment,
       required this.context,
       required this.userReference});
@@ -652,8 +652,13 @@ class ToggleButtonContainer extends StatelessWidget {
                   child: Align(
                       alignment: Alignment.centerLeft,
                       child: ClipOval(
-                        child: icon,
-                      ))),
+                        child: Image.asset(
+                          imgPath,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover),
+                      ),
+                      )),
               Expanded(
                 child: Align(
                   alignment: Alignment.centerRight,

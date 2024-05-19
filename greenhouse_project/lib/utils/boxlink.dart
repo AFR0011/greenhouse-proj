@@ -48,7 +48,7 @@ class _BoxLinkState extends State<BoxLink> {
         onTap: () {
           Navigator.push(
             context,
-            widget.pageRoute
+            widget.pageRoute,
           );
         },
         onHover: (isHover) {
@@ -59,25 +59,25 @@ class _BoxLinkState extends State<BoxLink> {
           });
         },
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              widget.imgPath, // Display the image
-              height: 170,
-              width: 170,
-              fit: BoxFit.cover,
+            Container(
+              margin: EdgeInsets.fromLTRB(2, 10, 2, 2),
+              child: Image.asset(
+                widget.imgPath, // Display the image
+                height: 170,
+                width: 170,
+                fit: BoxFit.cover,
+              ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-              child: Row(
-                children: [
-                  Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Text(
-                      widget.text,
-                      style: subheadingTextStyle,
-                    ),
-                  ),
-                ],
+              padding: EdgeInsets.fromLTRB(10, 10, 4, 4),
+              child: Center(
+                child: Text(
+                  widget.text,
+                  style: subheadingTextStyle,
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ],
