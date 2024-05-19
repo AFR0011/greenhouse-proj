@@ -14,6 +14,8 @@ class ChatsCubit extends Cubit<ChatsState> {
 
   final UserCredential? user;
 
+  bool _isActive = true;
+
   ChatsCubit(this.user) : super(ChatsLoading()) {
     if (user != null) {
       _subscribeToChats();
@@ -21,6 +23,7 @@ class ChatsCubit extends Cubit<ChatsState> {
   }
 
   void _subscribeToChats() async {
+    if (!_isActive) return;
     // Get user reference
     QuerySnapshot userQuery = await FirebaseFirestore.instance
         .collection('users')
@@ -36,15 +39,22 @@ class ChatsCubit extends Cubit<ChatsState> {
           .toList();
 
       final userChats = await Future.wait(userChatsFutures);
-      emit(ChatsLoaded([...userChats]));
+      if (_isActive) emit(ChatsLoaded([...userChats]));
     }, onError: (error) {
-      emit(ChatsError(error.toString()));
+      if (_isActive) emit(ChatsError(error.toString()));
     });
   }
 
   ChatsData? getChatByReference(
       List<ChatsData?> chats, DocumentReference chatReference) {
+    if (!_isActive) return null;
     return chats.firstWhere((chat) => chatReference == chat?.reference);
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 

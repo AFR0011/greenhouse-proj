@@ -11,11 +11,14 @@ class InventoryCubit extends Cubit<InventoryState> {
   final CollectionReference logs =
       FirebaseFirestore.instance.collection('logs');
 
+  bool _isActive = true;
+
   InventoryCubit() : super(InventoryLoading()) {
     _getInventory();
   }
 
   void _getInventory() {
+    if (!_isActive) return;
     inventory.snapshots().listen((snapshot) {
       final List<InventoryData> inventory =
           snapshot.docs.map((doc) => InventoryData.fromFirestore(doc)).toList();
@@ -27,6 +30,7 @@ class InventoryCubit extends Cubit<InventoryState> {
 
   Future<void> addInventory(
       Map<String, dynamic> data, DocumentReference userReference) async {
+    if (!_isActive) return;
     try {
       DocumentReference externalId = await inventory.add(data);
 
@@ -46,6 +50,7 @@ class InventoryCubit extends Cubit<InventoryState> {
 
   Future<void> removeInventory(
       DocumentReference item, DocumentReference userReference) async {
+    if (!_isActive) return;
     try {
       logs.add({
         "action": "Delete",
@@ -64,6 +69,7 @@ class InventoryCubit extends Cubit<InventoryState> {
 
   Future<void> updateInventory(DocumentReference item,
       Map<String, dynamic> data, DocumentReference userReference) async {
+    if (!_isActive) return;
     try {
       await item.set(data, SetOptions(merge: true));
 
@@ -81,6 +87,7 @@ class InventoryCubit extends Cubit<InventoryState> {
   }
 
   Future<void> approveItem(DocumentReference itemRef, userReference) async {
+    if (!_isActive) return;
     try {
       await itemRef.set({"pending": false}, SetOptions(merge: true));
 
@@ -96,6 +103,12 @@ class InventoryCubit extends Cubit<InventoryState> {
     } catch (error) {
       emit(InventoryError(error.toString()));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 

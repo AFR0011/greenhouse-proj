@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/plants_cubit.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
@@ -106,15 +107,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
   Widget _createPlantsPage() {
     return Scaffold(
       // Appbar (header)
-      appBar: AppBar(
-          automaticallyImplyLeading: true,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back),
-          )),
-
+      appBar: createAltAppbar(context, "Plants"),
       // Plants section
       body: Column(
         children: [
@@ -157,12 +150,15 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                       return ListTile(
                         title: Text(plant.type),
                         subtitle: Text(plant.subtype),
-                        trailing:WhiteElevatedButton(
+                        trailing: WhiteElevatedButton(
                           // Show details and sensor readings
                           text: 'Details',
                           onPressed: () {
                             // _showPlantDetails(plant);
-                            showDialog(context: context, builder: (context) => PlantDetailsDialog(plant:plant));
+                            showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    PlantDetailsDialog(plant: plant));
                           },
                         ),
                       );

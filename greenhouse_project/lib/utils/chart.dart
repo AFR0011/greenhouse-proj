@@ -40,8 +40,8 @@ class _ChartClassState extends State<ChartClass> {
     var data = await FirebaseFirestore.instance.collection("readings").get();
     List<_ChartData> list = data.docs.map((e) {
       DateTime timestamp = DateTime.fromMillisecondsSinceEpoch(int.parse(e.id));
-      int? sensorValue = e.data()[widget.sensor];
-      return _ChartData(x: timestamp, y: sensorValue);
+      double sensorValue = e.data()["1"][widget.sensor];
+      return _ChartData(x: timestamp, y: sensorValue.toInt());
     }).toList();
 
     setState(() {

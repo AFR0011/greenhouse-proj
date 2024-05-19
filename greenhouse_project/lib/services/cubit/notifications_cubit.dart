@@ -9,6 +9,8 @@ class NotificationsCubit extends HomeCubit {
 
   final UserCredential? user;
 
+  bool _isActive = true;
+
   NotificationsCubit(this.user) : super(NotificationsLoading()) {
     if (user != null) {
       initNotifications();
@@ -16,6 +18,7 @@ class NotificationsCubit extends HomeCubit {
   }
 
   void initNotifications() async {
+    if (!_isActive) return;
     // _firebaseMessaging.requestPermission();
 
     // String? fcmToken = await _firebaseMessaging.getToken();
@@ -45,7 +48,7 @@ class NotificationsCubit extends HomeCubit {
   }
 
   void handleNotification(RemoteMessage? message) {
-    if (message == null) return;
+    if (!_isActive || message == null) return;
   }
 
 // // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
@@ -54,6 +57,11 @@ class NotificationsCubit extends HomeCubit {
 //       // APNS token is available, make FCM plugin API requests...
 //     }
 //   }
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
+  }
 }
 
 class NotificationData {

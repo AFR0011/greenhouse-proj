@@ -10,13 +10,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/tasks.dart';
-import 'package:greenhouse_project/pages/workers.dart';
+import 'package:greenhouse_project/pages/employees.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
-import 'package:greenhouse_project/utils/main_appbar.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -105,7 +105,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
           }
 
           // Show content once user info is loaded
-          // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
             _userRole = state.userRole;
@@ -144,18 +143,12 @@ class _ManagementPageState extends State<_ManagementPageContent> {
     // Page content
     return Scaffold(
       // Main appbar (header)
-      appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      appBar: createMainAppBar(
+          context, widget.userCredential, _userReference, "Management"),
 
       // Scrollable list of items
       body: SingleChildScrollView(
         child: Column(children: [
-          // Heading text
-          const Center(
-              child: Padding(
-            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Text("Management", style: headingTextStyle),
-          )),
-
           // Tasks subsection
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
@@ -192,7 +185,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
               children: [
                 const Expanded(
                   child: Text(
-                    "Workers",
+                    "Employees",
                     style: subheadingTextStyle,
                   ),
                 ),
@@ -210,39 +203,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                 ),
               ],
             ),
-          ),
-
-          // BlocBuilder for manageWorkers state
-          BlocBuilder<ManageWorkersCubit, ManagementState>(
-            builder: (context, state) {
-              // Show "loading screen" if processing manageWorkers state
-              if (state is ManageWorkersLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              // Show workers once manageWorkers state is loaded
-              else if (state is ManageWorkersLoaded) {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: state.workers.length,
-                  itemBuilder: (context, index) {
-                    WorkerData worker = state.workers[index];
-                    return ListTile(
-                      title: Text("${worker.name} ${worker.surname}"),
-                      subtitle: Text(worker.creationDate.toString()),
-                    );
-                  },
-                );
-              }
-              // Show error message once an error occurs
-              else if (state is ManageWorkersError) {
-                return Text(state.error.toString());
-              }
-              // If the state is not any of the predefined states;
-              // never happens; but, anything can happen
-              else {
-                return const Text("Something went wrong...");
-              }
-            },
           ),
         ]),
       ),

@@ -5,9 +5,12 @@ import "package:flutter_bloc/flutter_bloc.dart";
 // part "task_edit_state.dart";
 
 class TaskEditCubit extends Cubit<List<dynamic>> {
+  bool _isActive = true;
+
   TaskEditCubit() : super([true, true, DateTime.now(), null]);
 
   bool updateState(List<dynamic> validation) {
+    if (!_isActive) return false;
     emit([...validation]);
     if (validation.contains(false) || validation.contains(null)) {
       return false;
@@ -16,6 +19,11 @@ class TaskEditCubit extends Cubit<List<dynamic>> {
     }
   }
 
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
+  }
 }
 
 class TaskDropdownCubit extends Cubit<DocumentReference?> {
@@ -28,5 +36,4 @@ class TaskDropdownCubit extends Cubit<DocumentReference?> {
     validation[3] = value;
     context.read<TaskEditCubit>().updateState(validation);
   }
-
 }

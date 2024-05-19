@@ -16,6 +16,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/profile_cubit.dart';
 import 'package:greenhouse_project/services/cubit/profile_edit_cubit.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
@@ -168,22 +169,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     ProfileCubit profileCubit = BlocProvider.of<ProfileCubit>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () => Navigator.pop(context),
-          icon: Image.asset(
-            "lib/utils/Icons/Left Arrow.png",
-            scale: 3,
-          ),
-        ),
-        title: const Padding(
-          padding: EdgeInsets.fromLTRB(70, 0, 0, 0),
-          child: Text(
-            "Profile",
-            style: headingTextStyle,
-          ),
-        ),
-      ),
+      appBar: createAltAppbar(context, "Profile"),
       body: Column(
         children: [
           GestureDetector(
@@ -278,17 +264,17 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                   errorText: state[0]
                       ? ""
                       : "Name should be longer than 4 characters.",
-                  hintText: "name"),
+                  labelText: "name"),
               InputTextField(
                   controller: _emailController,
                   errorText: state[1] ? "" : "Email format invalid.",
-                  hintText: "email"),
+                  labelText: "email"),
               InputTextField(
                   controller: _passwordController,
                   errorText: state[2]
                       ? ""
                       : "Password should be longer than 8 characters.",
-                  hintText: "password"),
+                  labelText: "password"),
               Row(
                 children: [
                   GreenElevatedButton(

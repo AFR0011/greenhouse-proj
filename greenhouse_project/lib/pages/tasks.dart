@@ -20,7 +20,7 @@ import 'package:greenhouse_project/services/cubit/task_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/input.dart';
-import 'package:greenhouse_project/utils/main_appbar.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class TasksPage extends StatelessWidget {
@@ -142,15 +142,9 @@ class _TasksPageState extends State<_TasksPageContent> {
     return Scaffold(
       // Appbar (header)
       appBar: _userRole == "worker"
-          ? createMainAppBar(context, widget.userCredential, _userReference)
-          : AppBar(
-              automaticallyImplyLeading: true,
-              leading: IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.arrow_back),
-              )),
+          ? createMainAppBar(
+              context, widget.userCredential, _userReference, "Tasks")
+          : createAltAppbar(context, "Tasks"),
       // Tasks section
       body: Column(
         children: [
@@ -349,9 +343,8 @@ class _TasksPageState extends State<_TasksPageContent> {
         List<WorkerData> workers =
             state is ManageWorkersLoaded ? state.workers : [];
         for (var worker in workers) {
-          dropdownItems.addEntries({
-            "${worker.name} ${worker.surname}": worker.reference
-          } as Iterable<MapEntry<String, dynamic>>);
+          dropdownItems.addEntries(
+              {"${worker.name} ${worker.surname}": worker.reference}.entries);
         }
       },
       child: GreenElevatedButton(
@@ -374,7 +367,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                         return AlertDialog(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.0),
-                              side: BorderSide(
+                              side: const BorderSide(
                                   color: Colors.transparent,
                                   width: 2.0), // Add border color and width
                             ),

@@ -19,13 +19,13 @@ import 'package:greenhouse_project/utils/theme.dart';
 class InputTextField extends StatelessWidget {
   final TextEditingController controller;
   final String errorText;
-  final String hintText;
+  final String labelText;
 
   const InputTextField(
       {super.key,
       required this.controller,
       required this.errorText,
-      required this.hintText});
+      required this.labelText});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class InputTextField extends StatelessWidget {
       decoration: InputDecoration(
         constraints:
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-        hintText: hintText,
+        labelText: labelText,
         errorText: errorText,
         filled: true,
         fillColor: Color.fromARGB(209, 235, 245, 231),
@@ -67,11 +67,11 @@ class LoginTextField extends StatelessWidget {
 }
 
 class InputDropdown extends StatelessWidget {
-  Map<String, dynamic> items;
-  String? value;
+  final Map<String, dynamic> items;
+  final String? value;
   final Function onChanged;
 
-  InputDropdown(
+  const InputDropdown(
       {super.key,
       required this.items,
       required this.value,
