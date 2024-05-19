@@ -16,13 +16,12 @@ import 'package:greenhouse_project/pages/programs.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
-import 'package:greenhouse_project/utils/chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
-import 'package:greenhouse_project/utils/main_appbar.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -81,7 +80,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
     "humidity",
     "lightIntensity",
     "soilMoisture",
-    "Temperature"
+    "temperature"
   ];
 
   // Dispose (destructor)
@@ -116,7 +115,6 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
             );
           }
 
-          // Show content once user info is loaded
           // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
@@ -185,41 +183,17 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
     // Page content
     return Scaffold(
       // Main appbar (header)
-      appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      appBar: createMainAppBar(
+          context, widget.userCredential, _userReference, "Greenhouse"),
 
       // Scrollable column for items
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Title (Greenhouse)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                child: Text("Greenhouse", style: headingTextStyle),
-              ),
-            ),
-
             // Plant status subheading and details button
             _buildSubheadingRow(
               "Plant Status",
               PlantsPage(userCredential: widget.userCredential),
-            ),
-
-            // Plant status graphs
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _sensors.map((sensor) {
-                  return Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width - 40,
-                      height: 400,
-                      child: ChartClass(sensor: sensor),
-                    ),
-                  );
-                }).toList(),
-              ),
             ),
 
             // Active programs subheading and details button

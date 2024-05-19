@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/login.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
@@ -74,20 +75,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         child: Theme(
             data: customTheme,
             child: Scaffold(
-              appBar: AppBar(
-                  leading: IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Image.asset(
-                        "lib/utils/Icons/Left Arrow.png",
-                        scale: 3,
-                      )),
-                  title: const Padding(
-                    padding: EdgeInsets.fromLTRB(70, 0, 0, 0),
-                    child: Text(
-                      "Settings",
-                      style: headingTextStyle,
-                    ),
-                  )),
+              appBar: createAltAppbar(context, "Settings"),
               body: Column(
                 children: [
                   const Row(

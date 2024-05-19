@@ -10,9 +10,9 @@ final class TaskLoading extends TaskState {}
 final class TaskLoaded extends TaskState {
   final List<TaskData> tasks;
 
-  TaskLoaded({
-    required this.tasks,
-  });
+  TaskLoaded(
+    this.tasks,
+  );
 }
 
 final class TaskError extends TaskState {

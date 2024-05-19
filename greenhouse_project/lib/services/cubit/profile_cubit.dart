@@ -12,11 +12,14 @@ class ProfileCubit extends Cubit<ProfileState> {
   FirebaseStorage storage = FirebaseStorage.instance;
   DocumentReference userReference;
 
+  bool _isActive = true;
+
   ProfileCubit(this.userReference) : super(ProfileLoading()) {
     _getUserProfile(storage);
   }
 
   void _getUserProfile(FirebaseStorage storage) async {
+    if (!_isActive) return;
     try {
       DocumentSnapshot userSnapshot = await userReference.get();
       final userSnapshotData = userSnapshot.data();
@@ -31,6 +34,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future selectImage() async {
+    if (!_isActive) return;
     final ImagePicker imagePicker = ImagePicker();
     XFile? file = await imagePicker.pickImage(source: ImageSource.gallery);
     if (file != null) {
@@ -62,6 +66,12 @@ class ProfileCubit extends Cubit<ProfileState> {
     } else {
       print('Image selection Failed');
     }
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 

@@ -13,9 +13,9 @@ class ManageWorkersCubit extends ManagementCubit {
       FirebaseFirestore.instance.collection('logs');
 
   final UserCredential? user;
-  final String mailerUsername = 'itec229.gr1.21008639@gmail.com'; //Your Email
-  final String mailerPassword =
-      'pnvt twlg mrru dmus'; // 16 Digits App Password Generated From Google Account
+  final String mailerUsername = 'itec229.gr1.21008639@gmail.com';
+  final String mailerPassword = 'pnvt twlg mrru dmus';
+
   bool _isActive = true;
 
   ManageWorkersCubit(this.user) : super(ManageWorkersLoading()) {
@@ -25,13 +25,12 @@ class ManageWorkersCubit extends ManagementCubit {
   }
 
   _fetchWorkers() {
+    if (!_isActive) return;
     users.where("role", isEqualTo: "worker").snapshots().listen((snapshot) {
       final List<WorkerData> workers =
           snapshot.docs.map((doc) => WorkerData.fromFirestore(doc)).toList();
 
-      if (_isActive) {
-        emit(ManageWorkersLoaded([...workers]));
-      }
+      emit(ManageWorkersLoaded([...workers]));
     }, onError: (error) {
       emit(ManageWorkersError(error));
     });
@@ -40,6 +39,7 @@ class ManageWorkersCubit extends ManagementCubit {
   // Create worker account and send credentials via email
   Future<void> createWorker(
       String email, String role, DocumentReference userReference) async {
+    if (!_isActive) return;
     try {
       // Create user profile
       await FirebaseAuth.instance
@@ -97,9 +97,7 @@ class ManageWorkersCubit extends ManagementCubit {
   }
 
   Future<void> disableWorker(WorkerData workerData) async {
-    if (!_isActive) {
-      return;
-    }
+    if (!_isActive) return;
     try {
       await workerData.reference
           .set({"enabled": false}, SetOptions(merge: true));
@@ -110,9 +108,8 @@ class ManageWorkersCubit extends ManagementCubit {
   }
 
   Future<void> enableWorker(WorkerData workerData) async {
-    if (!_isActive) {
-      return;
-    }
+    if (!_isActive) return;
+
     try {
       await workerData.reference
           .set({"enabled": true}, SetOptions(merge: true));
@@ -138,15 +135,14 @@ class WorkerData {
   final DocumentReference reference;
   final String role;
 
-  WorkerData({
-    required this.email,
-    required this.creationDate,
-    required this.name,
-    required this.surname,
-    required this.reference,
-    required this.enabled,
-    required this.role
-  });
+  WorkerData(
+      {required this.email,
+      required this.creationDate,
+      required this.name,
+      required this.surname,
+      required this.reference,
+      required this.enabled,
+      required this.role});
 
   factory WorkerData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
