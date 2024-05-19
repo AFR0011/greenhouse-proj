@@ -134,6 +134,11 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   }
                   // Display equipment
                   else {
+                    final imgpath = [
+                    {'path': "lib/utils/Icons/pump.png"},
+                    {'path': "lib/utils/Icons/bulb.png"},
+                    {'path': "lib/utils/Icons/fan.png"},
+                  ] as List<Map<String, dynamic>>;
                     return GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
@@ -148,7 +153,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                           context: context,
                           equipment: equipment,
                           userReference: _userReference,
-                          imgPath: "lib/utils/Icons/bulb.png",
+                          imgPath: imgpath[index]['path'],
                         );
                         // ListTile(
                         //   title: Text(equipment.type),
