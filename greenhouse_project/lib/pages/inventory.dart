@@ -410,7 +410,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
                                               content:
-                                                  Text("Item added succesfully")));
+                                                  Text("Item added succesfully!")));
                                     });
                                   }
                                 }),
@@ -457,7 +457,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                       color: Colors.transparent,
                       width: 2.0), // Add border color and width
                 ),
-          title: Text("Edit Inventory"),
+          title: Text("Edit inventory"),
             content: 
              BlocBuilder<InventoryEditCubit, List<bool>>(
               bloc: inventoryEditCubit,
@@ -554,7 +554,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
                                               content:
-                                                  Text("Item Edited succesfully")));
+                                                  Text("Item edited succesfully!")));
                                     });
                                   }
                                 }),
@@ -610,11 +610,11 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                     .removeInventory(
                                         inventory.reference, _userReference)
                                     .then((value) {
-                                  Navigator.pop(context);
+                                  Navigator.pop(context);Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content:
-                                              Text("Item deleted succesfully")));
+                                              Text("Item deleted succesfully!")));
                                 });
                               }),
                         ),
