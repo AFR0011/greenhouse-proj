@@ -209,7 +209,6 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     return Column(
       children: [
         // Main inventory items
-        const Text("Inventory", style: subheadingTextStyle),
         SizedBox(
           height: MediaQuery.of(context).size.height / 3,
           child: ListView.builder(
@@ -239,7 +238,10 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         ),
 
         // Pending inventory item updates
-        const Text("Pending Updates", style: subheadingTextStyle),
+        Container(
+          margin: EdgeInsets.only(top: 10, bottom: 10),
+          child: const Text("Pending Updates", style: subheadingTextStyle),
+        ),
         SizedBox(
           height: MediaQuery.of(context).size.height / 3,
           child: pendingInventory.isNotEmpty

@@ -5,6 +5,8 @@
 ///
 library;
 
+//import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,7 @@ import 'package:greenhouse_project/pages/employees.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
+import 'package:greenhouse_project/utils/boxlink.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
@@ -139,70 +142,44 @@ class _ManagementPageState extends State<_ManagementPageContent> {
   Widget _createManagementPage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
-
-    // Page content
+    final pages = [
+      {'route': MaterialPageRoute(
+          builder: (context) => TasksPage(
+              userCredential: widget.userCredential,
+              userReference: _userReference)), "title": "Tasks", "icon": "lib/utils/Icons/bulb.png"},
+      {'route': MaterialPageRoute(
+          builder: (context) =>
+              EmployeesPage(userCredential: widget.userCredential)),"title": "Employees", "icon": "lib/utils/Icons/bulb.png"}
+    ] as List<Map<String, dynamic>>;
+    // Page content;
     return Scaffold(
       // Main appbar (header)
       appBar: createMainAppBar(
           context, widget.userCredential, _userReference, "Management"),
 
       // Scrollable list of items
+      // Tasks subsection
       body: SingleChildScrollView(
         child: Column(children: [
-          // Tasks subsection
           Padding(
-            padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    "Tasks",
-                    style: subheadingTextStyle,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                  child: WhiteElevatedButton(
-                      text: "Details",
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => TasksPage(
-                                      userCredential: widget.userCredential,
-                                      userReference: _userReference,
-                                    )));
-                      }),
-                ),
-              ],
-            ),
-          ),
-
-          // Workers subsection
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 35, 0, 0),
-            child: Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    "Employees",
-                    style: subheadingTextStyle,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 25, 0),
-                  child: WhiteElevatedButton(
-                      text: "Details",
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => EmployeesPage(
-                                    userCredential: widget.userCredential)));
-                      }),
-                ),
-              ],
-            ),
+            padding: EdgeInsets.all(24.0),
+            child: GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12.0,
+                    mainAxisSpacing: 12.0,
+                    mainAxisExtent: 250),
+                shrinkWrap: true,
+                itemCount: 2,
+                itemBuilder: (context, index) {
+                  return BoxLink(
+                      text: pages[index]["title"],
+                      imgPath: pages[index]["icon"],
+                      context: context,
+                      userReference: _userReference,
+                      userCredential: widget.userCredential,
+                      pageRoute: pages[index]["route"]);
+                }),
           ),
         ]),
       ),

@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/chat_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/message_bubble.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -228,25 +229,27 @@ class _ChatPageState extends State<_ChatPageContent> {
   }
 
 // Build the message input box
-  // Widget _buildMessageInput(ChatsData? chat) {
-  //   return Row(
-  //     children: [
-  //       Expanded(
-  //           child: InputTextField(
-  //               controller: _textEditingController,
-  //               errorText: "",
-  //               hintText: "send a message")),
-  //       Expanded(
-  //         child: GreenElevatedButton(
-  //           text: "Send",
-  //           onPressed: () {
-  //             _sendMessage(chat);
-  //           },
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+  Widget _buildMessageInput(ChatsData? chat) {
+    return Row(
+      children: [
+        Expanded(
+          child:InputTextField(
+            controller: _textEditingController,
+             errorText: "",
+              labelText: "send a message"),
+              
+        ),
+        
+          IconButton(
+            onPressed: () {
+              _sendMessage(chat);
+            },
+            icon: const Icon(Icons.arrow_upward, size: 20),
+          ),
+        
+      ],
+    );
+  }
 
 // Function to send a message
   void _sendMessage(ChatsData? chat) {

@@ -13,8 +13,10 @@ import 'package:greenhouse_project/pages/chat.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
-import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
+import 'package:greenhouse_project/utils/footer_nav.dart';
+//import 'package:greenhouse_project/utils/main_appbar.dart';
+import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatsPage extends StatelessWidget {
@@ -128,7 +130,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
     // Main page content
     return Scaffold(
       appBar: createMainAppBar(
-          context, widget.userCredential, _userReference, "Chats"),
+          context, widget.userCredential, _userReference, 'Chats'),
       body: _buildChatsList(),
       bottomNavigationBar:
           createFooterNav(_selectedIndex, footerNavCubit, _userRole),
@@ -185,8 +187,46 @@ class _ChatsPageState extends State<_ChatsPageContent> {
           ),
         );
       },
-      child: ListTile(
-        title: Text("${receiverData?['name']} ${receiverData?['surname']}"),
+      child: Container(
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.black, ))),
+        child: Row(
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 5, bottom: 5),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ClipOval(
+                    child: Image.memory(
+                  chat!.receiverPicture,
+                  width: 40,
+                  height: 40,
+                )),
+              ),
+            ),
+            Container(
+                margin: const EdgeInsets.only(left: 5),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text.rich(
+                    TextSpan(
+                    text:"${receiverData?['name']} ${receiverData?['surname']}",
+                    style: bodyTextStyle,
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: "     ("+receiverData!['role']+")",
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w300,
+                          color: Colors.grey,
+                          fontSize: 14.0,
+                        ),
+                      ),
+                    ]
+                    ),
+                  
+                )
+                ))
+          ],
+        ),
       ),
     );
   }
