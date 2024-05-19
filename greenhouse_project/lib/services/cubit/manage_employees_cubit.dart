@@ -4,7 +4,7 @@
 
 part of 'management_cubit.dart';
 
-class ManageWorkersCubit extends ManagementCubit {
+class ManageEmployeesCubit extends ManagementCubit {
   // final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
@@ -13,33 +13,38 @@ class ManageWorkersCubit extends ManagementCubit {
       FirebaseFirestore.instance.collection('logs');
 
   final UserCredential? user;
-  final String mailerUsername = 'itec229.gr1.21008639@gmail.com';
-  final String mailerPassword = 'pnvt twlg mrru dmus';
 
+  final FirebaseStorage storage = FirebaseStorage.instance;
   bool _isActive = true;
 
-  ManageWorkersCubit(this.user) : super(ManageWorkersLoading()) {
+  ManageEmployeesCubit(this.user) : super(ManageEmployeesLoading()) {
     if (user != null) {
-      _fetchWorkers();
+      _fetchEmployees();
     }
   }
 
-  _fetchWorkers() {
+  _fetchEmployees() {
     if (!_isActive) return;
-    users.where("role", isEqualTo: "worker").snapshots().listen((snapshot) {
-      final List<WorkerData> workers =
-          snapshot.docs.map((doc) => WorkerData.fromFirestore(doc)).toList();
+    users
+        .where(Filter.or(Filter("role", isEqualTo: "worker"),
+            Filter("role", isEqualTo: "manager")))
+        .snapshots()
+        .listen((snapshot) {
+      final List<EmployeeData> workers =
+          snapshot.docs.map((doc) => EmployeeData.fromFirestore(doc)).toList();
 
-      emit(ManageWorkersLoaded([...workers]));
+      emit(ManageEmployeesLoaded([...workers]));
     }, onError: (error) {
-      emit(ManageWorkersError(error));
+      emit(ManageEmployeesError(error));
     });
   }
 
   // Create worker account and send credentials via email
-  Future<void> createWorker(
+  Future<void> createEmployee(
       String email, String role, DocumentReference userReference) async {
     if (!_isActive) return;
+    // Get url of uploaded image
+    String imageUrl = await storage.ref().child("Default.jpg").getDownloadURL();
     try {
       // Create user profile
       await FirebaseAuth.instance
@@ -52,7 +57,7 @@ class ManageWorkersCubit extends ManagementCubit {
         "name": email,
         "surname": email,
         "role": role,
-        "picture": <Uint8List>[],
+        "picture": imageUrl,
         "enabled": true,
       });
 
@@ -65,56 +70,42 @@ class ManageWorkersCubit extends ManagementCubit {
         "externalId": externalId,
       });
 
-      // Mail transfer server
-      final smtpServer = gmail(mailerUsername, mailerPassword);
+      // Use EmailJS to send email
+      String _emailMessage = "Your email  used to create an account in " +
+          "the Greenhouse Control System environment.\n\nIf you think this is a " +
+          "mistake, please ignore this email.\n\nYou can login to your account " +
+          "using the following password: 12345678";
 
-      // Create our message.
-      final message = Message()
-            ..from = const Address(
-                'itec229.gr1.21008639@gmail.com', 'Greenhouse Co.')
-            ..recipients.add(email)
-            // ..ccRecipients.addAll(['abc@gmail.com', 'xyz@gmail.com']) // For Adding Multiple Recipients
-            // ..bccRecipients.add(Address('a@gmail.com')) For Binding Carbon Copy of Sent Email
-            ..subject = 'Greenhouse Account Created'
-            ..text =
-                "Oh well hello there!\n Your email was used by a manager to create an account in the greenhouse control system. You can now login using your email and the following password:\n 12345678\n Please make sure to change this password as soon as possible!"
-          // ..html = "<h1>Test</h1>\n<p>Hey! Here's some HTML content</p>"; // For Adding Html in email
-          // ..attachments = [
-          //   FileAttachment(File('image.png'))  //For Adding Attachments
-          //     ..location = Location.inline
-          //     ..cid = '<myimg@3.141>'
-          // ]
-          ;
-      final sendReport = await send(message, smtpServer);
-      print('Message sent: ' + sendReport.toString());
-    } on MailerException catch (e) {
-      print('Message not sent.');
-      print(e.toString());
+      EmailJS.init(const Options(
+          publicKey: "Dzqja-Lc3erScWnmb", privateKey: "6--KQwTNaq-EKoZJg4-t6"));
+
+      EmailJS.send("service_1i330zn", "template_zx9tnxd",
+          {"receiver": email, "message": _emailMessage});
     } catch (error) {
       print(error);
-      emit(ManageWorkersError(error.toString()));
+      emit(ManageEmployeesError(error.toString()));
     }
   }
 
-  Future<void> disableWorker(WorkerData workerData) async {
+  Future<void> disableEmployee(EmployeeData workerData) async {
     if (!_isActive) return;
     try {
       await workerData.reference
           .set({"enabled": false}, SetOptions(merge: true));
     } catch (error) {
-      emit(ManageWorkersError(error.toString()));
+      emit(ManageEmployeesError(error.toString()));
     }
     return;
   }
 
-  Future<void> enableWorker(WorkerData workerData) async {
+  Future<void> enableEmployee(EmployeeData workerData) async {
     if (!_isActive) return;
 
     try {
       await workerData.reference
           .set({"enabled": true}, SetOptions(merge: true));
     } catch (error) {
-      emit(ManageWorkersError(error.toString()));
+      emit(ManageEmployeesError(error.toString()));
     }
     return;
   }
@@ -126,7 +117,7 @@ class ManageWorkersCubit extends ManagementCubit {
   }
 }
 
-class WorkerData {
+class EmployeeData {
   final String email;
   final DateTime creationDate;
   final String name;
@@ -135,7 +126,7 @@ class WorkerData {
   final DocumentReference reference;
   final String role;
 
-  WorkerData(
+  EmployeeData(
       {required this.email,
       required this.creationDate,
       required this.name,
@@ -144,9 +135,9 @@ class WorkerData {
       required this.enabled,
       required this.role});
 
-  factory WorkerData.fromFirestore(DocumentSnapshot doc) {
+  factory EmployeeData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    return WorkerData(
+    return EmployeeData(
         name: data['name'],
         surname: data['surname'],
         email: data['email'],
