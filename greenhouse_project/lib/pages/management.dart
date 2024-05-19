@@ -17,10 +17,8 @@ import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/utils/boxlink.dart';
-import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
-import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ManagementPage extends StatelessWidget {
@@ -143,13 +141,18 @@ class _ManagementPageState extends State<_ManagementPageContent> {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     final pages = [
-      {'route': MaterialPageRoute(
-          builder: (context) => TasksPage(
-              userCredential: widget.userCredential,
-              userReference: _userReference)), "title": "Tasks", "icon": "lib/utils/Icons/tasks.png"},
-      {'route': MaterialPageRoute(
-          builder: (context) =>
-              EmployeesPage(userCredential: widget.userCredential)),"title": "Employees", "icon": "lib/utils/Icons/worker.png"}
+      {
+        'route': TasksPage(
+            userCredential: widget.userCredential,
+            userReference: _userReference),
+        "title": "Tasks",
+        "icon": "lib/utils/Icons/bulb.png"
+      },
+      {
+        'route': EmployeesPage(userCredential: widget.userCredential),
+        "title": "Employees",
+        "icon": "lib/utils/Icons/bulb.png"
+      }
     ] as List<Map<String, dynamic>>;
     // Page content;
     return Scaffold(
@@ -176,8 +179,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                       text: pages[index]["title"],
                       imgPath: pages[index]["icon"],
                       context: context,
-                      userReference: _userReference,
-                      userCredential: widget.userCredential,
                       pageRoute: pages[index]["route"]);
                 }),
           ),

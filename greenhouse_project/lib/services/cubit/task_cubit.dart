@@ -33,7 +33,7 @@ class TaskCubit extends Cubit<TaskState> {
     String userRole = userData['role'];
 
     //Get user Tasks
-    if (userRole == "manager") {
+    if (userRole == "manager" || userRole == "admin") {
       tasks
           .where('manager', isEqualTo: userReference)
           .orderBy('dueDate', descending: true)

@@ -10,8 +10,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -142,7 +140,7 @@ class _TasksPageState extends State<_TasksPageContent> {
         BlocProvider.of<FooterNavCubit>(context);
     return Scaffold(
       // Appbar (header)
-      appBar: _userRole == "employee"
+      appBar: _userRole == "worker"
           ? createMainAppBar(
               context, widget.userCredential, _userReference, "Tasks")
           : createAltAppbar(context, "Tasks"),
@@ -183,33 +181,6 @@ class _TasksPageState extends State<_TasksPageContent> {
                             showDialog(
                               context: context,
                               builder: (context) {
-                                // Widget buttonRow = _userRole == "employee"
-                                //     ? Row(
-                                //         children: [
-                                //           WhiteElevatedButton(
-                                //               text: "Contact Manager",
-                                //               onPressed: () {}),
-                                //           WhiteElevatedButton(
-                                //               text: "Mark as Complete",
-                                //               onPressed: () {
-                                //                 context
-                                //                     .read<TaskCubit>()
-                                //                     .completeTask(
-                                //                         task.taskReference);
-                                //               })
-                                //         ],
-                                //       )
-                                //     : Row(children: [
-                                //         RedElevatedButton(
-                                //             text: "Delete", onPressed: () {}),
-                                //         WhiteElevatedButton(
-                                //             text: "Edit", onPressed: () {}),
-                                //         task.status == "waiting"
-                                //             ? GreenElevatedButton(
-                                //                 text: "Approve",
-                                //                 onPressed: () {})
-                                //             : const SizedBox(),
-                                //       ]);
                                 return TaskDetailsDialog(
                                     task: task,
                                     userRole: _userRole,
@@ -235,7 +206,7 @@ class _TasksPageState extends State<_TasksPageContent> {
               }
             },
           ),
-          _userRole == "manager" ? _createAddButton() : const SizedBox(),
+          _userRole != "worker" ? _createAddButton() : const SizedBox(),
         ],
       ),
 
@@ -253,7 +224,8 @@ class _TasksPageState extends State<_TasksPageContent> {
   void showEditForm(TaskData task) {
     // Get instance of programs cubit from main context
     TaskCubit taskCubit = context.read<TaskCubit>();
-    ManageEmployeesCubit manageEmployeesCubit = context.read<ManageEmployeesCubit>();
+    ManageEmployeesCubit manageEmployeesCubit =
+        context.read<ManageEmployeesCubit>();
     Map<String, dynamic> dropdownItems = {};
     // Get employees list
 
@@ -264,15 +236,17 @@ class _TasksPageState extends State<_TasksPageContent> {
           _descController.text = task.description;
           //make duedate editabale by choosing the  date&time from a panel
           _duedateController.text = task.dueDate.toString();
-          return  BlocListener<ManageEmployeesCubit, ManagementState>(
-      bloc: manageEmployeesCubit,
-      listener: (context, state) {
-        List<EmployeeData> employees =
-            state is ManageEmployeesLoaded ? state.employees : [];
-        for (var employee in employees) {
-          dropdownItems.addEntries(
-              {"${employee.name} ${employee.surname}": employee.reference}.entries);
-        }},
+          return BlocListener<ManageEmployeesCubit, ManagementState>(
+            bloc: manageEmployeesCubit,
+            listener: (context, state) {
+              List<EmployeeData> employees =
+                  state is ManageEmployeesLoaded ? state.employees : [];
+              for (var employee in employees) {
+                dropdownItems.addEntries({
+                  "${employee.name} ${employee.surname}": employee.reference
+                }.entries);
+              }
+            },
             child: MultiBlocProvider(
               providers: [
                 BlocProvider(
@@ -391,12 +365,12 @@ class _TasksPageState extends State<_TasksPageContent> {
           return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                side: BorderSide(
+                side: const BorderSide(
                     color: Colors.transparent,
                     width: 2.0), // Add border color and width
               ),
-              title: Text("Are you sure?"),
-              content: Container(
+              title: const Text("Are you sure?"),
+              content: SizedBox(
                 width: double.maxFinite, // Set maximum width
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
@@ -444,8 +418,9 @@ class _TasksPageState extends State<_TasksPageContent> {
         List<EmployeeData> employees =
             state is ManageEmployeesLoaded ? state.employees : [];
         for (var employee in employees) {
-          dropdownItems.addEntries(
-              {"${employee.name} ${employee.surname}": employee.reference}.entries);
+          dropdownItems.addEntries({
+            "${employee.name} ${employee.surname}": employee.reference
+          }.entries);
         }
       },
       child: GreenElevatedButton(

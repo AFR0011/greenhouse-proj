@@ -14,10 +14,11 @@ import "package:greenhouse_project/services/cubit/footer_nav_cubit.dart";
 import "package:greenhouse_project/utils/theme.dart";
 
 void navigateToPage(BuildContext context, int index, String userRole,
-    UserCredential userCredential, {DocumentReference? userReference}) {
+    UserCredential userCredential,
+    {DocumentReference? userReference}) {
   switch (index) {
     case 0:
-      userRole == "manager"
+      userRole != "worker"
           ? Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
@@ -76,12 +77,12 @@ void navigateToPage(BuildContext context, int index, String userRole,
 BottomNavigationBar createFooterNav(
     int selectedIndex, FooterNavCubit footerNavCubit, String userRole) {
   final footerNav = BottomNavigationBar(
-    elevation:120,
+    elevation: 120,
     backgroundColor: theme.colorScheme.background,
     type: BottomNavigationBarType.fixed,
     selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
     items: [
-      userRole == "manager"
+      userRole != "worker"
           ? const BottomNavigationBarItem(
               icon: Icon(Icons.precision_manufacturing_rounded),
               label: "Manage")

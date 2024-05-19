@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:greenhouse_project/pages/tasks.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -9,18 +6,14 @@ class BoxLink extends StatefulWidget {
   final String text;
   final String imgPath;
   final BuildContext context;
-  final DocumentReference userReference;
-  final UserCredential userCredential;
-  final PageRoute pageRoute;
+  final dynamic pageRoute;
 
-  const BoxLink({
-    required this.text,
-    required this.imgPath,
-    required this.context,
-    required this.userReference,
-    required this.userCredential,
-    required this.pageRoute
-  });
+  const BoxLink(
+      {super.key,
+      required this.text,
+      required this.imgPath,
+      required this.context,
+      required this.pageRoute});
 
   @override
   _BoxLinkState createState() => _BoxLinkState();
@@ -46,10 +39,8 @@ class _BoxLinkState extends State<BoxLink> {
       ),
       child: InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            widget.pageRoute,
-          );
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => widget.pageRoute));
         },
         onHover: (isHover) {
           setState(() {
