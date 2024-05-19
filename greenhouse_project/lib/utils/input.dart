@@ -46,7 +46,6 @@ class InputTextField extends StatelessWidget {
   }
 }
 
-
 class LoginTextField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
@@ -72,34 +71,27 @@ class ProfileTextField extends StatelessWidget {
   final String data;
   final Widget icon;
 
-  const ProfileTextField({
-    super.key,
-    required this.name,
-    required this.data,
-    required this.icon
-  });
+  const ProfileTextField(
+      {super.key, required this.name, required this.data, required this.icon});
 
   @override
   Widget build(BuildContext context) {
-  return TextField(   
-    readOnly: true,             
-    decoration: InputDecoration(
-      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.75),
-      label: Text(name),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
-      prefixIcon: icon
-    ),         
-    controller: TextEditingController(text: data),     
-  );
+    return TextField(
+      readOnly: true,
+      decoration: InputDecoration(
+          constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.75),
+          label: Text(name),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+          prefixIcon: icon),
+      controller: TextEditingController(text: data),
+    );
   }
 }
 
-
-
-
 class InputDropdown extends StatelessWidget {
   final Map<String, dynamic> items;
-  final String? value;
+  final dynamic value;
   final Function onChanged;
 
   const InputDropdown(
@@ -110,25 +102,27 @@ class InputDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<DropdownMenuItem<String>> itemsList = [];
+    List<DropdownMenuItem> itemsList = [];
     items.forEach((text, value) {
-      DropdownMenuItem<String> menuItem = DropdownMenuItem(
+      DropdownMenuItem menuItem = DropdownMenuItem(
         value: value,
-        child: Text(text),
+        child:
+            Text(text, style: const TextStyle(overflow: TextOverflow.ellipsis)),
       );
       itemsList.add(menuItem);
     });
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Container(
-        
         child: Center(
-          child: DropdownButtonFormField<String>(
+          child: DropdownButtonFormField(
+            isExpanded: true,
             value: value,
             onChanged: (value) => onChanged(value),
             decoration: const InputDecoration(
               labelText: 'Select an option',
-              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+              border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20))),
             ),
             items: itemsList,
           ),
@@ -214,10 +208,10 @@ class TaskDetailsDialog extends StatelessWidget {
   }
 }
 
-class WorkerDetailsDialog extends StatelessWidget {
-  final WorkerData worker;
+class EmployeeDetailsDialog extends StatelessWidget {
+  final EmployeeData employee;
 
-  const WorkerDetailsDialog({super.key, required this.worker});
+  const EmployeeDetailsDialog({super.key, required this.employee});
 
   @override
   Widget build(BuildContext context) {
@@ -228,23 +222,23 @@ class WorkerDetailsDialog extends StatelessWidget {
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Worker Details"),
+      title: Text("Employee Details"),
       content: Container(
         width: double.maxFinite, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildDetailRow("Name:", worker.name),
-            _buildDetailRow("Surname:", worker.surname),
-            _buildDetailRow("Email:", worker.email),
-            _buildDetailRow("Role:", worker.role),
+            _buildDetailRow("Name:", employee.name),
+            _buildDetailRow("Surname:", employee.surname),
+            _buildDetailRow("Email:", employee.email),
+            _buildDetailRow("Role:", employee.role),
             _buildDetailRow(
                 "Start Date:",
-                worker.creationDate
-                    .toString()
-                    .substring(0, worker.creationDate.toString().length - 12)),
-            _buildDetailRow("Status:", worker.enabled ? "Enabled" : "Disabled"),
+                employee.creationDate.toString().substring(
+                    0, employee.creationDate.toString().length - 12)),
+            _buildDetailRow(
+                "Status:", employee.enabled ? "Enabled" : "Disabled"),
             SizedBox(height: 20), // Add spacing between details and buttons
             Align(
               alignment: Alignment.center,
@@ -605,7 +599,6 @@ class WavePainter extends CustomPainter {
   }
 }
 
-
 class WavePainter1 extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -621,7 +614,6 @@ class WavePainter1 extends CustomPainter {
         size.width * 0.75, size.height * 0.5, size.width, size.height * 0.75);
     path.lineTo(size.width, 0);
     path.close();
-
 
     canvas.drawPath(path, paint);
   }
@@ -641,12 +633,11 @@ class WavePainter2 extends CustomPainter {
 
     final path = Path();
     path.lineTo(0, size.height * .95);
-    
+
     path.quadraticBezierTo(
-        size.width , size.height * 1.5, size.width*1.5, size.height * 0.95);
+        size.width, size.height * 1.5, size.width * 1.5, size.height * 0.95);
     path.lineTo(size.width, 0);
     path.close();
-
 
     canvas.drawPath(path, paint);
   }
@@ -656,5 +647,3 @@ class WavePainter2 extends CustomPainter {
     return false;
   }
 }
-
-

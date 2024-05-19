@@ -45,7 +45,7 @@ class TasksPage extends StatelessWidget {
           create: (context) => UserInfoCubit(),
         ),
         BlocProvider(create: (context) => TaskCubit(userReference!)),
-        BlocProvider(create: (context) => ManageWorkersCubit(userCredential)),
+        BlocProvider(create: (context) => ManageEmployeesCubit(userCredential)),
       ],
       child: _TasksPageContent(userCredential: userCredential),
     );
@@ -334,14 +334,15 @@ class _TasksPageState extends State<_TasksPageContent> {
 
   Widget _createAddButton() {
     TaskCubit taskCubit = context.read<TaskCubit>();
-    ManageWorkersCubit manageWorkersCubit = context.read<ManageWorkersCubit>();
+    ManageEmployeesCubit manageEmployeesCubit =
+        context.read<ManageEmployeesCubit>();
     Map<String, dynamic> dropdownItems = {};
     // Get workers list
-    return BlocListener<ManageWorkersCubit, ManagementState>(
-      bloc: manageWorkersCubit,
+    return BlocListener<ManageEmployeesCubit, ManagementState>(
+      bloc: manageEmployeesCubit,
       listener: (context, state) {
-        List<WorkerData> workers =
-            state is ManageWorkersLoaded ? state.workers : [];
+        List<EmployeeData> workers =
+            state is ManageEmployeesLoaded ? state.employees : [];
         for (var worker in workers) {
           dropdownItems.addEntries(
               {"${worker.name} ${worker.surname}": worker.reference}.entries);
@@ -375,7 +376,8 @@ class _TasksPageState extends State<_TasksPageContent> {
                             content: SizedBox(
                                 width: double.maxFinite,
                                 child: Column(
-                                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                                  mainAxisSize: MainAxisSize
+                                      .min, // Set column to minimum size
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     InputTextField(
@@ -384,24 +386,12 @@ class _TasksPageState extends State<_TasksPageContent> {
                                             ? ""
                                             : "Title should not be empty",
                                         labelText: "Title"),
-                                    // TextField(
-                                    //   controller: _titleController,
-                                    //   decoration: InputDecoration(
-                                    //       errorText: state[0]
-                                    //           ? ""
-                                    //           : "Title should not be empty"),
-                                    // ),
                                     InputTextField(
                                         controller: _descController,
                                         errorText: state[1]
                                             ? ""
                                             : "Description should not be empty",
                                         labelText: "Description"),
-                                    // TextField(
-                                    //   controller: _descController,
-                                    //   decoration: InputDecoration(
-                                    //       errorText: ),
-                                    // ),
                                     InputDropdown(
                                         items: dropdownItems,
                                         value:
