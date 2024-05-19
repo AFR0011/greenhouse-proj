@@ -56,28 +56,28 @@ class _LoginPageState extends State<LoginPage>
 
     return Scaffold(
       body: Stack(children: [
-        // Positioned(
-        //   top: 0,
-        //   left: 0,
-        //   right: 0,
-        //   child: CustomPaint(
-        //     painter: WavePainter1(),
-        //     child: Container(
-        //       height: 300,
-        //     ),
-        //   ),
-        // ),
-        // Positioned(
-        //   top: 0,
-        //   left: 0,
-        //   right: 0,
-        //   child: CustomPaint(
-        //     painter: WavePainter(),
-        //     child: Container(
-        //       height: 300,
-        //     ),
-        //   ),
-        // ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: CustomPaint(
+            painter: WavePainter1(),
+            child: Container(
+              height: 300,
+            ),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: CustomPaint(
+            painter: WavePainter(),
+            child: Container(
+              height: 300,
+            ),
+          ),
+        ),
         BlocConsumer<AuthCubit, AuthState>(
           builder: (context, state) {
             // Show "loading screen" if auth request is being processed
