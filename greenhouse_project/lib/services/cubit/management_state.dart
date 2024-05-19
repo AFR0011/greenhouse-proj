@@ -3,16 +3,16 @@ part of 'management_cubit.dart';
 @immutable
 sealed class ManagementState {}
 
-final class ManageWorkersLoading extends ManagementState {}
+final class ManageEmployeesLoading extends ManagementState {}
 
-final class ManageWorkersLoaded extends ManagementState {
-  final List<WorkerData> workers;
+final class ManageEmployeesLoaded extends ManagementState {
+  final List<EmployeeData> employees;
 
-  ManageWorkersLoaded(this.workers);
+  ManageEmployeesLoaded(this.employees);
 }
 
-final class ManageWorkersError extends ManagementState {
+final class ManageEmployeesError extends ManagementState {
   final String error;
 
-  ManageWorkersError(this.error);
+  ManageEmployeesError(this.error);
 }
