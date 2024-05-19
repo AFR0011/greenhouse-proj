@@ -7,6 +7,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/login.dart';
@@ -14,9 +15,8 @@ import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
-import 'package:greenhouse_project/utils/chart.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
-import 'package:greenhouse_project/utils/appbar.dart';
+import 'package:greenhouse_project/utils/main_appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -70,14 +70,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
 
   // Index of footer nav selection
   final int _selectedIndex = 2;
-
-  final List<String> _sensors = [
-    "gas",
-    "humidity",
-    "lightIntensity",
-    "soilMoisture",
-    "temperature"
-  ];
 
   // Dispose (destructor)
   @override
@@ -152,14 +144,10 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     // Page content
     return Scaffold(
       // Main appbar (header)
-      appBar: createMainAppBar(
-          context, widget.userCredential, _userReference, "Welcome"),
+      appBar: createMainAppBar(context, widget.userCredential, _userReference),
 
       // Call function to build notificaitons list
-      body: Builder(builder: (context) {
-        _buildReadingGraphs();
-        return const SizedBox();
-      }),
+      body: _buildNotifications(),
 
       // Footer nav bar
       bottomNavigationBar:
@@ -167,22 +155,70 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  Widget _buildReadingGraphs() {
-    // Plant status graphs
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: _sensors.map((sensor) {
-          return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width - 40,
-              height: 400,
-              child: ChartClass(sensor: sensor),
-            ),
-          );
-        }).toList(),
-      ),
+  Widget _buildNotifications() {
+    return Column(
+      children: [
+        // Welcome message
+        Padding(
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          child: Center(
+              child:
+                  Text("Welcome Back, $_userName!", style: headingTextStyle)),
+        ),
+
+        // Notifications subheading
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 20,
+          child: const Text(
+            "Notifications",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.left,
+          ),
+        ),
+
+        // BlocBuilder for notifications
+        BlocBuilder<NotificationsCubit, HomeState>(
+          builder: (context, state) {
+            // Show "loading screen" if processing notification state
+            if (state is NotificationsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            // Show equipment status once notification state is loaded
+            else if (state is NotificationsLoaded) {
+              List<NotificationData> notificationsList =
+                  state.notifications; // notifications list
+              // Display nothing if no notifications
+              if (notificationsList.isEmpty) {
+                return const Center(child: Text("No Notifications..."));
+              }
+              // Display notifications
+              else {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: notificationsList.length,
+                  itemBuilder: (context, index) {
+                    NotificationData notification =
+                        notificationsList[index]; // notification data
+                    // Notification message
+                    return ListTile(
+                      title: Text(notification.message),
+                    );
+                  },
+                );
+              }
+            }
+            // Show error message once an error occurs
+            else if (state is NotificationsError) {
+              return Center(child: Text('Error: ${state.errorMessage}'));
+            }
+            // If the state is not any of the predefined states;
+            // never happens; but, anything can happen
+            else {
+              return const Center(child: Text('Unexpected State'));
+            }
+          },
+        ),
+      ],
     );
   }
 

@@ -371,12 +371,11 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   color: Colors.transparent,
                                   width: 2.0), // Add border color and width
                             ),
-                            title: const Text("Add worker"),
+                            title: const Text("Add task"),
                             content: SizedBox(
                                 width: double.maxFinite,
                                 child: Column(
-                                  mainAxisSize: MainAxisSize
-                                      .min, // Set column to minimum size
+                                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     InputTextField(

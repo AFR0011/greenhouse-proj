@@ -37,14 +37,15 @@ class InputTextField extends StatelessWidget {
         labelText: labelText,
         errorText: errorText,
         filled: true,
-        fillColor: Color.fromARGB(209, 235, 245, 231),
+        fillColor: theme.colorScheme.secondary,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
         ),
       ),
     );
   }
 }
+
 
 class LoginTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -65,6 +66,36 @@ class LoginTextField extends StatelessWidget {
     );
   }
 }
+
+class ProfileTextField extends StatelessWidget {
+  final String name;
+  final String data;
+  final Widget icon;
+
+  const ProfileTextField({
+    super.key,
+    required this.name,
+    required this.data,
+    required this.icon
+  });
+
+  @override
+  Widget build(BuildContext context) {
+  return TextField(   
+    readOnly: true,             
+    decoration: InputDecoration(
+      constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.75),
+      label: Text(name),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+      prefixIcon: icon
+    ),         
+    controller: TextEditingController(text: data),     
+  );
+  }
+}
+
+
+
 
 class InputDropdown extends StatelessWidget {
   final Map<String, dynamic> items;
@@ -89,15 +120,18 @@ class InputDropdown extends StatelessWidget {
     });
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Center(
-        child: DropdownButtonFormField<String>(
-          value: value,
-          onChanged: (value) => onChanged(value),
-          decoration: const InputDecoration(
-            labelText: 'Select an option',
-            border: OutlineInputBorder(),
+      child: Container(
+        
+        child: Center(
+          child: DropdownButtonFormField<String>(
+            value: value,
+            onChanged: (value) => onChanged(value),
+            decoration: const InputDecoration(
+              labelText: 'Select an option',
+              border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+            ),
+            items: itemsList,
           ),
-          items: itemsList,
         ),
       ),
     );
@@ -545,3 +579,82 @@ class ToggleButtonContainer extends StatelessWidget {
     );
   }
 }
+
+class WavePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.green
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.lineTo(0, size.height * 0.75);
+    path.quadraticBezierTo(
+        size.width * 0.25, size.height, size.width * 0.5, size.height * 0.75);
+    path.quadraticBezierTo(
+        size.width * 0.75, size.height * 0.5, size.width, size.height * 0.75);
+    path.lineTo(size.width, 0);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+
+class WavePainter1 extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = theme.colorScheme.primary
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.lineTo(0, size.height * .95);
+    path.quadraticBezierTo(
+        size.width * 0.35, size.height, size.width * 0.55, size.height * 0.75);
+    path.quadraticBezierTo(
+        size.width * 0.75, size.height * 0.5, size.width, size.height * 0.75);
+    path.lineTo(size.width, 0);
+    path.close();
+
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+class WavePainter2 extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = theme.colorScheme.primary
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.lineTo(0, size.height * .95);
+    
+    path.quadraticBezierTo(
+        size.width , size.height * 1.5, size.width*1.5, size.height * 0.95);
+    path.lineTo(size.width, 0);
+    path.close();
+
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+

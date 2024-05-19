@@ -4,13 +4,16 @@
 /// - Update code to submit relevant data (line 311-*)
 /// - (then) make API call to sync databases
 /// - Fix context usage in async gaps
+/// - No controllers
 ///
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/programs_cubit.dart';
@@ -205,126 +208,142 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
         context: context,
         builder: (context) {
           _limitController.text = '0';
-          return Dialog(
-            child: Column(
-              children: [
-                TextField(
-                  controller: _titleController,
-                ),
-                BlocProvider(
-                  create: (context) => ProgramEditCubit(),
-                  child: BlocBuilder<ProgramEditCubit, List<String>>(
-                    builder: (context, state) {
-                      List<String> dropdownValues = state;
-                      return Column(
-                        children: [
-                          Slider(
-                              value: double.parse(_limitController.text),
-                              onChanged: (value) {
-                                _limitController.text = value.toString();
-                                context
-                                    .read<ProgramEditCubit>()
-                                    .updateDropdown(dropdownValues);
-                              }),
-                          DropdownButton(
-                              value: dropdownValues[0] != ""
-                                  ? dropdownValues[0]
-                                  : null,
-                              items: const [
-                                DropdownMenuItem(
-                                  value: 'fan',
-                                  child: Text('fan'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'pump',
-                                  child: Text('pump'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'light',
-                                  child: Text('light'),
-                                ),
-                              ],
-                              onChanged: (selection) {
-                                dropdownValues[0] = selection!;
-                                context
-                                    .read<ProgramEditCubit>()
-                                    .updateDropdown(dropdownValues);
-                              }),
-                          DropdownButton(
-                              value: dropdownValues[1] != ""
-                                  ? dropdownValues[1]
-                                  : null,
-                              items: const [
-                                DropdownMenuItem(
-                                  value: 'off',
-                                  child: Text('off'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'on',
-                                  child: Text('on'),
-                                ),
-                              ],
-                              onChanged: (selection) {
-                                dropdownValues[1] = selection!;
-                                context
-                                    .read<ProgramEditCubit>()
-                                    .updateDropdown(dropdownValues);
-                              }),
-                          DropdownButton(
-                              value: dropdownValues[2] != ""
-                                  ? dropdownValues[2]
-                                  : null,
-                              items: const [
-                                DropdownMenuItem(
-                                  value: 'lt',
-                                  child: Text('less than'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'gt',
-                                  child: Text('greater than'),
-                                ),
-                              ],
-                              onChanged: (selection) {
-                                dropdownValues[2] = selection!;
-                                context
-                                    .read<ProgramEditCubit>()
-                                    .updateDropdown(dropdownValues);
-                              }),
-                        ],
-                      );
-                    },
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: BorderSide(
+                        color: Colors.transparent,
+                        width: 2.0), // Add border color and width
                   ),
-                ),
-                Row(
-                  children: [
-                    GreenElevatedButton(
-                        text: "Submit",
-                        onPressed: () async {
-                          Map<String, dynamic> data = {
-                            "description": _limitController.text,
-                            "name": _titleController.text,
-                            "timeAdded": DateTime.now(),
-                            "pending": _userRole == 'manager' ? false : true,
-                          };
-                          await programsCubit.addProgram(data, userReference);
-                          _titleController.clear();
-                          _limitController.clear();
-                          Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Item added succesfully")));
-                        }),
-                    WhiteElevatedButton(
-                        text: "Cancel",
-                        onPressed: () {
-                          _titleController.clear();
-                          _limitController.clear();
-                          //_amountController.clear();
-                          Navigator.pop(context);
-                        })
-                  ],
-                )
-              ],
+                  title: const Text("Create program"),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _titleController,
+                  ),
+                  BlocProvider(
+                    create: (context) => ProgramEditCubit(),
+                    child: BlocBuilder<ProgramEditCubit, List<String>>(
+                      builder: (context, state) {
+                        List<String> dropdownValues = state;
+                        return Column(
+                          children: [
+                            Slider(
+                                value: double.parse(_limitController.text),
+                                onChanged: (value) {
+                                  _limitController.text = value.toString();
+                                  context
+                                      .read<ProgramEditCubit>()
+                                      .updateDropdown(dropdownValues);
+                                }),
+                            DropdownButton(
+                                value: dropdownValues[0] != ""
+                                    ? dropdownValues[0]
+                                    : null,
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 'fan',
+                                    child: Text('fan'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'pump',
+                                    child: Text('pump'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'light',
+                                    child: Text('light'),
+                                  ),
+                                ],
+                                onChanged: (selection) {
+                                  dropdownValues[0] = selection!;
+                                  context
+                                      .read<ProgramEditCubit>()
+                                      .updateDropdown(dropdownValues);
+                                }),
+                            DropdownButton(
+                                value: dropdownValues[1] != ""
+                                    ? dropdownValues[1]
+                                    : null,
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 'off',
+                                    child: Text('off'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'on',
+                                    child: Text('on'),
+                                  ),
+                                ],
+                                onChanged: (selection) {
+                                  dropdownValues[1] = selection!;
+                                  context
+                                      .read<ProgramEditCubit>()
+                                      .updateDropdown(dropdownValues);
+                                }),
+                            DropdownButton(
+                                value: dropdownValues[2] != ""
+                                    ? dropdownValues[2]
+                                    : null,
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 'lt',
+                                    child: Text('less than'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'gt',
+                                    child: Text('greater than'),
+                                  ),
+                                ],
+                                onChanged: (selection) {
+                                  dropdownValues[2] = selection!;
+                                  context
+                                      .read<ProgramEditCubit>()
+                                      .updateDropdown(dropdownValues);
+                                }),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GreenElevatedButton(
+                            text: "Submit",
+                            onPressed: () async {
+                              Map<String, dynamic> data = {
+                                "description": _limitController.text,
+                                "name": _titleController.text,
+                                "timeAdded": DateTime.now(),
+                                "pending": _userRole == 'manager' ? false : true,
+                              };
+                              await programsCubit.addProgram(data, userReference);
+                              _titleController.clear();
+                              _limitController.clear();
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("Item added succesfully")));
+                            }),
+                      ),
+                      Expanded(
+                        child: WhiteElevatedButton(
+                            text: "Cancel",
+                            onPressed: () {
+                              _titleController.clear();
+                              _limitController.clear();
+                              //_amountController.clear();
+                              Navigator.pop(context);
+                            }),
+                      )
+                    ],
+                  )
+                ],
+              ),
             ),
           );
         });

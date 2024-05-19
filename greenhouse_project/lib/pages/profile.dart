@@ -11,7 +11,9 @@ library;
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/profile_cubit.dart';
@@ -172,6 +174,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
       appBar: createAltAppbar(context, "Profile"),
       body: Column(
         children: [
+          const SizedBox(height: 20.0),
           GestureDetector(
             child: ClipOval(
                 child: Image.memory(
@@ -187,13 +190,20 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           // Display user profile picture
 
           // Display user name
-          _buildProfileField("Name", userData.name),
+          const SizedBox(height: 20.0),
+          ProfileTextField(name: "Name", data: userData.name, icon: userIcon(),),
+          // _buildProfileField("Name", userData.name),
           // Display user email
-          _buildProfileField("Email", userData.email),
+          // _buildProfileField("Email", userData.email),
+          const SizedBox(height: 20.0),
+          ProfileTextField(name: "Email", data: userData.email, icon: emailIcon(),),
           // Display password (if user is viewing their own profile)
+          const SizedBox(height: 20.0),
           if (userData.email == widget.userCredential.user?.email)
-            _buildProfileField("Password", "*******"),
+            ProfileTextField(name: "Password", data: "********", icon: passwordIcon(),),
+            // _buildProfileField("Password", "*******"),
           // Action buttons based on user role and authorization
+          const SizedBox(height: 20.0),
           _buildActionButtons(userData),
         ],
       ),
@@ -232,8 +242,17 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                     showDialog(
                       context: context,
                       builder: (context) {
-                        return Dialog(
-                          child: _createEditDialog(),
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: BorderSide(
+                        color: Colors.transparent,
+                        width: 2.0), // Add border color and width
+                          ),
+                          title: const Text("Edit Profil"),
+                          content: SizedBox(
+                            width: double.maxFinite,
+                            child: _createEditDialog()),
                         );
                       },
                     );
@@ -258,82 +277,101 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
       child: BlocBuilder<ProfileEditCubit, List<bool>>(
         builder: (context, state) {
           return Column(
+            mainAxisSize: MainAxisSize.min, // Set column to minimum size
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               InputTextField(
                   controller: _nameController,
                   errorText: state[0]
                       ? ""
                       : "Name should be longer than 4 characters.",
-                  labelText: "name"),
+                  labelText: "Name"),
               InputTextField(
                   controller: _emailController,
                   errorText: state[1] ? "" : "Email format invalid.",
-                  labelText: "email"),
+                  labelText: "Email"),
               InputTextField(
                   controller: _passwordController,
                   errorText: state[2]
                       ? ""
                       : "Password should be longer than 8 characters.",
-                  labelText: "password"),
+                  labelText: "Password"),
               Row(
                 children: [
-                  GreenElevatedButton(
-                      text: "Submit",
-                      onPressed: () {
-                        List<bool> validation = [true, true, true];
-                        if (_nameController.text.length < 4) {
-                          validation[0] = !validation[0];
-                        }
-                        if (!_emailController.text
-                            .contains(RegExp(r'.+@.+\..+'))) {
-                          validation[1] = !validation[1];
-                        }
-                        if (_passwordController.text.length < 8 &&
-                            _passwordController.text.isNotEmpty) {
-                          validation[2] = !validation[2];
-                        }
-
-                        bool isValid = context
-                            .read<ProfileEditCubit>()
-                            .updateState(validation);
-
-                        if (isValid) {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return Dialog(
-                                  child: Column(
-                                    children: [
-                                      const Center(
-                                          child: Text("Enter Password")),
-                                      TextField(
-                                        controller: _passwordConfirmController,
-                                      ),
-                                      Row(
+                  Expanded(
+                    child: GreenElevatedButton(
+                        text: "Submit",
+                        onPressed: () {
+                          List<bool> validation = [true, true, true];
+                          if (_nameController.text.length < 4) {
+                            validation[0] = !validation[0];
+                          }
+                          if (!_emailController.text
+                              .contains(RegExp(r'.+@.+\..+'))) {
+                            validation[1] = !validation[1];
+                          }
+                          if (_passwordController.text.length < 8 &&
+                              _passwordController.text.isNotEmpty) {
+                            validation[2] = !validation[2];
+                          }
+                    
+                          bool isValid = context
+                              .read<ProfileEditCubit>()
+                              .updateState(validation);
+                    
+                          if (isValid) {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                      side: BorderSide(
+                                          color: Colors.transparent,
+                                          width: 2.0), // Add border color and width
+                                    ),
+                                    title: const Text("Enter Password"),
+                                    content: SizedBox(
+                                      width: double.maxFinite,
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          GreenElevatedButton(
-                                              text: "Confirm",
-                                              onPressed: () => _updateProfile(
-                                                  userInfoCubit,
-                                                  scaffoldMessenger)),
-                                          GreenElevatedButton(
-                                              text: "Cancel",
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                              })
+                                          InputTextField(
+                                            controller: _passwordConfirmController,
+                                            errorText: state[2]
+                                                ? ""
+                                                : "Password should be longer than 8 characters.",
+                                            labelText: "Password"),
+                                          Row(
+                                            children: [
+                                              GreenElevatedButton(
+                                                  text: "Confirm",
+                                                  onPressed: () => _updateProfile(
+                                                      userInfoCubit,
+                                                      scaffoldMessenger)),
+                                              GreenElevatedButton(
+                                                  text: "Cancel",
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  })
+                                            ],
+                                          )
                                         ],
-                                      )
-                                    ],
-                                  ),
-                                );
-                              });
-                        }
-                      }),
-                  WhiteElevatedButton(
-                      text: "Cancel",
-                      onPressed: () {
-                        Navigator.pop(context);
-                      }),
+                                      ),
+                                    ),
+                                  );
+                                });
+                          }
+                        }),
+                  ),
+                  Expanded(
+                    child: WhiteElevatedButton(
+                        text: "Cancel",
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }),
+                  ),
                 ],
               )
             ],
@@ -402,3 +440,20 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
         });
   }
 }
+
+
+Widget userIcon(){
+      
+      return const Icon(Icons.account_circle_outlined) ;
+
+    }
+Widget emailIcon(){
+      
+      return const Icon(Icons.mail_outline_outlined) ;
+
+    }
+Widget passwordIcon(){
+      
+      return const Icon(Icons.password_outlined) ;
+
+    }
