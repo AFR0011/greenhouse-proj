@@ -4,11 +4,14 @@ class EquipmentCubit extends GreenhouseCubit {
   final CollectionReference equipment =
       FirebaseFirestore.instance.collection('equipment');
 
+  bool _isActive = true;
+
   EquipmentCubit() : super(EquipmentLoading()) {
     _fetchEquipmentInfo();
   }
 
   _fetchEquipmentInfo() {
+    if (!_isActive) return;
     equipment
         .orderBy('status', descending: true)
         .snapshots()
@@ -18,6 +21,12 @@ class EquipmentCubit extends GreenhouseCubit {
 
       emit(EquipmentLoaded([...equipment]));
     });
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 

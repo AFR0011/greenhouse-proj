@@ -14,7 +14,7 @@ import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
-import 'package:greenhouse_project/utils/main_appbar.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatsPage extends StatelessWidget {
@@ -127,7 +127,8 @@ class _ChatsPageState extends State<_ChatsPageContent> {
 
     // Main page content
     return Scaffold(
-      appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      appBar: createMainAppBar(
+          context, widget.userCredential, _userReference, "Chats"),
       body: _buildChatsList(),
       bottomNavigationBar:
           createFooterNav(_selectedIndex, footerNavCubit, _userRole),

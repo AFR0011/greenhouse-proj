@@ -26,6 +26,7 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   void _getTasks() async {
+    if (!_isActive) return;
     DocumentSnapshot userSnapshot = await userReference.get();
     Map<String, dynamic> userData =
         await userSnapshot.data() as Map<String, dynamic>;
@@ -60,18 +61,13 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   void completeTask(DocumentReference taskReference) async {
-    taskReference.set(
-        [
-          {'status': 'waiting'}
-        ] as Map<String, dynamic>,
-        SetOptions(merge: true));
+    if (!_isActive) return;
+    taskReference.update({'status': 'waiting'});
   }
 
   void addTask(String title, String desc, DateTime dueDate,
       DocumentReference worker) async {
-    if (!_isActive) {
-      return;
-    }
+    if (!_isActive) return;
     try {
       DocumentReference externalId = await tasks.add({
         "title": title,
@@ -98,6 +94,7 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> removeTask(
       DocumentReference item, DocumentReference userReference) async {
+    if (!_isActive) return;
     emit(TaskLoading());
     try {
       Map<String, dynamic> data =
@@ -121,6 +118,7 @@ class TaskCubit extends Cubit<TaskState> {
 
   Future<void> updateTask(DocumentReference item, Map<String, dynamic> data,
       DocumentReference userReference) async {
+    if (!_isActive) return;
     emit(TaskLoading());
     try {
       await item.set(data, SetOptions(merge: true));

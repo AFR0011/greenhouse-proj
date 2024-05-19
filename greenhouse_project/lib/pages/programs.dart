@@ -15,6 +15,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/programs_cubit.dart';
 import 'package:greenhouse_project/services/cubit/program_edit_cubit.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
@@ -120,16 +121,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
   Widget _createProgramsPage() {
     return Scaffold(
       // Appbar (header)
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-
+      appBar: createAltAppbar(context, "Programs"),
       // Blocbuilder for programs state
       body:
           BlocBuilder<ProgramsCubit, ProgramsState>(builder: (context, state) {
@@ -176,22 +168,28 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                 subtitle: Text(program.creationDate.toString()),
                 trailing: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child:WhiteElevatedButton(onPressed: () {
-                      showDialog(context: context, builder: (context) => ProgramDetailsDialog(program: program));
-                    },
-                    text: "details",) 
-                    ),
+                    child: WhiteElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) =>
+                                ProgramDetailsDialog(program: program));
+                      },
+                      text: "details",
+                    )),
               );
             },
           ),
         ),
         Row(
           children: [
-            GreenElevatedButton(
-                text: "Create program",
-                onPressed: () {
-                  _showAdditionForm();
-                })
+            Center(
+              child: GreenElevatedButton(
+                  text: "Create program",
+                  onPressed: () {
+                    _showAdditionForm();
+                  }),
+            )
           ],
         )
       ],
@@ -367,7 +365,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                             "pending": _userRole == 'manager' ? false : true,
                           };
                           await programsCubit.updatePrograms(
-                              program.reference, data,userReference);
+                              program.reference, data, userReference);
                           _titleController.clear();
                           _limitController.clear();
                           Navigator.pop(context);
@@ -404,7 +402,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                     GreenElevatedButton(
                         text: "Submit",
                         onPressed: () async {
-                          await programsCubit.removeProgram(program.reference, userReference);
+                          await programsCubit.removeProgram(
+                              program.reference, userReference);
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

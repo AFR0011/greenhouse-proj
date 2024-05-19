@@ -14,7 +14,6 @@ import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
-import 'package:greenhouse_project/utils/chart.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
@@ -71,14 +70,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // Index of footer nav selection
   final int _selectedIndex = 2;
 
-  final List<String> _sensors = [
-    "gas",
-    "humidity",
-    "lightIntensity",
-    "soilMoisture",
-    "temperature"
-  ];
-
   // Dispose (destructor)
   @override
   void dispose() {
@@ -119,16 +110,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             _userReference = state.userReference;
             _enabled = state.enabled;
 
-            // Get device token for notifications
-
-            // Call function to create home page
-            if (_enabled) {
-              return Theme(data: customTheme, child: _createHomePage());
-            } else {
-              return Center(
-                  child: Theme(
-                      data: customTheme, child: _createHomePageDisabled()));
-            }
+            // Function call to build page
+            return Theme(data: customTheme, child: _createNotificationsPage());
           }
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {
@@ -144,8 +127,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  // Create greenhouse page function
-  Widget _createHomePage() {
+  // Create notifications page function
+  Widget _createNotificationsPage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
@@ -153,13 +136,10 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     return Scaffold(
       // Main appbar (header)
       appBar: createMainAppBar(
-          context, widget.userCredential, _userReference, "Welcome"),
+          context, widget.userCredential, _userReference, "Notifications"),
 
       // Call function to build notificaitons list
-      body: Builder(builder: (context) {
-        _buildReadingGraphs();
-        return const SizedBox();
-      }),
+      body: _buildNotifications(),
 
       // Footer nav bar
       bottomNavigationBar:
@@ -167,71 +147,70 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  Widget _buildReadingGraphs() {
-    // Plant status graphs
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: _sensors.map((sensor) {
-          return Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width - 40,
-              height: 400,
-              child: ChartClass(sensor: sensor),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
+  Widget _buildNotifications() {
+    return Column(
+      children: [
+        // Welcome message
+        Padding(
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          child: Center(
+              child:
+                  Text("Welcome Back, $_userName!", style: headingTextStyle)),
+        ),
 
-  _createHomePageDisabled() {
-    UserInfoCubit userInfoCubit = context.read<UserInfoCubit>();
-    AuthCubit authCubit = context.read<AuthCubit>();
+        // Notifications subheading
+        SizedBox(
+          width: MediaQuery.of(context).size.width - 20,
+          child: const Text(
+            "Notifications",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.left,
+          ),
+        ),
 
-    // Page content
-    return Scaffold(
-      // Main appbar (header)
-      appBar: AppBar(),
-
-      // Call function to build notificaitons list
-      body: Column(
-        children: [
-          const Text(
-              "Your account has been disabled by the greenhouse administration.\n If you don't work here anymore, please delete your account."),
-          Row(
-            children: [
-              GreenElevatedButton(
-                  text: "Delete Account",
-                  onPressed: () {
-                    userInfoCubit.deleteUserAccount(
-                        widget.userCredential, _userReference);
-                    showDialog(
-                        context: context,
-                        builder: (context) => Dialog(
-                              child: Column(
-                                children: [
-                                  const Text("All done!"),
-                                  Center(
-                                      child: GreenElevatedButton(
-                                          text: "OK",
-                                          onPressed: () => authCubit
-                                              .authLogoutRequest()
-                                              .then((value) =>
-                                                  Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const LoginPage())))))
-                                ],
-                              ),
-                            ));
-                  })
-            ],
-          )
-        ],
-      ),
+        // BlocBuilder for notifications
+        BlocBuilder<NotificationsCubit, HomeState>(
+          builder: (context, state) {
+            // Show "loading screen" if processing notification state
+            if (state is NotificationsLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            // Show equipment status once notification state is loaded
+            else if (state is NotificationsLoaded) {
+              List<NotificationData> notificationsList =
+                  state.notifications; // notifications list
+              // Display nothing if no notifications
+              if (notificationsList.isEmpty) {
+                return const Center(child: Text("No Notifications..."));
+              }
+              // Display notifications
+              else {
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: notificationsList.length,
+                  itemBuilder: (context, index) {
+                    NotificationData notification =
+                        notificationsList[index]; // notification data
+                    // Notification message
+                    return ListTile(
+                      title: Text(notification.message),
+                    );
+                  },
+                );
+              }
+            }
+            // Show error message once an error occurs
+            else if (state is NotificationsError) {
+              return Center(child: Text('Error: ${state.errorMessage}'));
+            }
+            // If the state is not any of the predefined states;
+            // never happens; but, anything can happen
+            else {
+              return const Center(child: Text('Unexpected State'));
+            }
+          },
+        ),
+      ],
     );
   }
 }

@@ -55,31 +55,30 @@ class _LoginPageState extends State<LoginPage>
     emailController.text = "admin@admin.com";
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: CustomPaint(
-              painter: WavePainter1(),
-              child: Container(
-                height: 300,
-              ),
-            ),
-          ),
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: CustomPaint(
-              painter: WavePainter(),
-              child: Container(
-                height: 300,
-              ),
-            ),
-          ),
-          BlocConsumer<AuthCubit, AuthState>(
+      body: Stack(children: [
+        // Positioned(
+        //   top: 0,
+        //   left: 0,
+        //   right: 0,
+        //   child: CustomPaint(
+        //     painter: WavePainter1(),
+        //     child: Container(
+        //       height: 300,
+        //     ),
+        //   ),
+        // ),
+        // Positioned(
+        //   top: 0,
+        //   left: 0,
+        //   right: 0,
+        //   child: CustomPaint(
+        //     painter: WavePainter(),
+        //     child: Container(
+        //       height: 300,
+        //     ),
+        //   ),
+        // ),
+        BlocConsumer<AuthCubit, AuthState>(
           builder: (context, state) {
             // Show "loading screen" if auth request is being processed
             if (state is AuthLoading) {
@@ -92,12 +91,10 @@ class _LoginPageState extends State<LoginPage>
               // Content
               Padding(
                 padding: const EdgeInsets.all(25.0),
-                child:SafeArea(
+                child: SafeArea(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      
-                    
                       const Padding(
                         padding: EdgeInsets.only(bottom: 60),
                         child: Text(
@@ -112,18 +109,20 @@ class _LoginPageState extends State<LoginPage>
                           filled: true,
                           fillColor: theme.colorScheme.secondary,
                           labelText: 'Email',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20)),
                         ),
                       ),
                       const SizedBox(height: 20.0),
                       TextField(
                         controller: passwordController,
-                        obscureText:  _isSecurePassword,
-                        decoration:  InputDecoration(
+                        obscureText: _isSecurePassword,
+                        decoration: InputDecoration(
                           filled: true,
                           fillColor: Colors.white70,
                           labelText: 'Password',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20)),
                           suffixIcon: togglePassword(),
                         ),
                       ),
@@ -131,7 +130,8 @@ class _LoginPageState extends State<LoginPage>
                       ElevatedButton(
                         onPressed: () {
                           context.read<AuthCubit>().authLoginRequest(
-                              emailController.text.trim(), passwordController.text);
+                              emailController.text.trim(),
+                              passwordController.text);
                         },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
@@ -165,7 +165,7 @@ class _LoginPageState extends State<LoginPage>
             }
           },
         ),
-     ] ),
+      ]),
     );
   }
 
@@ -182,4 +182,3 @@ class _LoginPageState extends State<LoginPage>
         color: Colors.grey);
   }
 }
-

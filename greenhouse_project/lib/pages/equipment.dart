@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/equipment_status_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
@@ -106,15 +107,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // Create equipment page function
   Widget _createEquipmentPage() {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
+      appBar: createAltAppbar(context, "Equipment"),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -140,16 +133,22 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   }
                   // Display equipment
                   else {
-                    
                     return GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2),
                       shrinkWrap: true,
                       itemCount: equipmentList.length,
                       itemBuilder: (context, index) {
                         EquipmentStatus equipment =
                             equipmentList[index]; //equipment data
                         // Display equipment info
-                        return ToggleButtonContainer(context: context, equipment: equipment, userReference: _userReference, icon: const Icon(Icons.accessibility),);
+                        return ToggleButtonContainer(
+                          context: context,
+                          equipment: equipment,
+                          userReference: _userReference,
+                          icon: const Icon(Icons.accessibility),
+                        );
                         // ListTile(
                         //   title: Text(equipment.type),
                         //   subtitle: Text(equipment.status.toString()),

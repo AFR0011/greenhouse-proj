@@ -17,7 +17,7 @@ import 'package:greenhouse_project/services/cubit/inventory_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/input.dart';
-import 'package:greenhouse_project/utils/main_appbar.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 import 'package:list_utilities/list_utilities.dart';
@@ -116,7 +116,6 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             );
           }
           // Show content once user info is loaded
-          // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
             _userRole = state.userRole;
@@ -153,7 +152,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     // Page content
     return Scaffold(
       // Main appbar (header)
-      appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      appBar: createMainAppBar(
+          context, widget.userCredential, _userReference, "Inventory"),
 
       // Scrollable list of items
       body: SingleChildScrollView(
@@ -222,11 +222,15 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                 // Buttons for edit and deleting items
                 trailing: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child:WhiteElevatedButton(onPressed: () {
-                      showDialog(context: context, builder: (context) => InventoryDetailsDialog(inventory:inventory));
-                    },
-                    text: "details",) 
-                    ),
+                    child: WhiteElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) =>
+                                InventoryDetailsDialog(inventory: inventory));
+                      },
+                      text: "details",
+                    )),
               );
             },
           ),
@@ -236,43 +240,47 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         const Text("Pending Updates", style: subheadingTextStyle),
         SizedBox(
           height: MediaQuery.of(context).size.height / 3,
-          child: pendingInventory != null && pendingInventory.isNotEmpty
-          ?  ListView.builder(
-            shrinkWrap: true,
-            itemCount: pendingInventory.length,
-            itemBuilder: (context, index) {
-              InventoryData inventory = pendingInventory[index];
-              return ListTile(
-                title: Text(inventory.name),
-                subtitle: Text(inventory.timeAdded.toString()),
-                trailing: _userRole == 'manager'
-                    ? FittedBox(
-                        child: Row(
-                        children: [
-                          GreenElevatedButton(
-                              text: "Approve",
-                              onPressed: () {
-                                context.read<InventoryCubit>().approveItem(
-                                    inventory.reference, _userReference);
-                              }),
-                          GreenElevatedButton(
-                              text: "Deny",
-                              onPressed: () {
-                                context.read<InventoryCubit>().removeInventory(
-                                    inventory.reference, _userReference);
-                              })
-                        ],
-                      ))
-                    : Text(inventory.amount.toString()),
-              );
-            },
-          )
-          : const Center(
-            child: Text(
-              "No pending updates",
-            style: TextStyle(color: Colors.grey),
-            ),
-          ),
+          child: pendingInventory.isNotEmpty
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: pendingInventory.length,
+                  itemBuilder: (context, index) {
+                    InventoryData inventory = pendingInventory[index];
+                    return ListTile(
+                      title: Text(inventory.name),
+                      subtitle: Text(inventory.timeAdded.toString()),
+                      trailing: _userRole == 'manager'
+                          ? FittedBox(
+                              child: Row(
+                              children: [
+                                GreenElevatedButton(
+                                    text: "Approve",
+                                    onPressed: () {
+                                      context
+                                          .read<InventoryCubit>()
+                                          .approveItem(inventory.reference,
+                                              _userReference);
+                                    }),
+                                GreenElevatedButton(
+                                    text: "Deny",
+                                    onPressed: () {
+                                      context
+                                          .read<InventoryCubit>()
+                                          .removeInventory(inventory.reference,
+                                              _userReference);
+                                    })
+                              ],
+                            ))
+                          : Text(inventory.amount.toString()),
+                    );
+                  },
+                )
+              : const Center(
+                  child: Text(
+                    "No pending updates",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
         ),
 
         // Add item button
@@ -510,34 +518,41 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         context: context,
         builder: (context) {
           return SimpleDialog(
-            title: Expanded(child:  Text("Are you Sure?",textAlign:TextAlign.center, style:  TextStyle(fontSize: 15,fontWeight: FontWeight.bold),)),
-            children: [Column(
+              title: const Expanded(
+                  child: Text(
+                "Are you Sure?",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              )),
               children: [
-                Row(
+                Column(
                   children: [
-                    GreenElevatedButton(
-                        text: "Submit",
-                        onPressed: () async {
-                          inventoryCubit
-                              .removeInventory(
-                                  inventory.reference, _userReference)
-                              .then((value) {
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("Item Deleted succesfully")));
-                          });
-                        }),
-                    WhiteElevatedButton(
-                        text: "Cancel",
-                        onPressed: () {
-                          Navigator.pop(context);
-                        })
+                    Row(
+                      children: [
+                        GreenElevatedButton(
+                            text: "Submit",
+                            onPressed: () async {
+                              inventoryCubit
+                                  .removeInventory(
+                                      inventory.reference, _userReference)
+                                  .then((value) {
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content:
+                                            Text("Item Deleted succesfully")));
+                              });
+                            }),
+                        WhiteElevatedButton(
+                            text: "Cancel",
+                            onPressed: () {
+                              Navigator.pop(context);
+                            })
+                      ],
+                    )
                   ],
-                )
-              ],
-            ),
-          ]);
+                ),
+              ]);
         });
   }
 }

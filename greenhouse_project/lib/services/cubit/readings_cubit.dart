@@ -4,11 +4,14 @@ class ReadingsCubit extends GreenhouseCubit {
   final CollectionReference readings =
       FirebaseFirestore.instance.collection('readings');
 
+  bool _isActive = true;
+
   ReadingsCubit() : super(ReadingsLoading()) {
     _fetchReadingInfo();
   }
 
   _fetchReadingInfo() {
+    if (!_isActive) return;
     readings.snapshots().listen((snapshot) {
       final List<ReadingsData> readings =
           snapshot.docs.map((doc) => ReadingsData.fromFirestore(doc)).toList();
@@ -17,6 +20,12 @@ class ReadingsCubit extends GreenhouseCubit {
     }, onError: (error) {
       emit(ReadingsError(error.toString()));
     });
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 
