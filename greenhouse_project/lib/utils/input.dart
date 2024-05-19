@@ -4,7 +4,9 @@
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/equipment_status_cubit.dart';
 import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
@@ -134,8 +136,12 @@ class InputDropdown extends StatelessWidget {
 
 class TaskDetailsDialog extends StatelessWidget {
   final TaskData task;
+  final String userRole;
+  final Function showEditForm;
+  final Function showDeleteForm;
 
-  const TaskDetailsDialog({super.key, required this.task});
+
+  const TaskDetailsDialog({super.key, required this.task, required this.userRole, required this.showEditForm, required this.showDeleteForm});
 
   @override
   Widget build(BuildContext context) {
@@ -162,15 +168,58 @@ class TaskDetailsDialog extends StatelessWidget {
                     .substring(0, task.dueDate.toString().length - 7)),
             _buildDetailRow("Status:", task.status),
             SizedBox(height: 20), // Add spacing between details and buttons
+            userRole == "worker"
+                               ? Row(
+                                   children: [
+                                     Expanded(
+                                       child: WhiteElevatedButton(
+                                           text: "Contact Manager",
+                                           onPressed: () {}),
+                                     ),
+                                     Expanded(
+                                       child: WhiteElevatedButton(
+                                           text: "Mark as Complete",
+                                           onPressed: () {
+                                             context
+                                                 .read<TaskCubit>()
+                                                 .completeTask(
+                                                     task.taskReference);
+                                           }),
+                                     )
+                                   ],
+                                 )
+                               : Row(children: [
+                                   Expanded(
+                                     child: WhiteElevatedButton(
+                                         text: "Edit", onPressed: showEditForm()),
+                                   ),
+                                   Expanded(
+                                     child: RedElevatedButton(
+                                         text: "Delete", onPressed: showDeleteForm()),
+                                   ),
+                                   
+                                   task.status == "waiting"
+                                       ? Expanded(
+                                         child: GreenElevatedButton(
+                                             text: "Approve",
+                                             onPressed: () {}),
+                                       )
+                                       : const SizedBox(),
+                                   
+                                 ]),
+
+            SizedBox(height: 20),
+            
             Align(
               alignment: Alignment.center,
-              child: ElevatedButton(
+              child: WhiteElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
                 },
-                child: Text("Close"),
+                text: "close",
               ),
             ),
+
           ],
         ),
       ),
@@ -210,8 +259,11 @@ class TaskDetailsDialog extends StatelessWidget {
 
 class EmployeeDetailsDialog extends StatelessWidget {
   final EmployeeData employee;
+  final Function tasksFunction;
+  final Function toggleAccount;
+  final Function profileFunction;
 
-  const EmployeeDetailsDialog({super.key, required this.employee});
+  const EmployeeDetailsDialog({super.key, required this.employee, required this.tasksFunction, required this.profileFunction, required this.toggleAccount});
 
   @override
   Widget build(BuildContext context) {
@@ -240,6 +292,36 @@ class EmployeeDetailsDialog extends StatelessWidget {
             _buildDetailRow(
                 "Status:", employee.enabled ? "Enabled" : "Disabled"),
             SizedBox(height: 20), // Add spacing between details and buttons
+
+              Row(
+                                  children: [
+                                    Expanded(
+                                      child: WhiteElevatedButton(
+                                          text: "Tasks",
+                                          onPressed: () {
+                                           tasksFunction();
+                                          }),
+                                    ),
+                                    Expanded(
+                                      child: WhiteElevatedButton(
+                                          text: "Show profile",
+                                          onPressed: () {
+                                            profileFunction();
+                                          }),
+                                    ),
+                                    Expanded(
+                                      child: RedElevatedButton(
+                                          text: employee.enabled
+                                              ? "Disable account"
+                                              : "Enable account",
+                                          onPressed: () {
+                                            toggleAccount();
+                                          }),
+                                    ),
+                                  ],
+                                ),
+              SizedBox(height: 20),
+            
             Align(
               alignment: Alignment.center,
               child: WhiteElevatedButton(
@@ -288,8 +370,11 @@ class EmployeeDetailsDialog extends StatelessWidget {
 
 class InventoryDetailsDialog extends StatelessWidget {
   final InventoryData inventory;
+  final Function editInventory;
+  final Function deleteInventory;
 
-  const InventoryDetailsDialog({super.key, required this.inventory});
+
+  const InventoryDetailsDialog({super.key, required this.inventory, required this.editInventory, required this.deleteInventory});
 
   @override
   Widget build(BuildContext context) {
@@ -316,6 +401,28 @@ class InventoryDetailsDialog extends StatelessWidget {
                     .toString()
                     .substring(0, inventory.timeAdded.toString().length - 7)),
             SizedBox(height: 20), // Add spacing between details and buttons
+            Row(
+                                  children: [
+                                    Expanded(
+                                      child: WhiteElevatedButton(
+                                          text: "Edit",
+                                          onPressed: () {
+                                           editInventory();
+                                          }),
+                                    ),
+                                    
+                                    Expanded(
+                                      child: RedElevatedButton(
+                                          text:
+                                               "Delete",
+                                          onPressed: () {
+                                            deleteInventory();
+                                          }),
+                                    ),
+                                  ],
+                                ),
+              SizedBox(height: 20),
+            
             Align(
               alignment: Alignment.center,
               child: WhiteElevatedButton(
