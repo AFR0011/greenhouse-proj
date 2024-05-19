@@ -1,0 +1,88 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:greenhouse_project/pages/tasks.dart';
+import 'package:greenhouse_project/utils/text_styles.dart';
+import 'package:greenhouse_project/utils/theme.dart';
+
+class BoxLink extends StatefulWidget {
+  final String text;
+  final String imgPath;
+  final BuildContext context;
+  final DocumentReference userReference;
+  final UserCredential userCredential;
+  final PageRoute pageRoute;
+
+  const BoxLink({
+    required this.text,
+    required this.imgPath,
+    required this.context,
+    required this.userReference,
+    required this.userCredential,
+    required this.pageRoute
+  });
+
+  @override
+  _BoxLinkState createState() => _BoxLinkState();
+}
+
+class _BoxLinkState extends State<BoxLink> {
+  late Color containerColor;
+
+  @override
+  void initState() {
+    super.initState();
+    containerColor = theme.colorScheme.primary; // Initialize with primary color
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData customTheme = theme;
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: containerColor,
+      ),
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            widget.pageRoute
+          );
+        },
+        onHover: (isHover) {
+          setState(() {
+            containerColor = isHover
+                ? customTheme.colorScheme.secondary
+                : customTheme.colorScheme.primary;
+          });
+        },
+        child: Column(
+          children: [
+            Image.asset(
+              widget.imgPath, // Display the image
+              height: 170,
+              width: 170,
+              fit: BoxFit.cover,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+              child: Row(
+                children: [
+                  Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(
+                      widget.text,
+                      style: subheadingTextStyle,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

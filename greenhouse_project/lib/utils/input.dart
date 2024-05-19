@@ -534,10 +534,10 @@ class ToggleButtonContainer extends StatelessWidget {
             color: equipment.status
                 ? theme.colorScheme.primary
                 : theme.colorScheme.secondary),
-        margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.05),
+        margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
         // color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary,
-        width: MediaQuery.of(context).size.width * 0.4,
-        height: MediaQuery.of(context).size.width * 0.4,
+        width: MediaQuery.of(context).size.width * 0.5,
+        height: MediaQuery.of(context).size.width * 0.5,
         child: Column(
           children: [
             Row(children: [
@@ -562,7 +562,7 @@ class ToggleButtonContainer extends StatelessWidget {
               )
             ]),
             Align(
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.bottomLeft,
                 child: Text(
                   equipment.type,
                   style: subheadingTextStyle,

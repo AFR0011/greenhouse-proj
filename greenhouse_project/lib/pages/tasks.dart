@@ -150,11 +150,6 @@ class _TasksPageState extends State<_TasksPageContent> {
         children: [
           SizedBox(
             width: MediaQuery.of(context).size.width - 20,
-            child: const Text(
-              "Tasks",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.left,
-            ),
           ),
           // BlocBuilder for tasks
           BlocBuilder<TaskCubit, TaskState>(

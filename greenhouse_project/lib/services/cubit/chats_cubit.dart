@@ -61,10 +61,12 @@ class ChatsCubit extends Cubit<ChatsState> {
 class ChatsData {
   final DateTime creationDate;
   final Map<String, dynamic>? receiverData;
+  final Uint8List receiverPicture;
   final DocumentReference reference;
 
   ChatsData(
       {required this.receiverData,
+      required this.receiverPicture,
       required this.creationDate,
       required this.reference});
 
@@ -87,10 +89,10 @@ class ChatsData {
         .getData();
 
     receiverData['reference'] = receiverReference;
-    receiverData['picture'] = receiverPicture;
 
     return ChatsData(
         receiverData: receiverData,
+        receiverPicture: receiverPicture!,
         creationDate: (data['creationDate'] as Timestamp).toDate(),
         reference: doc.reference);
   }
