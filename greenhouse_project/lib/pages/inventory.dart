@@ -205,7 +205,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
 
   // Create inventory list function
   Widget _createInventoryList(
-      List actualInventory, List pendingInventory, BuildContext context) {
+      List actualInventory, List pendingInventory, BuildContext mainContext) {
     return Column(
       children: [
         // Main inventory items
@@ -215,6 +215,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             shrinkWrap: true,
             itemCount: actualInventory.length,
             itemBuilder: (context, index) {
+              
               InventoryData inventory = actualInventory[index];
               return ListTile(
                 title: Text(inventory.name),
@@ -228,7 +229,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                         showDialog(
                             context: context,
                             builder: (context) =>
-                                InventoryDetailsDialog(inventory: inventory));
+                                InventoryDetailsDialog(inventory: inventory, editInventory: () => showEditForm(mainContext, inventory), deleteInventory: () => showDeleteForm(mainContext, inventory)));
                       },
                       text: "details",
                     )),
@@ -436,12 +437,11 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   }
 
   // Item edit form function
-  void _showEditForm(BuildContext context, InventoryData inventory) {
+  void showEditForm(BuildContext context, InventoryData inventory) {
     // Get instance of inventory cubit from main context
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
     InventoryEditCubit inventoryEditCubit =
         BlocProvider.of<InventoryEditCubit>(context);
-
     showDialog(
         context: context,
         builder: (context) {
@@ -450,94 +450,129 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           _descController.text = inventory.description;
           _amountController.text = inventory.amount.toString();
 
-          return Dialog(
-            child: BlocBuilder<InventoryEditCubit, List<bool>>(
+          return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                  side: BorderSide(
+                      color: Colors.transparent,
+                      width: 2.0), // Add border color and width
+                ),
+          title: Text("Edit Inventory"),
+            content: 
+             BlocBuilder<InventoryEditCubit, List<bool>>(
               bloc: inventoryEditCubit,
               builder: (context, state) {
-                return Column(
-                  // Textfields
-                  children: [
-                    TextField(
-                      controller: _equipmentController,
-                      decoration: InputDecoration(
-                          errorText: state[0]
-                              ? ""
-                              : "Name should be longer than 1 characters."),
-                    ),
-                    TextField(
-                      controller: _descController,
-                      decoration: InputDecoration(
-                          errorText: state[1]
-                              ? ""
-                              : "Description should be longer than 2 characters."),
-                    ),
-                    TextFormField(
-                      controller: _amountController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                      decoration: InputDecoration(
-                          errorText:
-                              state[2] ? "" : "Amount should be more than 0."),
-                    ),
-                    // Submit and Cancel buttons
-                    Row(
-                      children: [
-                        GreenElevatedButton(
-                            text: "Submit",
-                            onPressed: () async {
-                              List<bool> validation = [true, true, true];
-                              if (_equipmentController.text.length < 1) {
-                                validation[0] = !validation[0];
-                              }
-                              if (_descController.text.length < 2) {
-                                validation[1] = !validation[1];
-                              }
-                              if (_amountController.text.isEmpty ||
-                                  int.parse(_amountController.text) <= 0) {
-                                validation[2] = !validation[2];
-                              }
-
-                              bool isValid =
-                                  inventoryEditCubit.updateState(validation);
-                              if (!isValid) {
-                              } else {
-                                Map<String, dynamic> data = {
-                                  "amount": num.parse(_amountController.text),
-                                  "description": _descController.text,
-                                  "name": _equipmentController.text,
-                                  "timeAdded": DateTime.now(),
-                                  "pending":
-                                      _userRole == 'manager' ? false : true,
-                                };
-
-                                inventoryCubit
-                                    .updateInventory(inventory.reference, data,
-                                        _userReference)
-                                    .then((value) {
+                return Container(
+                  width: double.maxFinite, 
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    // Textfields
+                    children: [
+                      InputTextField(controller:  _equipmentController, errorText: state[0]? "": "Name should be longer than 1 characters.", labelText: "Name"),
+                      // TextField(
+                      //   controller: _equipmentController,
+                      //   decoration: InputDecoration(
+                      //       errorText: state[0]
+                      //           ? ""
+                      //           : "Name should be longer than 1 characters."),
+                      // ),
+                      InputTextField(controller: _descController, errorText: state[1]? "": "Description should be longer than 2 characters.", labelText: "Description"),
+                      // TextField(
+                      //   controller: _descController,
+                      //   decoration: InputDecoration(
+                      //       errorText: state[1]
+                      //           ? ""
+                      //           : "Description should be longer than 2 characters."),
+                      // ),
+                      TextFormField(
+                        controller: _amountController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        decoration: InputDecoration(
+                          constraints:BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                          labelText: "Amount",
+                          filled: true,
+                          fillColor: theme.colorScheme.secondary,
+                            errorText:
+                                state[2] ? "" : "Amount should be more than 0.",
+                                border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),)
+                        // controller: _amountController,
+                        // keyboardType: TextInputType.number,
+                        // inputFormatters: <TextInputFormatter>[
+                        //   FilteringTextInputFormatter.digitsOnly
+                        // ],
+                        // decoration: InputDecoration(
+                        //     errorText:
+                        //         state[2] ? "" : "Amount should be more than 0."),
+                      ),
+                      // Submit and Cancel buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GreenElevatedButton(
+                                text: "Submit",
+                                onPressed: () async {
+                                  List<bool> validation = [true, true, true];
+                                  if (_equipmentController.text.length < 1) {
+                                    validation[0] = !validation[0];
+                                  }
+                                  if (_descController.text.length < 2) {
+                                    validation[1] = !validation[1];
+                                  }
+                                  if (_amountController.text.isEmpty ||
+                                      int.parse(_amountController.text) <= 0) {
+                                    validation[2] = !validation[2];
+                                  }
+                                              
+                                  bool isValid =
+                                      inventoryEditCubit.updateState(validation);
+                                  if (!isValid) {
+                                  } else {
+                                    Map<String, dynamic> data = {
+                                      "amount": num.parse(_amountController.text),
+                                      "description": _descController.text,
+                                      "name": _equipmentController.text,
+                                      "timeAdded": DateTime.now(),
+                                      "pending":
+                                          _userRole == 'manager' ? false : true,
+                                    };
+                                              
+                                    inventoryCubit
+                                        .updateInventory(inventory.reference, data,
+                                            _userReference)
+                                        .then((value) {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                      _equipmentController.clear();
+                                      _descController.clear();
+                                      _amountController.clear();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                              content:
+                                                  Text("Item Edited succesfully")));
+                                    });
+                                  }
+                                }),
+                          ),
+                          Expanded(
+                            child: WhiteElevatedButton(
+                                text: "Cancel",
+                                onPressed: () {
                                   Navigator.pop(context);
                                   _equipmentController.clear();
                                   _descController.clear();
                                   _amountController.clear();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content:
-                                              Text("Item Edited succesfully")));
-                                });
-                              }
-                            }),
-                        WhiteElevatedButton(
-                            text: "Cancel",
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _equipmentController.clear();
-                              _descController.clear();
-                              _amountController.clear();
-                            })
-                      ],
-                    )
-                  ],
+                                }),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 );
               },
             ),
@@ -546,47 +581,55 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   }
 
   // Create item deletion form function
-  void _showDeleteForm(BuildContext context, InventoryData inventory) {
+  void showDeleteForm(BuildContext context, InventoryData inventory) {
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
     showDialog(
         context: context,
         builder: (context) {
-          return SimpleDialog(
-              title: const Expanded(
-                  child: Text(
-                "Are you Sure?",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              )),
-              children: [
-                Column(
+          return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: BorderSide(
+                        color: Colors.transparent,
+                        width: 2.0), // Add border color and width
+                  ),
+                  title: Text("Are you sure?"),
+                  content: Container(
+                  width: double.maxFinite, // Set maximum width
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        GreenElevatedButton(
-                            text: "Submit",
-                            onPressed: () async {
-                              inventoryCubit
-                                  .removeInventory(
-                                      inventory.reference, _userReference)
-                                  .then((value) {
+                        Expanded(
+                          child: RedElevatedButton(
+                              text: "Yes",
+                              onPressed: () async {
+                                inventoryCubit
+                                    .removeInventory(
+                                        inventory.reference, _userReference)
+                                    .then((value) {
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text("Item deleted succesfully")));
+                                });
+                              }),
+                        ),
+                        Expanded(
+                          child: WhiteElevatedButton(
+                              text: "No",
+                              onPressed: () {
                                 Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content:
-                                            Text("Item Deleted succesfully")));
-                              });
-                            }),
-                        WhiteElevatedButton(
-                            text: "Cancel",
-                            onPressed: () {
-                              Navigator.pop(context);
-                            })
+                              }),
+                        )
                       ],
                     )
                   ],
                 ),
-              ]);
+              ));
         });
   }
 }

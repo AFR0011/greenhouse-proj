@@ -10,6 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/pages/profile.dart';
+import 'package:greenhouse_project/pages/tasks.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
@@ -38,6 +40,7 @@ class EmployeesPage extends StatelessWidget {
           create: (context) => UserInfoCubit(),
         ),
         BlocProvider(create: (context) => ManageEmployeesCubit(userCredential)),
+        BlocProvider(create: (context) => EmployeeEditCubit()),
       ],
       child: _EmployeesPageContent(userCredential: userCredential),
     );
@@ -103,9 +106,11 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
 
   // Function to create employees page
   Widget _createEmployeesPage() {
+    
     final ManageEmployeesCubit manageEmployeesCubit =
         BlocProvider.of<ManageEmployeesCubit>(context);
-
+    final EmployeeEditCubit employeeEditCubit =
+        BlocProvider.of<EmployeeEditCubit>(context);
     return Scaffold(
       // Appbar (header)
       appBar: AppBar(
@@ -138,8 +143,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
               }
               // Show employees if manageEmployees state is loaded
               else if (state is ManageEmployeesLoaded) {
-                List<EmployeeData> employeeList =
-                    state.employees; // employees list
+                List<EmployeeData> employeeList = state.employees; // employees list
 
                 // Display nothing if no employees
                 if (employeeList.isEmpty) {
@@ -151,20 +155,107 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                     shrinkWrap: true,
                     itemCount: employeeList.length,
                     itemBuilder: (context, index) {
-                      EmployeeData employee =
-                          employeeList[index]; // employee info
+                      EmployeeData employee = employeeList[index]; // employee info
+                      void tasksFunction() {
+                            Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  TasksPage(
+                                    userCredential: widget
+                                        .userCredential,
+                                    userReference:
+                                        employee.reference,
+                                  )));
+                      }
+                      void toggleAccount() {
+                        showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            side: BorderSide(
+                                color: Colors.transparent,
+                                width: 2.0), // Add border color and width
+                          ),
+                            title: const Text("Are you sure"),
+                              content: SizedBox(
+                                width: double.maxFinite,
+                                child: Column(
+                                mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                Center(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: GreenElevatedButton(
+                                            text: "Confirm",
+                                            onPressed: () {
+                                              if (employee
+                                                  .enabled) {
+                                                manageEmployeesCubit
+                                                    .disableEmployee(
+                                                        employee)
+                                                    .then((_) {
+                                                       Navigator.pop(context);Navigator.pop(context);
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(
+                                                            content:
+                                                                Text("Account disabled successfuly!")));
+                                                    });
+                                              } else {
+                                                manageEmployeesCubit
+                                                    .enableEmployee(
+                                                        employee)
+                                                    .then((_) { 
+                                                      Navigator.pop(context);Navigator.pop(context);
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                            const SnackBar(
+                                                                content:
+                                                                    Text("Account enabled successfuly!")));});
+                                              }
+                                            }),
+                                      ),
+                                      Expanded(
+                                        child: WhiteElevatedButton(
+                                            text: "Go Back",
+                                            onPressed: () =>
+                                                Navigator.pop(
+                                                    context)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                                            ],
+                                                          ),
+                              ));
+                        });
+                      }
+                      void profileFunction() {
+                        Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ProfilePage(
+                                                          userCredential: widget
+                                                              .userCredential,
+                                                          userReference: employee
+                                                              .reference)));
+                      }
                       return ListTile(
                         title: Text(employee.name),
-                        subtitle:
-                            Text(employee.enabled ? "Active" : "Inactive"),
+                        subtitle: Text(employee.enabled ? "Active" : "Inactive"),
                         trailing: WhiteElevatedButton(
                           text: 'Details',
                           onPressed: () {
                             showDialog(
+                              
                               context: context,
                               builder: (context) {
-                                return EmployeeDetailsDialog(
-                                    employee: employee);
+                                
+                            return EmployeeDetailsDialog(employee: employee, tasksFunction: tasksFunction, toggleAccount: toggleAccount,profileFunction: profileFunction,);
+                                
                               },
                             );
                           },
@@ -192,110 +283,68 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                 showDialog(
                     context: context,
                     builder: (context) {
-                      return MultiBlocProvider(
-                        providers: [
-                          BlocProvider(
-                              create: (context) => EmployeeEditCubit()),
-                          BlocProvider(
-                              create: (context) =>
-                                  EmployeeDropdownCubit(context)),
-                        ],
-                        child: BlocBuilder<EmployeeEditCubit, List<dynamic>>(
-                          builder: (context, state) {
-                            return AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                side: const BorderSide(
-                                    color: Colors.transparent,
-                                    width: 2.0), // Add border color and width
+                      return BlocBuilder<EmployeeEditCubit, List<dynamic>>(
+                        bloc: employeeEditCubit,
+                        builder: (context, state) {
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            side: BorderSide(
+                                color: Colors.transparent,
+                                width: 2.0), // Add border color and width
+                          ),
+                            title: const Text("Add employee"),
+                            content: SizedBox(
+                              width: double.maxFinite,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                //Textfields
+                                children: [
+                                  // InputTextField(controller: _emailController, labelText: "email"),
+                                  SizedBox(width: double.maxFinite , child: InputDropdown(items: const {"employee": "employee", "manager": "manager"}, value:state != '' ? state : "worker", onChanged: employeeEditCubit.updateState,)),
+                                  //Submit or Cancel
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GreenElevatedButton(
+                                            text: 'Submit',
+                                            onPressed: () async {
+                                              await manageEmployeesCubit.createEmployee(
+                                                  _emailController.text,
+                                                  state[1],
+                                                  _userReference);
+                                              Navigator.pop(context);
+                                              _emailController.clear();
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(const SnackBar(
+                                                      content: Text(
+                                                          "HI THERE, THIS WORKED!!!")));
+                                            }),
+                                      ),
+                                      Expanded(
+                                        child: WhiteElevatedButton(
+                                            text: 'Cancel',
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              _emailController.clear();
+                                            }),
+                                      )
+                                    ],
+                                  )
+                                ],
                               ),
-                              title: const Text("Add employee"),
-                              content: SizedBox(
-                                width: double.maxFinite,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize
-                                      .min, // Set column to minimum size
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  //Textfields
-                                  children: [
-                                    InputTextField(
-                                        controller: _emailController,
-                                        errorText: state[0]
-                                            ? ""
-                                            : "Email format is incorrect",
-                                        labelText: "email"),
-                                    SizedBox(
-                                        width: double.maxFinite,
-                                        child: InputDropdown(
-                                          items: const {
-                                            "worker": "worker",
-                                            "manager": "manager"
-                                          },
-                                          value: state[1] != ''
-                                              ? state[1]
-                                              : "employee",
-                                          onChanged: context
-                                              .read<EmployeeDropdownCubit>()
-                                              .updateDropdown,
-                                        )),
-                                    //Submit or Cancel
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: GreenElevatedButton(
-                                              text: 'Submit',
-                                              onPressed: () async {
-                                                List<dynamic> validation = [
-                                                  true,
-                                                  state[1]
-                                                ];
-                                                if (!_emailController.text
-                                                    .contains(
-                                                        RegExp(r'.+@.+\..+'))) {
-                                                  validation[0] =
-                                                      !validation[0];
-                                                }
-
-                                                bool isValid = context
-                                                    .read<EmployeeEditCubit>()
-                                                    .updateState(validation);
-
-                                                if (isValid) {
-                                                  await manageEmployeesCubit
-                                                      .createEmployee(
-                                                          _emailController.text,
-                                                          state[1],
-                                                          _userReference);
-                                                  Navigator.pop(context);
-                                                  _emailController.clear();
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(const SnackBar(
-                                                          content: Text(
-                                                              "Account created successfully!")));
-                                                }
-                                              }),
-                                        ),
-                                        Expanded(
-                                          child: WhiteElevatedButton(
-                                              text: 'Cancel',
-                                              onPressed: () {
-                                                Navigator.pop(context);
-                                                _emailController.clear();
-                                              }),
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
                       );
                     });
               })
         ],
       ),
     );
+    
   }
+
+
 }

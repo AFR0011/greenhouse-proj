@@ -239,23 +239,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
               ? WhiteElevatedButton(
                   text: "Edit",
                   onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    side: BorderSide(
-                        color: Colors.transparent,
-                        width: 2.0), // Add border color and width
-                          ),
-                          title: const Text("Edit Profil"),
-                          content: SizedBox(
-                            width: double.maxFinite,
-                            child: _createEditDialog()),
-                        );
-                      },
-                    );
+                    _createEditDialog();
                   },
                 )
               : WhiteElevatedButton(text: "Message", onPressed: () {}),
@@ -263,7 +247,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   }
 
   // Function to create profile edit form
-  Widget _createEditDialog() {
+   void _createEditDialog() {
     // Get instance of cubit from main context
     UserInfoCubit userInfoCubit = BlocProvider.of<UserInfoCubit>(context);
 
@@ -271,7 +255,20 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     ScaffoldMessengerState scaffoldMessenger = ScaffoldMessenger.of(context);
 
     // Provide profile edit cubit
-    return BlocProvider(
+                        showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          side: BorderSide(
+                        color: Colors.transparent,
+                        width: 2.0), // Add border color and width
+                          ),
+                          title: const Text("Edit Profil"),
+                          content: SizedBox(
+                            width: double.maxFinite,
+                            child:  BlocProvider(
       create: (context) => ProfileEditCubit(),
       // BlocBuilder for profile edit state
       child: BlocBuilder<ProfileEditCubit, List<bool>>(
@@ -320,6 +317,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                               .updateState(validation);
                     
                           if (isValid) {
+                            Navigator.pop(context);
                             showDialog(
                                 context: context,
                                 builder: (context) {
@@ -345,16 +343,21 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                                             labelText: "Password"),
                                           Row(
                                             children: [
-                                              GreenElevatedButton(
-                                                  text: "Confirm",
-                                                  onPressed: () => _updateProfile(
-                                                      userInfoCubit,
-                                                      scaffoldMessenger)),
-                                              GreenElevatedButton(
-                                                  text: "Cancel",
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  })
+                                              Expanded(
+                                                child: GreenElevatedButton(
+                                                    text: "Confirm",
+                                                    onPressed: () => _updateProfile(
+                                                        userInfoCubit,
+                                                        scaffoldMessenger)),
+                                              ),
+                                              Expanded(
+                                                child: WhiteElevatedButton(
+                                                    text: "Cancel",
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      _createEditDialog();
+                                                    }),
+                                              )
                                             ],
                                           )
                                         ],
@@ -378,7 +381,10 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           );
         },
       ),
-    );
+    )),
+                        );
+                      },
+                    );
   }
 
   // Function to submit profile edits
@@ -412,32 +418,48 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
 
   // Function to show edit confirmation dialog
   void _showConfirmation() {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return Dialog(
-            child: Column(
-              children: [
-                const Center(
-                  child: Text("Profile Updated Succesfully."),
-                ),
-                Center(
-                  child: GreenElevatedButton(
-                    text: "OK",
-                    onPressed: () {
-                      // Wait a few seconds for info to load
-                      Future.delayed(const Duration(seconds: 5));
-                      // Pop all dialogs
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                      Navigator.pop(context);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        });
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+        content:
+            Text("Profile updated successfully")));
+    // showDialog(
+    //     context: context,
+    //     builder: (context) {
+    //       return AlertDialog(
+    //         shape: RoundedRectangleBorder(
+    //         borderRadius: BorderRadius.circular(10.0),
+    //         side: BorderSide(
+    //             color: Colors.transparent,
+    //             width: 2.0), // Add border color and width
+    //                                 ),
+    //         content: SizedBox(
+    //           width: double.maxFinite,
+    //           child: Column(
+    //           mainAxisSize: MainAxisSize.min, // Set column to minimum size
+    //           crossAxisAlignment: CrossAxisAlignment.start,
+    //             children: [
+    //               const Center(
+    //                 child: Text("Profile Updated Succesfully."),
+    //               ),
+    //               Center(
+    //                 child: GreenElevatedButton(
+    //                   text: "OK",
+    //                   onPressed: () {
+    //                     // Wait a few seconds for info to load
+    //                     Future.delayed(const Duration(seconds: 5));
+    //                     // Pop all dialogs
+    //                     Navigator.pop(context);
+    //                     Navigator.pop(context);
+    //                     Navigator.pop(context);
+    //                   },
+    //                 ),
+    //               ),
+    //             ],
+    //           ),
+    //         ),
+    //       );
+    //     });
   }
 }
 
