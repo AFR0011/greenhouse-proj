@@ -2,12 +2,14 @@
 ///
 /// TODO:
 /// - Implement "deleteWorker" function
+/// -input validation add worker
 ///
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/profile.dart';
 import 'package:greenhouse_project/pages/tasks.dart';
@@ -201,13 +203,10 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                                           showDialog(
                                               context: context,
                                               builder: (context) {
-                                                return Dialog(
-                                                    child: Column(
+                                                return AlertDialog(
+                                                  title: const Text("Are you sure"),
+                                                    content: Column(
                                                   children: [
-                                                    const Center(
-                                                      child:
-                                                          Text("Are you sure?"),
-                                                    ),
                                                     Center(
                                                       child: Row(
                                                         children: [
@@ -307,40 +306,54 @@ class _WorkersPageState extends State<_WorkersPageContent> {
                       return BlocBuilder<WorkerEditCubit, String>(
                         bloc: workerEditCubit,
                         builder: (context, state) {
-                          return Dialog(
-                            child: Column(
-                              //Textfields
-                              children: [
-                                TextField(
-                                  controller: _emailController,
-                                ),
-                                InputDropdown(items: const {"worker": "worker", "admin": "admin"}, value:state != '' ? state : "admin", onChanged: workerEditCubit.updateDropdown,),
-                                //Submit or Cancel
-                                Row(
-                                  children: [
-                                    GreenElevatedButton(
-                                        text: 'Submit',
-                                        onPressed: () async {
-                                          await manageWorkersCubit.createWorker(
-                                              _emailController.text,
-                                              state,
-                                              _userReference);
-                                          Navigator.pop(context);
-                                          _emailController.clear();
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                                  content: Text(
-                                                      "HI THERE, THIS WORKED!!!")));
-                                        }),
-                                    WhiteElevatedButton(
-                                        text: 'Cancel',
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          _emailController.clear();
-                                        })
-                                  ],
-                                )
-                              ],
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                            side: BorderSide(
+                                color: Colors.transparent,
+                                width: 2.0), // Add border color and width
+                          ),
+                            title: const Text("Add worker"),
+                            content: SizedBox(
+                              width: double.maxFinite,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                //Textfields
+                                children: [
+                                  // InputTextField(controller: _emailController, labelText: "email"),
+                                  SizedBox(width: double.maxFinite , child: InputDropdown(items: const {"worker": "worker", "admin": "admin"}, value:state != '' ? state : "admin", onChanged: workerEditCubit.updateDropdown,)),
+                                  //Submit or Cancel
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GreenElevatedButton(
+                                            text: 'Submit',
+                                            onPressed: () async {
+                                              await manageWorkersCubit.createWorker(
+                                                  _emailController.text,
+                                                  state,
+                                                  _userReference);
+                                              Navigator.pop(context);
+                                              _emailController.clear();
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(const SnackBar(
+                                                      content: Text(
+                                                          "HI THERE, THIS WORKED!!!")));
+                                            }),
+                                      ),
+                                      Expanded(
+                                        child: WhiteElevatedButton(
+                                            text: 'Cancel',
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              _emailController.clear();
+                                            }),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
                           );
                         },

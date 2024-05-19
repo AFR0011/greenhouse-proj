@@ -110,16 +110,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             _userReference = state.userReference;
             _enabled = state.enabled;
 
-            // Get device token for notifications
-
-            // Call function to create home page
-            if (_enabled) {
-              return Theme(data: customTheme, child: _createHomePage());
-            } else {
-              return Center(
-                  child: Theme(
-                      data: customTheme, child: _createHomePageDisabled()));
-            }
+            // Function call to build page
+            return Theme(data: customTheme, child: _createNotificationsPage());
           }
           // Show error if there is an issues with user info
           else if (state is UserInfoError) {
@@ -135,15 +127,16 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  // Create greenhouse page function
-  Widget _createHomePage() {
+  // Create notifications page function
+  Widget _createNotificationsPage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
     // Page content
     return Scaffold(
       // Main appbar (header)
-      appBar: createMainAppBar(context, widget.userCredential, _userReference, "Welcome"),
+      appBar: createMainAppBar(
+          context, widget.userCredential, _userReference, "Notifications"),
 
       // Call function to build notificaitons list
       body: _buildNotifications(),
@@ -218,55 +211,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           },
         ),
       ],
-    );
-  }
-
-  _createHomePageDisabled() {
-    UserInfoCubit userInfoCubit = context.read<UserInfoCubit>();
-    AuthCubit authCubit = context.read<AuthCubit>();
-
-    // Page content
-    return Scaffold(
-      // Main appbar (header)
-      appBar: AppBar(),
-
-      // Call function to build notificaitons list
-      body: Column(
-        children: [
-          const Text(
-              "Your account has been disabled by the greenhouse administration.\n If you don't work here anymore, please delete your account."),
-          Row(
-            children: [
-              GreenElevatedButton(
-                  text: "Delete Account",
-                  onPressed: () {
-                    userInfoCubit.deleteUserAccount(
-                        widget.userCredential, _userReference);
-                    showDialog(
-                        context: context,
-                        builder: (context) => Dialog(
-                              child: Column(
-                                children: [
-                                  const Text("All done!"),
-                                  Center(
-                                      child: GreenElevatedButton(
-                                          text: "OK",
-                                          onPressed: () => authCubit
-                                              .authLogoutRequest()
-                                              .then((value) =>
-                                                  Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              const LoginPage())))))
-                                ],
-                              ),
-                            ));
-                  })
-            ],
-          )
-        ],
-      ),
     );
   }
 }

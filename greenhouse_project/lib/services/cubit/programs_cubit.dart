@@ -11,11 +11,14 @@ class ProgramsCubit extends Cubit<ProgramsState> {
   final CollectionReference logs =
       FirebaseFirestore.instance.collection('logs');
 
+  bool _isActive = true;
+
   ProgramsCubit() : super(ProgramsLoading()) {
     _getPrograms();
   }
 
   void _getPrograms() {
+    if (!_isActive) return;
     programs.orderBy('creationDate', descending: true).snapshots().listen(
         (snapshot) {
       if (snapshot.docs.isNotEmpty) {
@@ -28,61 +31,77 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     });
   }
 
-  Future<void> addProgram(Map<String, dynamic> data, DocumentReference userReference) async {
+  Future<void> addProgram(
+      Map<String, dynamic> data, DocumentReference userReference) async {
+    if (!_isActive) return;
+
     emit(ProgramsLoading());
     try {
       DocumentReference externalId = await programs.add(data);
-    
-    logs.add({
+
+      logs.add({
         "action": "create",
         "description": "Program added by user at ${Timestamp.now().toString()}",
         "timestamp": Timestamp.now(),
         "type": "Program",
         "userId": userReference,
         "externalId": externalId,
-        });
-    }catch (error) {
-      emit(ProgramsError(error.toString()));
-    }
-  }
-
-  Future<void> removeProgram(DocumentReference item, DocumentReference userReference) async {
-    emit(ProgramsLoading());
-    try {
-      Map<String, dynamic> data =item.get().then((doc) => doc.data() ) as Map<String, dynamic>;
-     logs.add({
-        "action": "delete",
-        "description": "Program removed by user at ${Timestamp.now().toString()} program details: ${data["title"]}",
-        "timestamp": Timestamp.now(),
-        "type": "Program",
-        "userId": userReference,
-        });
-
-     await item.delete();
-      _getPrograms();
-      
+      });
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }
   }
 
-  Future<void> updatePrograms(
-      DocumentReference item, Map<String, dynamic> data, DocumentReference userReference) async {
+  Future<void> removeProgram(
+      DocumentReference item, DocumentReference userReference) async {
+    if (!_isActive) return;
+
+    emit(ProgramsLoading());
+    try {
+      Map<String, dynamic> data =
+          item.get().then((doc) => doc.data()) as Map<String, dynamic>;
+      logs.add({
+        "action": "delete",
+        "description":
+            "Program removed by user at ${Timestamp.now().toString()} program details: ${data["title"]}",
+        "timestamp": Timestamp.now(),
+        "type": "Program",
+        "userId": userReference,
+      });
+
+      await item.delete();
+      _getPrograms();
+    } catch (error) {
+      emit(ProgramsError(error.toString()));
+    }
+  }
+
+  Future<void> updatePrograms(DocumentReference item, Map<String, dynamic> data,
+      DocumentReference userReference) async {
+    if (!_isActive) return;
+
     emit(ProgramsLoading());
     try {
       await item.set(data, SetOptions(merge: true));
       _getPrograms();
       logs.add({
         "action": "Update",
-        "description": "Program updated by user at ${Timestamp.now().toString()}",
+        "description":
+            "Program updated by user at ${Timestamp.now().toString()}",
         "timestamp": Timestamp.now(),
         "type": "Program",
         "userId": userReference,
         "externalId": item,
-        });
+      });
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 

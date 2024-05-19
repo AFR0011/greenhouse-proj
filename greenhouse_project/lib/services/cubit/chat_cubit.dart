@@ -4,24 +4,31 @@ import 'package:flutter/foundation.dart';
 
 part 'chat_state.dart';
 
+// Cubit for managing chat state and interactions with Firestore.
 class ChatCubit extends Cubit<ChatState> {
+  // Reference to the 'messages' collection in Firestore.
   final CollectionReference messages =
       FirebaseFirestore.instance.collection('messages');
 
+  // Reference to the 'logs' collection in Firestore.
   final CollectionReference logs =
       FirebaseFirestore.instance.collection('logs');
 
-  final DocumentReference? reference;
-  bool _isActive = true; // Flag to track the status of the ChatCubit
+  // Reference to a chat document in Firestore.
+  final DocumentReference? chatReference;
+  // Flag to check if the cubit is active.
+  bool _isActive = true;
 
-  ChatCubit(this.reference) : super(ChatLoading()) {
+  // Constructor initializing the cubit with a document reference and loading initial state.
+  ChatCubit(this.chatReference) : super(ChatLoading()) {
     _getMessages();
   }
 
+  // Private method to listen to message changes in Firestore and update state.
   void _getMessages() {
-    // Get user's chats
+    if (!_isActive) return;
     messages
-        .where('chat', isEqualTo: reference)
+        .where('chat', isEqualTo: chatReference)
         .orderBy('timestamp', descending: false)
         .snapshots()
         .listen((snapshot) {
@@ -34,11 +41,10 @@ class ChatCubit extends Cubit<ChatState> {
     });
   }
 
+  // Public method to send a message and log the action in Firestore.
   Future<void> sendMessage(String message, DocumentReference receiver,
       DocumentReference sender, DocumentReference chat) async {
-    if (!_isActive) {
-      return; // Do nothing if the ChatCubit is closed
-    }
+    if (!_isActive) return;
 
     try {
       DocumentReference externalId = await messages.add({
@@ -54,23 +60,23 @@ class ChatCubit extends Cubit<ChatState> {
         "description": "message sent by user at ${Timestamp.now().toString()}",
         "timestamp": Timestamp.now(),
         "type": "message",
-        "userId": reference,
+        "userId": sender,
         "externalId": externalId,
       });
     } catch (error) {
-      emit(ChatError(
-          error.toString())); // Emit an error state if an error occurs
+      emit(ChatError(error.toString()));
     }
   }
 
-  // Close (cubit destructor)
+  // Overridden close method to deactivate the cubit before closing.
   @override
   Future<void> close() {
-    _isActive = false; // Set the flag to indicate that the ChatCubit is closed
+    _isActive = false;
     return super.close();
   }
 }
 
+// Data model class for message data.
 class MessageData {
   final String message;
   final DateTime timestamp;
@@ -79,6 +85,7 @@ class MessageData {
   MessageData(
       {required this.message, required this.receiver, required this.timestamp});
 
+  // Factory constructor to create a MessageData instance from a Firestore document.
   factory MessageData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
 

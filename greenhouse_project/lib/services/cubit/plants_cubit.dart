@@ -10,11 +10,14 @@ part 'plants_state.dart';
 
 class PlantStatusCubit extends Cubit<PlantStatusState> {
   CollectionReference plants = FirebaseFirestore.instance.collection("plants");
+
+  bool _isActive = true;
   PlantStatusCubit() : super(PlantsLoading()) {
     _getPlants();
   }
 
   void _getPlants() async {
+    if (!_isActive) return;
     //Get user Plants
     plants.orderBy('birthdate', descending: true).snapshots().listen(
         (snapshot) {
@@ -24,6 +27,12 @@ class PlantStatusCubit extends Cubit<PlantStatusState> {
     }, onError: (error) {
       emit(PlantsError(error.toString()));
     });
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 

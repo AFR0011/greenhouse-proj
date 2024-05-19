@@ -11,11 +11,14 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
   final CollectionReference logs =
       FirebaseFirestore.instance.collection('logs');
 
+  bool _isActive = true;
+
   EquipmentStatusCubit() : super(StatusLoading()) {
     _getEquipmentStatus();
   }
 
   _getEquipmentStatus() {
+    if (!_isActive) return;
     equipment
         .orderBy('status', descending: true)
         .snapshots()
@@ -29,18 +32,26 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
     });
   }
 
-   void toggleStatus(DocumentReference userReference,
-   DocumentReference reference, bool currentStatus) async {
+  void toggleStatus(DocumentReference userReference,
+      DocumentReference reference, bool currentStatus) async {
+    if (!_isActive) return;
     reference.update({'status': !currentStatus});
-    
+
     logs.add({
-        "action": "create",
-        "description": "equipment toggled by user at ${Timestamp.now().toString()}",
-        "timestamp": Timestamp.now(),
-        "type": "equipment status",
-        "userId": userReference,
-        "externalId": reference,
-        });
+      "action": "create",
+      "description":
+          "equipment toggled by user at ${Timestamp.now().toString()}",
+      "timestamp": Timestamp.now(),
+      "type": "equipment status",
+      "userId": userReference,
+      "externalId": reference,
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
 

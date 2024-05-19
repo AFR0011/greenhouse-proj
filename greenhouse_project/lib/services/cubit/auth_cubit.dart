@@ -4,9 +4,12 @@ import "package:flutter_bloc/flutter_bloc.dart";
 part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
+  bool _isActive = true;
+
   AuthCubit() : super(AuthInitial());
 
   void authLoginRequest(String email, String password) async {
+    if (!_isActive) return;
     emit(AuthLoading());
     try {
       FirebaseAuth auth = FirebaseAuth.instance;
@@ -21,6 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> authLogoutRequest() async {
+    if (!_isActive) return;
     try {
       emit(AuthLoading());
       await FirebaseAuth.instance.signOut();
@@ -28,5 +32,11 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       return emit(AuthFailure("Logout Failed"));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }

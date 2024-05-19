@@ -7,8 +7,10 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -17,7 +19,7 @@ import 'package:greenhouse_project/services/cubit/inventory_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/input.dart';
-import 'package:greenhouse_project/utils/main_appbar.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 import 'package:list_utilities/list_utilities.dart';
@@ -116,7 +118,6 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             );
           }
           // Show content once user info is loaded
-          // Show content once user info is loaded
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
             _userRole = state.userRole;
@@ -153,7 +154,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     // Page content
     return Scaffold(
       // Main appbar (header)
-      appBar: createMainAppBar(context, widget.userCredential, _userReference),
+      appBar: createMainAppBar(
+          context, widget.userCredential, _userReference, "Inventory"),
 
       // Scrollable list of items
       body: SingleChildScrollView(
@@ -222,11 +224,15 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                 // Buttons for edit and deleting items
                 trailing: FittedBox(
                     fit: BoxFit.scaleDown,
-                    child:WhiteElevatedButton(onPressed: () {
-                      showDialog(context: context, builder: (context) => InventoryDetailsDialog(inventory:inventory));
-                    },
-                    text: "details",) 
-                    ),
+                    child: WhiteElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (context) =>
+                                InventoryDetailsDialog(inventory: inventory));
+                      },
+                      text: "details",
+                    )),
               );
             },
           ),
@@ -236,43 +242,47 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         const Text("Pending Updates", style: subheadingTextStyle),
         SizedBox(
           height: MediaQuery.of(context).size.height / 3,
-          child: pendingInventory != null && pendingInventory.isNotEmpty
-          ?  ListView.builder(
-            shrinkWrap: true,
-            itemCount: pendingInventory.length,
-            itemBuilder: (context, index) {
-              InventoryData inventory = pendingInventory[index];
-              return ListTile(
-                title: Text(inventory.name),
-                subtitle: Text(inventory.timeAdded.toString()),
-                trailing: _userRole == 'manager'
-                    ? FittedBox(
-                        child: Row(
-                        children: [
-                          GreenElevatedButton(
-                              text: "Approve",
-                              onPressed: () {
-                                context.read<InventoryCubit>().approveItem(
-                                    inventory.reference, _userReference);
-                              }),
-                          GreenElevatedButton(
-                              text: "Deny",
-                              onPressed: () {
-                                context.read<InventoryCubit>().removeInventory(
-                                    inventory.reference, _userReference);
-                              })
-                        ],
-                      ))
-                    : Text(inventory.amount.toString()),
-              );
-            },
-          )
-          : const Center(
-            child: Text(
-              "No pending updates",
-            style: TextStyle(color: Colors.grey),
-            ),
-          ),
+          child: pendingInventory.isNotEmpty
+              ? ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: pendingInventory.length,
+                  itemBuilder: (context, index) {
+                    InventoryData inventory = pendingInventory[index];
+                    return ListTile(
+                      title: Text(inventory.name),
+                      subtitle: Text(inventory.timeAdded.toString()),
+                      trailing: _userRole == 'manager'
+                          ? FittedBox(
+                              child: Row(
+                              children: [
+                                GreenElevatedButton(
+                                    text: "Approve",
+                                    onPressed: () {
+                                      context
+                                          .read<InventoryCubit>()
+                                          .approveItem(inventory.reference,
+                                              _userReference);
+                                    }),
+                                GreenElevatedButton(
+                                    text: "Deny",
+                                    onPressed: () {
+                                      context
+                                          .read<InventoryCubit>()
+                                          .removeInventory(inventory.reference,
+                                              _userReference);
+                                    })
+                              ],
+                            ))
+                          : Text(inventory.amount.toString()),
+                    );
+                  },
+                )
+              : const Center(
+                  child: Text(
+                    "No pending updates",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ),
         ),
 
         // Add item button
@@ -300,94 +310,124 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     showDialog(
         context: context,
         builder: (context) {
-          return Dialog(
-            child: BlocBuilder<InventoryEditCubit, List<bool>>(
-              bloc: inventoryEditCubit,
-              builder: (context, state) {
-                return Column(
-                  children: [
-                    TextField(
-                      controller: _equipmentController,
-                      decoration: InputDecoration(
-                          errorText: state[0]
-                              ? ""
-                              : "Name should be longer than 1 characters."),
-                    ),
-                    TextField(
-                      controller: _descController,
-                      decoration: InputDecoration(
-                          errorText: state[1]
-                              ? ""
-                              : "Description should be longer than 2 characters."),
-                    ),
-                    TextFormField(
-                      controller: _amountController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.digitsOnly
-                      ],
-                      decoration: InputDecoration(
-                          errorText:
-                              state[2] ? "" : "Amount should be more than 0."),
-                    ),
-
-                    // Submit and cancel buttons
-                    Row(
-                      children: [
-                        GreenElevatedButton(
-                            text: "Submit",
-                            onPressed: () async {
-                              List<bool> validation = [true, true, true];
-                              if (_equipmentController.text.isEmpty) {
-                                validation[0] = !validation[0];
-                              }
-                              if (_descController.text.isEmpty) {
-                                validation[1] = !validation[1];
-                              }
-                              if (_amountController.text.isEmpty ||
-                                  int.parse(_amountController.text) <= 0) {
-                                validation[2] = !validation[2];
-                              }
-
-                              bool isValid =
-                                  inventoryEditCubit.updateState(validation);
-                              if (!isValid) {
-                              } else {
-                                Map<String, dynamic> data = {
-                                  "amount": num.parse(_amountController.text),
-                                  "description": _descController.text,
-                                  "name": _equipmentController.text,
-                                  "timeAdded": DateTime.now(),
-                                  "pending":
-                                      _userRole == 'manager' ? false : true,
-                                };
-                                await inventoryCubit
-                                    .addInventory(data, _userReference)
-                                    .then((value) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: BorderSide(
+                        color: Colors.transparent,
+                        width: 2.0), // Add border color and width
+                  ),
+                  title: const Text("Add item"),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: BlocBuilder<InventoryEditCubit, List<bool>>(
+                bloc: inventoryEditCubit,
+                builder: (context, state) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InputTextField(controller: _equipmentController, errorText: state[0]
+                                ? ""
+                                : "Name should be longer than 1 characters.", labelText: "Name"),
+                      // TextField(
+                      //   controller: _equipmentController,
+                      //   decoration: InputDecoration(
+                      //       errorText: state[0]
+                      //           ? ""
+                      //           : "Name should be longer than 1 characters."),
+                      // ),
+                      InputTextField(controller: _descController, errorText: state[1]
+                                ? ""
+                                : "Description should be longer than 2 characters.", labelText: "Description"),
+                      // TextField(
+                      //   controller: _descController,
+                      //   decoration: InputDecoration(
+                      //       errorText: state[1]
+                      //           ? ""
+                      //           : "Description should be longer than 2 characters."),
+                      // ),
+                      TextFormField(
+                        controller: _amountController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        decoration: InputDecoration(
+                          constraints:BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+                          labelText: "Amount",
+                          filled: true,
+                          fillColor: theme.colorScheme.secondary,
+                            errorText:
+                                state[2] ? "" : "Amount should be more than 0.",
+                                border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                                ),
+                      ),
+              
+                      // Submit and cancel buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GreenElevatedButton(
+                                text: "Submit",
+                                onPressed: () async {
+                                  List<bool> validation = [true, true, true];
+                                  if (_equipmentController.text.isEmpty) {
+                                    validation[0] = !validation[0];
+                                  }
+                                  if (_descController.text.isEmpty) {
+                                    validation[1] = !validation[1];
+                                  }
+                                  if (_amountController.text.isEmpty ||
+                                      int.parse(_amountController.text) <= 0) {
+                                    validation[2] = !validation[2];
+                                  }
+                                          
+                                  bool isValid =
+                                      inventoryEditCubit.updateState(validation);
+                                  if (!isValid) {
+                                  } else {
+                                    Map<String, dynamic> data = {
+                                      "amount": num.parse(_amountController.text),
+                                      "description": _descController.text,
+                                      "name": _equipmentController.text,
+                                      "timeAdded": DateTime.now(),
+                                      "pending":
+                                          _userRole == 'manager' ? false : true,
+                                    };
+                                    await inventoryCubit
+                                        .addInventory(data, _userReference)
+                                        .then((value) {
+                                      Navigator.pop(context);
+                                      _equipmentController.clear();
+                                      _descController.clear();
+                                      _amountController.clear();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                              content:
+                                                  Text("Item added succesfully")));
+                                    });
+                                  }
+                                }),
+                          ),
+                          Expanded(
+                            child: WhiteElevatedButton(
+                                text: "Cancel",
+                                onPressed: () {
                                   Navigator.pop(context);
                                   _equipmentController.clear();
                                   _descController.clear();
                                   _amountController.clear();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content:
-                                              Text("Item added succesfully")));
-                                });
-                              }
-                            }),
-                        WhiteElevatedButton(
-                            text: "Cancel",
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _equipmentController.clear();
-                              _descController.clear();
-                              _amountController.clear();
-                            })
-                      ],
-                    )
-                  ],
-                );
-              },
+                                }),
+                          )
+                        ],
+                      )
+                    ],
+                  );
+                },
+              ),
             ),
           );
         });
@@ -510,34 +550,41 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         context: context,
         builder: (context) {
           return SimpleDialog(
-            title: Expanded(child:  Text("Are you Sure?",textAlign:TextAlign.center, style:  TextStyle(fontSize: 15,fontWeight: FontWeight.bold),)),
-            children: [Column(
+              title: const Expanded(
+                  child: Text(
+                "Are you Sure?",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              )),
               children: [
-                Row(
+                Column(
                   children: [
-                    GreenElevatedButton(
-                        text: "Submit",
-                        onPressed: () async {
-                          inventoryCubit
-                              .removeInventory(
-                                  inventory.reference, _userReference)
-                              .then((value) {
-                            Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("Item Deleted succesfully")));
-                          });
-                        }),
-                    WhiteElevatedButton(
-                        text: "Cancel",
-                        onPressed: () {
-                          Navigator.pop(context);
-                        })
+                    Row(
+                      children: [
+                        GreenElevatedButton(
+                            text: "Submit",
+                            onPressed: () async {
+                              inventoryCubit
+                                  .removeInventory(
+                                      inventory.reference, _userReference)
+                                  .then((value) {
+                                Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content:
+                                            Text("Item Deleted succesfully")));
+                              });
+                            }),
+                        WhiteElevatedButton(
+                            text: "Cancel",
+                            onPressed: () {
+                              Navigator.pop(context);
+                            })
+                      ],
+                    )
                   ],
-                )
-              ],
-            ),
-          ]);
+                ),
+              ]);
         });
   }
 }

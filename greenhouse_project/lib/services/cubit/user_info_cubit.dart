@@ -1,9 +1,12 @@
 part of 'home_cubit.dart';
 
 class UserInfoCubit extends HomeCubit {
+  bool _isActive = true;
+
   UserInfoCubit() : super(UserInfoLoading());
 
   Future<void> getUserInfo(UserCredential userCredential) async {
+    if (!_isActive) return;
     try {
       String? email = userCredential.user?.email;
       QuerySnapshot userQuery = await FirebaseFirestore.instance
@@ -20,7 +23,6 @@ class UserInfoCubit extends HomeCubit {
         final String userName = userData?['name'] ?? 'Unknown';
         final DocumentReference userReference = userSnapshot.reference;
         final bool enabled = userData?['enabled'];
-        print("USER DATA: ${userData}\n\n");
 
         emit(UserInfoLoaded(userRole, userName, userReference, enabled));
       } else {
@@ -33,6 +35,7 @@ class UserInfoCubit extends HomeCubit {
 
   Future<void> setUserInfo(DocumentReference userReference, String name,
       String email, String password) async {
+    if (!_isActive) return;
     emit(UserInfoLoading());
     try {
       userReference.update({
@@ -52,11 +55,18 @@ class UserInfoCubit extends HomeCubit {
 
   void deleteUserAccount(
       UserCredential userCredential, DocumentReference userReference) {
+    if (!_isActive) return;
     try {
       userCredential.user?.delete();
       userReference.delete();
     } catch (e) {
       emit(UserInfoError(e.toString()));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _isActive = false;
+    return super.close();
   }
 }
