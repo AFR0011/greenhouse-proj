@@ -7,6 +7,7 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/chat_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
@@ -71,6 +72,7 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   // Text controller for sending messages
   final TextEditingController _textEditingController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   // Dispose (destructor)
   @override
@@ -166,7 +168,7 @@ class _ChatPageState extends State<_ChatPageContent> {
           if (state is ChatLoading) {
             return const CircularProgressIndicator();
           } else if (state is ChatLoaded) {
-            return _buildChatContent(state.messages);
+            return _buildChatContent(state.messages, chat);
           } else if (state is ChatError) {
             return const Text("Something went wrong...");
           } else {
@@ -178,7 +180,7 @@ class _ChatPageState extends State<_ChatPageContent> {
   }
 
   // Build the list of chat messages
-  Widget _buildChatContent(List<MessageData?> messages) {
+  Widget _buildChatContent(List<MessageData?> messages, ChatsData chat) {
     if (messages.isEmpty) {
       return const Center(child: Text("Write your first message!"));
     } else {
@@ -186,6 +188,7 @@ class _ChatPageState extends State<_ChatPageContent> {
         children: [
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               shrinkWrap: true,
               itemCount: messages.length,
               itemBuilder: (context, index) {
@@ -203,9 +206,22 @@ class _ChatPageState extends State<_ChatPageContent> {
               },
             ),
           ),
-          Container(
-              // ADD INPUT FIELD
+          SafeArea(
+            child: Container(
+              margin: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.05,0,MediaQuery.of(context).size.width * 0.05,MediaQuery.of(context).size.width * 0.02),
+              child: TextField(
+                controller: _textEditingController,
+                decoration: InputDecoration(
+                  hintText: "send a message...",
+                  suffixIcon: sendButton(chat),
+                  filled: true,
+                  fillColor: theme.colorScheme.secondary,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))
+                ),
               ),
+                
+                ),
+          ),
         ],
       );
     }
@@ -244,4 +260,15 @@ class _ChatPageState extends State<_ChatPageContent> {
       _textEditingController.text = "";
     }
   }
+
+
+Widget sendButton(chat){
+      
+      return IconButton(onPressed: () {
+        _sendMessage(chat);
+        _scrollController.jumpTo(_scrollController.position.extentTotal-750);
+      },
+      icon: Icon(Icons.send_outlined),
+      color: Colors.grey ); 
+}
 }
