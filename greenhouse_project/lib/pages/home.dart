@@ -143,7 +143,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     // Page content
     return Scaffold(
       // Main appbar (header)
-      appBar: createMainAppBar(context, widget.userCredential, _userReference, "Welcome"),
+      appBar: createMainAppBar(
+          context, widget.userCredential, _userReference, "Welcome"),
 
       // Call function to build notificaitons list
       body: _buildNotifications(),

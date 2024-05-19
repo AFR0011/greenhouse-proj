@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 
 class SeaPainter extends CustomPainter {
@@ -10,8 +9,9 @@ class SeaPainter extends CustomPainter {
 
     final path = Path();
     path.moveTo(size.width, -1000000);
-    path.lineTo(0, size.height /2);
-    path.cubicTo(size.width / 4, 3* (size.height/2), 3* (size.width/4) , size.height/2, size.width, size.height*0.9);
+    path.lineTo(0, size.height / 2);
+    path.cubicTo(size.width / 4, 3 * (size.height / 2), 3 * (size.width / 4),
+        size.height / 2, size.width, size.height * 0.9);
     // Draw the combined path to create the sea waves
     canvas.drawPath(path, paint);
   }
@@ -29,7 +29,8 @@ class SeaBackground extends StatelessWidget {
     return CustomPaint(
       painter: SeaPainter(),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.5, // Adjust the height of the sea (water body)
+        height: MediaQuery.of(context).size.height *
+            0.5, // Adjust the height of the sea (water body)
         // You can add other widgets on top of the sea background
         child: Center(
           child: Text(
@@ -45,7 +46,3 @@ class SeaBackground extends StatelessWidget {
     );
   }
 }
-
-
-
-
