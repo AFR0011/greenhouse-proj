@@ -108,16 +108,10 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // Create equipment page function
   Widget _createEquipmentPage() {
     return Scaffold(
-      appBar: createAltAppbar(context, "Equipment"),
+      appBar: createAltAppbar(context, "Equipments"),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                child: Text("Equipment Status", style: headingTextStyle),
-              ),
-            ),
             // BlocBuilder for Equipment Status
             BlocBuilder<EquipmentStatusCubit, EquipmentStatusState>(
               builder: (context, state) {
@@ -136,7 +130,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   else {
                     final imgpath = [
                     {'path': "lib/utils/Icons/pump.png"},
-                    {'path': "lib/utils/Icons/bulb.png"},
+                    {'path': "lib/utils/Icons/idea.png"},
                     {'path': "lib/utils/Icons/fan.png"},
                   ] as List<Map<String, dynamic>>;
                     return GridView.builder(
@@ -155,19 +149,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                           userReference: _userReference,
                           imgPath: imgpath[index]['path'],
                         );
-                        // ListTile(
-                        //   title: Text(equipment.type),
-                        //   subtitle: Text(equipment.status.toString()),
-                        //   // Toggle equipment status
-                        //   trailing: Switch(
-                        //       value: equipment.status,
-                        //       onChanged: (value) {
-                        //         context
-                        //             .read<EquipmentStatusCubit>()
-                        //             .toggleStatus(_userReference,
-                        //                 equipment.reference, equipment.status);
-                        //       }),
-                        // );
                       },
                     );
                   }

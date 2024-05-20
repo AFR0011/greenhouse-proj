@@ -14,6 +14,7 @@ import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/message_bubble.dart';
+import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class ChatPage extends StatelessWidget {
@@ -159,8 +160,34 @@ class _ChatPageState extends State<_ChatPageContent> {
             Navigator.pop(context);
           },
         ),
-        title: Text(
-          "${chat.receiverData?['name']} ${chat.receiverData?['surname']}",
+        title: Container(
+          //margin: const BoxDecoration(border: Border(bottom: BorderSide())),
+          child: Row(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 5, bottom: 5),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: ClipOval(
+                    child: Image.memory(
+                      chat!.receiverPicture,
+                      width: 25,
+                      height: 25,
+                    ),)
+                ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(left: 5),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "${chat.receiverData?['name']} ${chat.receiverData?['surname']}",
+                    style: bodyTextStyle,
+                  ),
+                )
+              )
+            ],
+          ),
         ),
       ),
       body: BlocBuilder<ChatCubit, ChatState>(

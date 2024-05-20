@@ -20,7 +20,7 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
   _getEquipmentStatus() {
     if (!_isActive) return;
     equipment
-        .orderBy('status', descending: true)
+        .orderBy('type', descending: true)
         .snapshots()
         .listen((snapshot) {
       if (snapshot.docs.isNotEmpty) {
