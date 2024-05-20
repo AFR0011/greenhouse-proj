@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage>
                         controller: emailController,
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: theme.colorScheme.secondary,
+                          fillColor: theme.colorScheme.secondary.withOpacity(0.5),
                           labelText: 'Email',
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20)),
@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage>
                         obscureText: _isSecurePassword,
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: Colors.white70,
+                          fillColor: Colors.white70.withOpacity(0.5),
                           labelText: 'Password',
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20)),

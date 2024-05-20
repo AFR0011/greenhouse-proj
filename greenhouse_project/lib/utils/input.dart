@@ -661,49 +661,71 @@ class ToggleButtonContainer extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
+            borderRadius: BorderRadius.circular(25),
             color: equipment.status
-                ? theme.colorScheme.primary
-                : theme.colorScheme.secondary),
+                ? theme.colorScheme.secondary.withOpacity(0.75)
+                : theme.colorScheme.primary.withOpacity(0.75),
+            border: Border.all(width: 2, color: Colors.white30),
+                ),
+            
         margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
         // color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary,
         width: MediaQuery.of(context).size.width * 0.5,
         height: MediaQuery.of(context).size.width * 0.5,
-        child: Column(
-          children: [
-            Row(children: [
-              Expanded(
+        child: Container(
+          height: 200,
+          width: 200,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomCenter,
+              colors: [Colors.white60, Colors.white10],
+            ),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(width: 2, color: Colors.white10),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(children: [
+                Expanded(
+                    child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          margin: EdgeInsets.fromLTRB(2, 10, 2, 2),
+                            child: ClipOval(
+                              child: Image.asset(
+                                imgPath,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover),
+                            ),
+                        )
+                        
+                        )),
+                Expanded(
                   child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: ClipOval(
-                        child: Image.asset(
-                          imgPath,
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover),
-                      ),
-                      )),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Switch(
-                      value: equipment.status,
-                      onChanged: (value) {
-                        context.read<EquipmentStatusCubit>().toggleStatus(
-                            userReference,
-                            equipment.reference,
-                            equipment.status);
-                      }),
-                ),
-              )
-            ]),
-            Align(
-                alignment: Alignment.bottomLeft,
-                child: Text(
-                  equipment.type,
-                  style: subheadingTextStyle,
-                ))
-          ],
+                    alignment: Alignment.centerRight,
+                    child: Switch(
+                        value: equipment.status,
+                        onChanged: (value) {
+                          context.read<EquipmentStatusCubit>().toggleStatus(
+                              userReference,
+                              equipment.reference,
+                              equipment.status);
+                        }),
+                  ),
+                )
+              ]),
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      equipment.type,
+                      style: subheadingTextStyle,
+                    ),
+                  )
+            ],
+          ),
         ),
       ),
     );

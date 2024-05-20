@@ -146,12 +146,12 @@ class _ManagementPageState extends State<_ManagementPageContent> {
             userCredential: widget.userCredential,
             userReference: _userReference),
         "title": "Tasks",
-        "icon": "lib/utils/Icons/bulb.png"
+        "icon": "lib/utils/Icons/tasks.png"
       },
       {
         'route': EmployeesPage(userCredential: widget.userCredential),
         "title": "Employees",
-        "icon": "lib/utils/Icons/bulb.png"
+        "icon": "lib/utils/Icons/worker.png"
       }
     ] as List<Map<String, dynamic>>;
     // Page content;
