@@ -7,6 +7,8 @@ library;
 
 //import 'dart:math';
 
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -175,11 +177,27 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                 shrinkWrap: true,
                 itemCount: 2,
                 itemBuilder: (context, index) {
-                  return BoxLink(
-                      text: pages[index]["title"],
-                      imgPath: pages[index]["icon"],
-                      context: context,
-                      pageRoute: pages[index]["route"]);
+                  return ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 20,sigmaY: 20),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 241, 13, 13).withOpacity(0.2),
+                          border:  Border.all(
+                            width: 1.5,
+                            color: const Color.fromARGB(255, 234, 17, 17).withOpacity(0.2)
+                          )
+                        ),
+                        child: BoxLink(
+                            text: pages[index]["title"],
+                            imgPath: pages[index]["icon"],
+                            context: context,
+                            pageRoute: pages[index]["route"]),
+                      ),
+                    ),
+                  );
                 }),
           ),
         ]),

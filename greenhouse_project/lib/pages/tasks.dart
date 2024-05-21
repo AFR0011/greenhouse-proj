@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -167,32 +168,62 @@ class _TasksPageState extends State<_TasksPageContent> {
                 }
                 // Display tasks
                 else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: taskList.length,
-                    itemBuilder: (context, index) {
-                      TaskData task = taskList[index]; // task info
-                      return ListTile(
-                        title: Text(task.title),
-                        subtitle: Text(task.dueDate.toString()),
-                        trailing: WhiteElevatedButton(
-                          text: 'Details',
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (context) {
-                                return TaskDetailsDialog(
-                                    task: task,
-                                    userRole: _userRole,
-                                    showEditForm: () => showEditForm(task),
-                                    showDeleteForm: () => showDeleteForm(task));
-                              },
-                            );
-                          },
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height / 3,
+                          child: ListView.builder(
+                                                shrinkWrap: true,
+                                                itemCount: taskList.length,
+                                                itemBuilder: (context, index) {
+                          TaskData task = taskList[index]; // task info
+                          return Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              elevation: 4.0,
+                              margin: EdgeInsets.only(bottom: 16.0),
+                              child: ListTile(
+                                leading: Container(
+                                padding: EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                              child: Icon(
+                                Icons.task_outlined,
+                                color: Colors.grey[600]!,
+                                size: 30,
+                              ),
+                                ),
+                                title: Text(task.title,
+                                style: TextStyle(fontWeight: FontWeight.bold,
+                                fontSize: 18),
+                                ),
+                                subtitle: Text(task.dueDate.toString()),
+                                trailing: WhiteElevatedButton(
+                                  text: 'Details',
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return TaskDetailsDialog(
+                                            task: task,
+                                            userRole: _userRole,
+                                            showEditForm: () => showEditForm(task),
+                                            showDeleteForm: () => showDeleteForm(task));
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                                                },
+                                              ),
                         ),
-                      );
-                    },
-                  );
+        ],));
                 }
               }
               // Show error message once an error occurs
@@ -335,7 +366,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content:
-                                              Text("Task edited succesfully")));
+                                              Text("Task edited succesfully!")));
                                         }
                                       }),
                                   WhiteElevatedButton(
@@ -388,7 +419,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                         content:
-                                            Text("Task deleted succesfully")));
+                                            Text("Task deleted succesfully!")));
                               }),
                         ),
                         Expanded(
@@ -525,7 +556,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content:
-                                              Text("Task has been created!")));
+                                              Text("Task created succesfully!")));
                                         
                                               }
                                             }),

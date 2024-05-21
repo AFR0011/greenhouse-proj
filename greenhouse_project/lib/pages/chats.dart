@@ -151,14 +151,21 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             return const Center(child: Text("No chats..."));
           } else {
             // Display the list of chats
-            return ListView.builder(
-              shrinkWrap: true,
-              itemCount: chatsList.length,
-              itemBuilder: (context, index) {
-                final chat = chatsList[index];
-                return _buildChatItem(chat);
-              },
-            );
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                  children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height / 10,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: chatsList.length,
+                      itemBuilder: (context, index) {
+                        final chat = chatsList[index];
+                        return _buildChatItem(chat);
+                },
+              ),
+              )]));
           }
         } else if (state is ChatsError) {
           // Display an error message if chats cannot be loaded
@@ -174,56 +181,63 @@ class _ChatsPageState extends State<_ChatsPageContent> {
   Widget _buildChatItem(ChatsData? chat) {
     final receiverData = chat?.receiverData;
     // Display chat information
-    return GestureDetector(
-      onTap: () {
-        // Navigate to the chat page when a chat is tapped
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatPage(
-              userCredential: widget.userCredential,
-              chatReference: chat.reference,
-            ),
-          ),
-        );
-      },
-      child: Container(
-        decoration: const BoxDecoration(border: Border(bottom: BorderSide())),
-        child: Row(
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 5, bottom: 5),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: ClipOval(
-                    child: Image.memory(
-                  chat!.receiverPicture,
-                  width: 50,
-                  height: 50,
-                )),
+    return Card(
+      shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(15.0),
+      ),
+      elevation: 4.0,
+      margin: EdgeInsets.only(bottom: 16.0),
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to the chat page when a chat is tapped
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatPage(
+                userCredential: widget.userCredential,
+                chatReference: chat.reference,
               ),
             ),
-            Container(
-                margin: const EdgeInsets.only(left: 5),
+          );
+        },
+        child: Container(
+          decoration: const BoxDecoration(border: Border(bottom: BorderSide())),
+          child: Row(
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 5, bottom: 5),
                 child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text.rich(
-                      TextSpan(
-                          text:
-                              "${receiverData?['name']} ${receiverData?['surname']}",
-                          style: bodyTextStyle,
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: "     (" + receiverData!['role'] + ")",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w300,
-                                color: Colors.grey,
-                                fontSize: 14.0,
+                  alignment: Alignment.centerLeft,
+                  child: ClipOval(
+                      child: Image.memory(
+                    chat!.receiverPicture,
+                    width: 50,
+                    height: 50,
+                  )),
+                ),
+              ),
+              Container(
+                  margin: const EdgeInsets.only(left: 5),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text.rich(
+                        TextSpan(
+                            text:
+                                "${receiverData?['name']} ${receiverData?['surname']}",
+                            style: bodyTextStyle,
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: "     (" + receiverData!['role'] + ")",
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w300,
+                                  color: Colors.grey,
+                                  fontSize: 14.0,
+                                ),
                               ),
-                            ),
-                          ]),
-                    )))
-          ],
+                            ]),
+                      )))
+            ],
+          ),
         ),
       ),
     );

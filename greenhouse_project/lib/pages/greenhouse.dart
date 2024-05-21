@@ -150,29 +150,66 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   }
 
   // Function to create a subheading row with a details button
-  Widget _buildSubheadingRow(String subheading, Widget pageWidget) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              subheading,
-              style: subheadingTextStyle,
+  Widget _buildSubheadingRow(String subheading, Widget pageWidget, Color color,IconData icon) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+      elevation: 4.0,
+      margin: EdgeInsets.only(bottom: 16.0),
+      child: ListTile(
+        leading: Container(
+          padding: EdgeInsets.all(8.0),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            icon,
+            color: color,
+            size: 30.0,
+          ),
+        ),
+        title: Text(
+          subheading,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18.0,
+          ),
+        ),
+        trailing: ElevatedButton(
+          onPressed: () {
+                  _navigateToDetailsPage(pageWidget);
+                },
+          child: Text('Details'),
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white, backgroundColor: color,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(25, 15, 25, 15),
-            child: WhiteElevatedButton(
-              text: "Details",
-              onPressed: () {
-                _navigateToDetailsPage(pageWidget);
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+        ),
+      // child: Padding(
+      //   padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+      //   child: Row(
+      //     children: [
+      //       Expanded(
+      //         child: Text(
+      //           subheading,
+      //           style: subheadingTextStyle,
+      //         ),
+      //       ),
+      //       Padding(
+      //         padding: const EdgeInsets.fromLTRB(25, 15, 25, 15),
+      //         child: WhiteElevatedButton(
+      //           text: "Details",
+                // onPressed: () {
+                //   _navigateToDetailsPage(pageWidget);
+                // },
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ),
+    ));
   }
 
   /// Creates the main content of the greenhouse page.
@@ -187,27 +224,37 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
           context, widget.userCredential, _userReference, "Greenhouse"),
 
       // Scrollable column for items
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Plant status subheading and details button
-            _buildSubheadingRow(
-              "Plant Status",
-              PlantsPage(userCredential: widget.userCredential),
-            ),
-
-            // Active programs subheading and details button
-            _buildSubheadingRow(
-              "Active Programs",
-              ProgramsPage(userCredential: widget.userCredential),
-            ),
-
-            // Equipment status subheading and details button
-            _buildSubheadingRow(
-              "Equipment Status",
-              EquipmentPage(userCredential: widget.userCredential),
-            ),
-          ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Plant status subheading and details button
+              _buildSubheadingRow(
+                "Plant Status",
+                PlantsPage(userCredential: widget.userCredential),
+                Colors.greenAccent,
+                Icons.local_florist,
+              ),
+        
+              // Active programs subheading and details button
+              _buildSubheadingRow(
+                "Active Programs",
+                ProgramsPage(userCredential: widget.userCredential),
+                Colors.blueAccent,
+                Icons.play_circle_fill,
+              ),
+        
+              // Equipment status subheading and details button
+              _buildSubheadingRow(
+                "Equipment Status",
+                EquipmentPage(userCredential: widget.userCredential),
+                Colors.orangeAccent,
+                 Icons.build,
+              ),
+            ],
+          ),
         ),
       ),
 

@@ -140,29 +140,58 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                 }
                 // Display plants
                 else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: plantList.length,
-                    itemBuilder: (context, index) {
-                      PlantData plant = plantList[index]; //plant data
-
-                      // Display plant info
-                      return ListTile(
-                        title: Text(plant.type),
-                        subtitle: Text(plant.subtype),
-                        trailing: WhiteElevatedButton(
-                          // Show details and sensor readings
-                          text: 'Details',
-                          onPressed: () {
-                            // _showPlantDetails(plant);
-                            showDialog(
-                                context: context,
-                                builder: (context) =>
-                                    PlantDetailsDialog(plant: plant));
-                          },
-                        ),
-                      );
-                    },
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height / 10,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: plantList.length,
+                              itemBuilder: (context, index) {
+                                PlantData plant = plantList[index]; //plant data
+                            
+                                // Display plant info
+                                return Card(
+                                  shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  elevation: 4.0,
+                                  margin: EdgeInsets.only(bottom: 16.0),
+                                  child: ListTile(
+                                    leading: Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                    child: Icon(
+                                      Icons.grass_outlined,
+                                      color: Colors.green[800]!,
+                                      size: 30,
+                                    ),
+                                    ),
+                                    title: Text(plant.type,
+                                    style: TextStyle(fontWeight: FontWeight.bold,
+                                    fontSize: 18),),
+                                    subtitle: Text(plant.subtype),
+                                    trailing: WhiteElevatedButton(
+                                      // Show details and sensor readings
+                                      text: 'Details',
+                                      onPressed: () {
+                                        // _showPlantDetails(plant);
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                PlantDetailsDialog(plant: plant));
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                  )],),
                   );
                 }
               }
@@ -178,6 +207,17 @@ class _PlantsPageState extends State<_PlantsPageContent> {
               }
             },
           ),
+
+          Container(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                Readings(title: 'Temperature', value: '24°C', icon: Icons.wb_sunny, color: Colors.orange),
+                Readings(title: "Soil humidity", value: "75%", icon: Icons.grass, color: Colors.brown)
+
+            ],
+            ),
+          )
         ],
       ),
     );

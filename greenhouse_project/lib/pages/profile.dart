@@ -265,7 +265,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                         color: Colors.transparent,
                         width: 2.0), // Add border color and width
                           ),
-                          title: const Text("Edit Profil"),
+                          title: const Text("Edit profil"),
                           content: SizedBox(
                             width: double.maxFinite,
                             child:  BlocProvider(
@@ -328,7 +328,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                                           color: Colors.transparent,
                                           width: 2.0), // Add border color and width
                                     ),
-                                    title: const Text("Enter Password"),
+                                    title: const Text("Enter password"),
                                     content: SizedBox(
                                       width: double.maxFinite,
                                       child: Column(
@@ -422,7 +422,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     ScaffoldMessenger.of(context).showSnackBar(
     const SnackBar(
         content:
-            Text("Profile updated successfully")));
+            Text("Profile updated successfully!")));
     // showDialog(
     //     context: context,
     //     builder: (context) {
