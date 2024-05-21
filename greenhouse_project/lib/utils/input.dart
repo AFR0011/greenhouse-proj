@@ -216,7 +216,7 @@ class TaskDetailsDialog extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
                 },
-                text: "close",
+                text: "Close",
               ),
             ),
 
@@ -274,7 +274,7 @@ class EmployeeDetailsDialog extends StatelessWidget {
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Employee Details"),
+      title: Text("Employee details"),
       content: Container(
         width: double.maxFinite, // Set maximum width
         child: Column(
@@ -328,7 +328,7 @@ class EmployeeDetailsDialog extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
                 },
-                text: "close",
+                text: "Close",
               ),
             ),
           ],
@@ -385,7 +385,7 @@ class InventoryDetailsDialog extends StatelessWidget {
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Inventory Details"),
+      title: Text("Inventory details"),
       content: Container(
         width: double.maxFinite, // Set maximum width
         child: Column(
@@ -396,7 +396,7 @@ class InventoryDetailsDialog extends StatelessWidget {
             _buildDetailRow("Description:", inventory.description),
             _buildDetailRow("Amount:", inventory.amount.toString()),
             _buildDetailRow(
-                "Time Added",
+                "Time added",
                 inventory.timeAdded
                     .toString()
                     .substring(0, inventory.timeAdded.toString().length - 7)),
@@ -429,7 +429,7 @@ class InventoryDetailsDialog extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
                 },
-                text: "close",
+                text: "Close",
               ),
             ),
           ],
@@ -483,7 +483,7 @@ class PlantDetailsDialog extends StatelessWidget {
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Plant Details"),
+      title: Text("Plant details"),
       content: Container(
         width: double.maxFinite, // Set maximum width
         child: Column(
@@ -505,7 +505,7 @@ class PlantDetailsDialog extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
                 },
-                text: "close",
+                text: "Close",
               ),
             ),
           ],
@@ -561,7 +561,7 @@ class ProgramDetailsDialog extends StatelessWidget {
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Program Details"),
+      title: Text("Program details"),
       content: Container(
         width: double.maxFinite, // Set maximum width
         child: Column(
@@ -571,7 +571,7 @@ class ProgramDetailsDialog extends StatelessWidget {
             _buildDetailRow("Equipment:", program.equipment),
             _buildDetailRow("Title", program.title),
             _buildDetailRow(
-                "Creation Date:",
+                "Creation date:",
                 program.creationDate
                     .toString()
                     .substring(0, program.creationDate.toString().length - 7)),
@@ -604,7 +604,7 @@ class ProgramDetailsDialog extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pop(); // Close the dialog
                 },
-                text: "close",
+                text: "Close",
               ),
             ),
           ],
@@ -649,6 +649,7 @@ class ToggleButtonContainer extends StatelessWidget {
   final String imgPath;
   final BuildContext context;
   final DocumentReference userReference;
+  
   ToggleButtonContainer(
       {required this.imgPath,
       required this.equipment,
@@ -805,3 +806,34 @@ class WavePainter2 extends CustomPainter {
     return false;
   }
 }
+
+
+class Readings extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color color;
+
+  Readings(
+      {required this.title,
+      required this.value,
+      required this.icon,
+      required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Card(
+      elevation: 4.0,
+      margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: ListTile(
+        leading: Icon(icon, color: color, size: 40),
+        title: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        subtitle: Text('Seasonal normal'),
+        trailing: Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+      ),
+    )
+    );
+  }
+}
+

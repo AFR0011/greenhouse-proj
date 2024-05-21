@@ -9,6 +9,7 @@ library;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/profile.dart';
 import 'package:greenhouse_project/pages/tasks.dart';
@@ -151,117 +152,148 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                 }
                 // Display employees
                 else {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: employeeList.length,
-                    itemBuilder: (context, index) {
-                      EmployeeData employee = employeeList[index]; // employee info
-                      void tasksFunction() {
-                            Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  TasksPage(
-                                    userCredential: widget
-                                        .userCredential,
-                                    userReference:
-                                        employee.reference,
-                                  )));
-                      }
-                      void toggleAccount() {
-                        showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            side: BorderSide(
-                                color: Colors.transparent,
-                                width: 2.0), // Add border color and width
-                          ),
-                            title: const Text("Are you sure"),
-                              content: SizedBox(
-                                width: double.maxFinite,
-                                child: Column(
-                                mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                Center(
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: GreenElevatedButton(
-                                            text: "Confirm",
-                                            onPressed: () {
-                                              if (employee
-                                                  .enabled) {
-                                                manageEmployeesCubit
-                                                    .disableEmployee(
-                                                        employee)
-                                                    .then((_) {
-                                                       Navigator.pop(context);Navigator.pop(context);
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(
-                                                            content:
-                                                                Text("Account disabled successfuly!")));
-                                                    });
-                                              } else {
-                                                manageEmployeesCubit
-                                                    .enableEmployee(
-                                                        employee)
-                                                    .then((_) { 
-                                                      Navigator.pop(context);Navigator.pop(context);
-                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                            const SnackBar(
-                                                                content:
-                                                                    Text("Account enabled successfuly!")));});
-                                              }
-                                            }),
-                                      ),
-                                      Expanded(
-                                        child: WhiteElevatedButton(
-                                            text: "Go Back",
-                                            onPressed: () =>
-                                                Navigator.pop(
-                                                    context)),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                                            ],
-                                                          ),
-                              ));
-                        });
-                      }
-                      void profileFunction() {
-                        Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ProfilePage(
-                                                          userCredential: widget
-                                                              .userCredential,
-                                                          userReference: employee
-                                                              .reference)));
-                      }
-                      return ListTile(
-                        title: Text(employee.name),
-                        subtitle: Text(employee.enabled ? "Active" : "Inactive"),
-                        trailing: WhiteElevatedButton(
-                          text: 'Details',
-                          onPressed: () {
-                            showDialog(
-                              
+                  return Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                         SizedBox(
+                          height: MediaQuery.of(context).size.height / 3,
+                           child: ListView.builder( 
+                            shrinkWrap: true,
+                            itemCount: employeeList.length,
+                            itemBuilder: (context, index) {
+                            EmployeeData employee = employeeList[index]; // employee info
+                            void tasksFunction() {
+                                  Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        TasksPage(
+                                          userCredential: widget
+                                              .userCredential,
+                                          userReference:
+                                              employee.reference,
+                                        )));
+                            }
+                            void toggleAccount() {
+                              showDialog(
                               context: context,
                               builder: (context) {
-                                
-                            return EmployeeDetailsDialog(employee: employee, tasksFunction: tasksFunction, toggleAccount: toggleAccount,profileFunction: profileFunction,);
-                                
-                              },
+                                return AlertDialog(shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  side: BorderSide(
+                                      color: Colors.transparent,
+                                      width: 2.0), // Add border color and width
+                                ),
+                                  title: const Text("Are you sure"),
+                                    content: SizedBox(
+                                      width: double.maxFinite,
+                                      child: Column(
+                                      mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                      Center(
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: GreenElevatedButton(
+                                                  text: "Confirm",
+                                                  onPressed: () {
+                                                    if (employee
+                                                        .enabled) {
+                                                      manageEmployeesCubit
+                                                          .disableEmployee(
+                                                              employee)
+                                                          .then((_) {
+                                                             Navigator.pop(context);Navigator.pop(context);
+                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                              const SnackBar(
+                                                                  content:
+                                                                      Text("Account disabled successfuly!")));
+                                                          });
+                                                    } else {
+                                                      manageEmployeesCubit
+                                                          .enableEmployee(
+                                                              employee)
+                                                          .then((_) { 
+                                                            Navigator.pop(context);Navigator.pop(context);
+                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                  const SnackBar(
+                                                                      content:
+                                                                          Text("Account enabled successfuly!")));});
+                                                    }
+                                                  }),
+                                            ),
+                                            Expanded(
+                                              child: WhiteElevatedButton(
+                                                  text: "Go Back",
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                          context)),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                                                  ],
+                                                                ),
+                                    ));
+                              });
+                            }
+                            void profileFunction() {
+                              Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ProfilePage(
+                                                                userCredential: widget
+                                                                    .userCredential,
+                                                                userReference: employee
+                                                                    .reference)));
+                            }
+                            return Card(
+                              shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                              ),
+                              elevation: 4.0,
+                              margin: EdgeInsets.only(bottom: 16.0),
+                              child: ListTile(
+                                leading: Container(
+                                padding: EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                              child: Icon(
+                                Icons.account_box_outlined,
+                                color: Colors.grey[600]!,
+                                size: 30,
+                              ),
+                              ),
+                                title: Text(employee.name,
+                                style: TextStyle(fontWeight: FontWeight.bold,
+                                fontSize: 18),
+                                ),
+                                subtitle: Text(employee.enabled ? "Active" : "Inactive"),
+                                trailing: WhiteElevatedButton(
+                                  text: 'Details',
+                                  onPressed: () {
+                                    showDialog(
+                                      
+                                      context: context,
+                                      builder: (context) {
+                                        
+                                    return EmployeeDetailsDialog(employee: employee, tasksFunction: tasksFunction, toggleAccount: toggleAccount,profileFunction: profileFunction,);
+                                        
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
                             );
-                          },
-                        ),
-                      );
-                    },
+                                                   },
+                                                 ),
+                         ),],
+                    ),
                   );
                 }
               }

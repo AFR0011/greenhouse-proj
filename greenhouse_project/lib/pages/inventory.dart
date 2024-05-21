@@ -206,99 +206,147 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   // Create inventory list function
   Widget _createInventoryList(
       List actualInventory, List pendingInventory, BuildContext mainContext) {
-    return Column(
-      children: [
-        // Main inventory items
-        SizedBox(
-          height: MediaQuery.of(context).size.height / 3,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: actualInventory.length,
-            itemBuilder: (context, index) {
-              
-              InventoryData inventory = actualInventory[index];
-              return ListTile(
-                title: Text(inventory.name),
-                subtitle: Text(inventory.timeAdded.toString()),
-
-                // Buttons for edit and deleting items
-                trailing: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: WhiteElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) =>
-                                InventoryDetailsDialog(inventory: inventory, editInventory: () => showEditForm(mainContext, inventory), deleteInventory: () => showDeleteForm(mainContext, inventory)));
-                      },
-                      text: "details",
-                    )),
-              );
-            },
-          ),
-        ),
-
-        // Pending inventory item updates
-        Container(
-          margin: EdgeInsets.only(top: 10, bottom: 10),
-          child: const Text("Pending Updates", style: subheadingTextStyle),
-        ),
-        SizedBox(
-          height: MediaQuery.of(context).size.height / 3,
-          child: pendingInventory.isNotEmpty
-              ? ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: pendingInventory.length,
-                  itemBuilder: (context, index) {
-                    InventoryData inventory = pendingInventory[index];
-                    return ListTile(
-                      title: Text(inventory.name),
-                      subtitle: Text(inventory.timeAdded.toString()),
-                      trailing: _userRole == 'manager'
-                          ? FittedBox(
-                              child: Row(
-                              children: [
-                                GreenElevatedButton(
-                                    text: "Approve",
-                                    onPressed: () {
-                                      context
-                                          .read<InventoryCubit>()
-                                          .approveItem(inventory.reference,
-                                              _userReference);
-                                    }),
-                                GreenElevatedButton(
-                                    text: "Deny",
-                                    onPressed: () {
-                                      context
-                                          .read<InventoryCubit>()
-                                          .removeInventory(inventory.reference,
-                                              _userReference);
-                                    })
-                              ],
-                            ))
-                          : Text(inventory.amount.toString()),
-                    );
-                  },
-                )
-              : const Center(
-                  child: Text(
-                    "No pending updates",
-                    style: TextStyle(color: Colors.grey),
-                  ),
+    return 
+    Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          // Main inventory items
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 3,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: actualInventory.length,
+              itemBuilder: (context, index) {
+                
+                InventoryData inventory = actualInventory[index];
+                return Card(
+                          shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
                 ),
-        ),
-
-        // Add item button
-        Center(
-          child: GreenElevatedButton(
-              text: "Add Item",
-
-              // Display addition form
-              onPressed: () {
-                _showAdditionForm(context);
-              }),
-        )
-      ],
+                elevation: 4.0,
+                margin: EdgeInsets.only(bottom: 16.0),
+                child: ListTile(
+                  leading: Container(
+                    padding: EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                  child: Icon(
+                    Icons.inventory_2_outlined,
+                    color: Colors.grey[600]!,
+                    size: 30,
+                  ),
+                  ),
+                  
+                    title: Text(inventory.name,
+                    style: TextStyle(fontWeight: FontWeight.bold,
+                    fontSize: 18),
+                    ),
+                    subtitle: Text(inventory.timeAdded.toString()),
+                  
+                    // Buttons for edit and deleting items
+                    trailing: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: WhiteElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    InventoryDetailsDialog(inventory: inventory, editInventory: () => showEditForm(mainContext, inventory), deleteInventory: () => showDeleteForm(mainContext, inventory)));
+                          },
+                          text: "Details",
+                        )),
+                  ),
+                
+            );})),
+              
+            
+      
+          // Pending inventory item updates
+          Container(
+            margin: EdgeInsets.only(top: 10, bottom: 10),
+            child: const Text("Pending updates", style: subheadingTextStyle),
+          ),
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 3,
+            child: pendingInventory.isNotEmpty
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: pendingInventory.length,
+                    itemBuilder: (context, index) {
+                      InventoryData inventory = pendingInventory[index];
+                      return Card(
+                                  shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
+                        ),
+                        elevation: 4.0,
+                        margin: EdgeInsets.only(bottom: 16.0),
+                        child: ListTile(
+                          leading: Container(
+                            padding: EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                          child: Icon(
+                            Icons.inventory_2_outlined,
+                            color: Colors.grey[600]!,
+                            size: 30,
+                          ),
+                          ),
+                        title: Text(inventory.name,
+                        style: TextStyle(fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                          ),
+                        subtitle: Text(inventory.timeAdded.toString()),
+                        trailing: _userRole == 'manager'
+                            ? FittedBox(
+                                child: Row(
+                                children: [
+                                  GreenElevatedButton(
+                                      text: "Approve",
+                                      onPressed: () {
+                                        context
+                                            .read<InventoryCubit>()
+                                            .approveItem(inventory.reference,
+                                                _userReference);
+                                      }),
+                                  RedElevatedButton(
+                                      text: "Deny",
+                                      onPressed: () {
+                                        context
+                                            .read<InventoryCubit>()
+                                            .removeInventory(inventory.reference,
+                                                _userReference);
+                                      })
+                                ],
+                              ))
+                            : Text(inventory.amount.toString()),
+                      ));
+                    },
+                  )
+                : const Center(
+                    child: Text(
+                      "No pending updates",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+          ),
+      
+          // Add item button
+          Center(
+            child: GreenElevatedButton(
+                text: "Add Item",
+      
+                // Display addition form
+                onPressed: () {
+                  _showAdditionForm(context);
+                }),
+          )
+        ],
+      ),
     );
   }
 

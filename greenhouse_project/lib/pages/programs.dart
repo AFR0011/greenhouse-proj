@@ -157,46 +157,70 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
 
   // Function call to create programs list
   Widget _createProgramsList(List programsList) {
-    return Column(
-      children: [
-        const Text("Programs", style: subheadingTextStyle),
-        SizedBox(
-          height: MediaQuery.of(context).size.height / 3,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: programsList.length,
-            itemBuilder: (context, index) {
-              ProgramData program = programsList[index]; // program info
-              return ListTile(
-                title: Text(program.title),
-                subtitle: Text(program.creationDate.toString()),
-                trailing: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: WhiteElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) =>
-                                ProgramDetailsDialog(program: program, editProgram: () => _showEditForm(program), deleteProgram: () => _showDeleteForm(program)));
-                      },
-                      text: "details",
-                    )),
-              );
-            },
+    return 
+    Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height / 3,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: programsList.length,
+              itemBuilder: (context, index) {
+                ProgramData program = programsList[index]; // program info
+                return Card(
+                  shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                  ),
+                  elevation: 4.0,
+                  margin: EdgeInsets.only(bottom: 16.0),
+                  child: ListTile(
+                    leading: Container(
+                      padding: EdgeInsets.all(8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                    child: Icon(
+                      Icons.build_circle_outlined,
+                      color: Colors.orange[800]!,
+                      size: 30,
+                    ),
+                    ),
+                    title: Text(program.title,
+                    style: TextStyle(fontWeight: FontWeight.bold,
+                                    fontSize: 18),),
+                    subtitle: Text(program.creationDate.toString()),
+                    trailing: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: WhiteElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) =>
+                                    ProgramDetailsDialog(program: program, editProgram: () => _showEditForm(program), deleteProgram: () => _showDeleteForm(program)));
+                          },
+                          text: "Details",
+                        )),
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-        Row(
-          children: [
-            Center(
-              child: GreenElevatedButton(
-                  text: "Create program",
-                  onPressed: () {
-                    _showAdditionForm();
-                  }),
-            )
-          ],
-        )
-      ],
+          Row(
+            children: [
+              Center(
+                child: GreenElevatedButton(
+                    text: "Create program",
+                    onPressed: () {
+                      _showAdditionForm();
+                    }),
+              )
+            ],
+          )
+        ],
+      ),
     );
   }
 
@@ -328,7 +352,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text("Item added succesfully")));
+                                      content: Text("Item added succesfully!")));
                             }),
                       ),
                       Expanded(
@@ -403,7 +427,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                             Navigator.pop(context);
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content: Text("Program edited succesfully")));
+                                    content: Text("Program edited succesfully!")));
                           }),
                     ),
                     Expanded(
@@ -435,7 +459,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                         color: Colors.transparent,
                         width: 2.0), // Add border color and width
                   ),
-                  title: const Text("Are you Sure?"),
+                  title: const Text("Are you sure?"),
             content: SizedBox(
               width: double.maxFinite,
             child: Column(
@@ -455,7 +479,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                     content:
-                                        Text("Program Deleted succesfully")));
+                                        Text("Program deleted succesfully!")));
                           }),
                     ),
                     Expanded(
