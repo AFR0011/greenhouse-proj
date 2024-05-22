@@ -273,6 +273,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
 
       // Call function to build notificaitons list
       body: Column(
+        
         children: [
           const Text(
               "Your account has been disabled by the greenhouse administration.\n If you don't work here anymore, please delete your account."),

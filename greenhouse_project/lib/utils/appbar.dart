@@ -7,6 +7,9 @@ import "package:flutter/material.dart";
 import "package:greenhouse_project/pages/profile.dart";
 import "package:greenhouse_project/pages/settings.dart";
 import "package:greenhouse_project/utils/text_styles.dart";
+import "package:greenhouse_project/utils/theme.dart";
+
+import 'package:flutter/material.dart';
 
 AppBar createMainAppBar(BuildContext context, UserCredential userCredential,
     DocumentReference userReference, String title) {
@@ -45,14 +48,16 @@ AppBar createMainAppBar(BuildContext context, UserCredential userCredential,
       onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => SettingsPage(
-                    userCredential: userCredential,
-                  ))),
-      icon: const Icon(Icons.settings_outlined, size: 55),
-    ),
-    actions: [
-      IconButton(
-        onPressed: () => Navigator.push(
+            builder: (context) => SettingsPage(
+              userCredential: userCredential,
+            ),
+          ),
+        ),
+        icon: const Icon(Icons.settings_outlined, size: 50, color: Colors.white60),
+      ),
+      actions: [
+        IconButton(
+          onPressed: () => Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => ProfilePage(
