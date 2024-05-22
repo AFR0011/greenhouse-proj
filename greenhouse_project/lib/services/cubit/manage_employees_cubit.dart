@@ -19,24 +19,26 @@ class ManageEmployeesCubit extends ManagementCubit {
 
   ManageEmployeesCubit(this.user) : super(ManageEmployeesLoading()) {
     if (user != null) {
-      _fetchEmployees();
+      fetchEmployees();
     }
   }
 
-  _fetchEmployees() {
-    if (!_isActive) return;
+  List<EmployeeData>? fetchEmployees() {
+    if (!_isActive) return null;
+    List<EmployeeData>? employees;
     users
         .where(Filter.or(Filter("role", isEqualTo: "worker"),
             Filter("role", isEqualTo: "manager")))
         .snapshots()
         .listen((snapshot) {
-      final List<EmployeeData> workers =
+      employees =
           snapshot.docs.map((doc) => EmployeeData.fromFirestore(doc)).toList();
 
-      emit(ManageEmployeesLoaded([...workers]));
+      emit(ManageEmployeesLoaded([...employees!]));
     }, onError: (error) {
       emit(ManageEmployeesError(error));
     });
+    return employees;
   }
 
   // Create worker account and send credentials via email
