@@ -145,8 +145,9 @@ class _ManagementPageState extends State<_ManagementPageContent> {
     final pages = [
       {
         'route': TasksPage(
-            userCredential: widget.userCredential,
-            userReference: _userReference),
+          userCredential: widget.userCredential,
+          userReference: _userReference,
+        ),
         "title": "Tasks",
         "icon": "lib/utils/Icons/tasks.png"
       },
