@@ -137,23 +137,29 @@ class InputDropdown extends StatelessWidget {
 class TaskDetailsDialog extends StatelessWidget {
   final TaskData task;
   final String userRole;
-  final Function showEditForm;
-  final Function showDeleteForm;
+  final DocumentReference? managerReference;
+  final Function editOrComplete;
+  final Function deleteOrContact;
 
-
-  const TaskDetailsDialog({super.key, required this.task, required this.userRole, required this.showEditForm, required this.showDeleteForm});
+  const TaskDetailsDialog(
+      {super.key,
+      required this.task,
+      required this.userRole,
+      required this.managerReference,
+      required this.editOrComplete,
+      required this.deleteOrContact});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(
+        side: const BorderSide(
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Task Details"),
-      content: Container(
+      title: const Text("Task Details"),
+      content: SizedBox(
         width: double.maxFinite, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
@@ -167,49 +173,52 @@ class TaskDetailsDialog extends StatelessWidget {
                     .toString()
                     .substring(0, task.dueDate.toString().length - 7)),
             _buildDetailRow("Status:", task.status),
-            SizedBox(height: 20), // Add spacing between details and buttons
+            const SizedBox(
+                height: 20), // Add spacing between details and buttons
             userRole == "worker"
-                               ? Row(
-                                   children: [
-                                     Expanded(
-                                       child: WhiteElevatedButton(
-                                           text: "Contact Manager",
-                                           onPressed: () {}),
-                                     ),
-                                     Expanded(
-                                       child: WhiteElevatedButton(
-                                           text: "Mark as Complete",
-                                           onPressed: () {
-                                             context
-                                                 .read<TaskCubit>()
-                                                 .completeTask(
-                                                     task.taskReference);
-                                           }),
-                                     )
-                                   ],
-                                 )
-                               : Row(children: [
-                                   Expanded(
-                                     child: WhiteElevatedButton(
-                                         text: "Edit", onPressed: showEditForm()),
-                                   ),
-                                   Expanded(
-                                     child: RedElevatedButton(
-                                         text: "Delete", onPressed: showDeleteForm()),
-                                   ),
-                                   
-                                   task.status == "waiting"
-                                       ? Expanded(
-                                         child: GreenElevatedButton(
-                                             text: "Approve",
-                                             onPressed: () {}),
-                                       )
-                                       : const SizedBox(),
-                                   
-                                 ]),
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: WhiteElevatedButton(
+                            text: "Contact Manager", onPressed: () {}),
+                      ),
+                      Expanded(
+                        child: WhiteElevatedButton(
+                            text: "Mark as Complete",
+                            onPressed: () {
+                              context
+                                  .read<TaskCubit>()
+                                  .completeTask(task.taskReference);
+                            }),
+                      )
+                    ],
+                  )
+                : Row(children: [
+                    Expanded(
+                      child: WhiteElevatedButton(
+                          text: userRole == "worker"
+                              ? "Mark as Complete"
+                              : "Edit",
+                          onPressed: () => editOrComplete(task)),
+                    ),
+                    Expanded(
+                      child: RedElevatedButton(
+                          text: userRole == "worker"
+                              ? "Contact Manager"
+                              : "Delete",
+                          onPressed: () => deleteOrContact(
+                              userRole == "worker" ? managerReference : task)),
+                    ),
+                    task.status == "waiting"
+                        ? Expanded(
+                            child: GreenElevatedButton(
+                                text: "Approve", onPressed: () {}),
+                          )
+                        : const SizedBox(),
+                  ]),
 
-            SizedBox(height: 20),
-            
+            const SizedBox(height: 20),
+
             Align(
               alignment: Alignment.center,
               child: WhiteElevatedButton(
@@ -219,7 +228,6 @@ class TaskDetailsDialog extends StatelessWidget {
                 text: "Close",
               ),
             ),
-
           ],
         ),
       ),
@@ -240,7 +248,7 @@ class TaskDetailsDialog extends StatelessWidget {
                   .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               value,
@@ -263,19 +271,24 @@ class EmployeeDetailsDialog extends StatelessWidget {
   final Function toggleAccount;
   final Function profileFunction;
 
-  const EmployeeDetailsDialog({super.key, required this.employee, required this.tasksFunction, required this.profileFunction, required this.toggleAccount});
+  const EmployeeDetailsDialog(
+      {super.key,
+      required this.employee,
+      required this.tasksFunction,
+      required this.profileFunction,
+      required this.toggleAccount});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(
+        side: const BorderSide(
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Employee details"),
-      content: Container(
+      title: const Text("Employee Details"),
+      content: SizedBox(
         width: double.maxFinite, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
@@ -291,37 +304,34 @@ class EmployeeDetailsDialog extends StatelessWidget {
                     0, employee.creationDate.toString().length - 12)),
             _buildDetailRow(
                 "Status:", employee.enabled ? "Enabled" : "Disabled"),
-            SizedBox(height: 20), // Add spacing between details and buttons
+            const SizedBox(
+                height: 20), // Add spacing between details and buttons
 
-              Row(
-                                  children: [
-                                    Expanded(
-                                      child: WhiteElevatedButton(
-                                          text: "Tasks",
-                                          onPressed: () {
-                                           tasksFunction();
-                                          }),
-                                    ),
-                                    Expanded(
-                                      child: WhiteElevatedButton(
-                                          text: "Show profile",
-                                          onPressed: () {
-                                            profileFunction();
-                                          }),
-                                    ),
-                                    Expanded(
-                                      child: RedElevatedButton(
-                                          text: employee.enabled
-                                              ? "Disable account"
-                                              : "Enable account",
-                                          onPressed: () {
-                                            toggleAccount();
-                                          }),
-                                    ),
-                                  ],
-                                ),
-              SizedBox(height: 20),
-            
+            Row(
+              children: [
+                Expanded(
+                  child: WhiteElevatedButton(
+                    text: "Tasks",
+                    onPressed: () => tasksFunction(employee),
+                  ),
+                ),
+                Expanded(
+                  child: WhiteElevatedButton(
+                    text: "Show profile",
+                    onPressed: () => profileFunction(employee),
+                  ),
+                ),
+                Expanded(
+                  child: RedElevatedButton(
+                    text:
+                        employee.enabled ? "Disable account" : "Enable account",
+                    onPressed: () => toggleAccount(employee),
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 20),
+
             Align(
               alignment: Alignment.center,
               child: WhiteElevatedButton(
@@ -351,7 +361,7 @@ class EmployeeDetailsDialog extends StatelessWidget {
                   .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               value,
@@ -373,20 +383,23 @@ class InventoryDetailsDialog extends StatelessWidget {
   final Function editInventory;
   final Function deleteInventory;
 
-
-  const InventoryDetailsDialog({super.key, required this.inventory, required this.editInventory, required this.deleteInventory});
+  const InventoryDetailsDialog(
+      {super.key,
+      required this.inventory,
+      required this.editInventory,
+      required this.deleteInventory});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(
+        side: const BorderSide(
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Inventory details"),
-      content: Container(
+      title: const Text("Inventory Details"),
+      content: SizedBox(
         width: double.maxFinite, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
@@ -400,29 +413,28 @@ class InventoryDetailsDialog extends StatelessWidget {
                 inventory.timeAdded
                     .toString()
                     .substring(0, inventory.timeAdded.toString().length - 7)),
-            SizedBox(height: 20), // Add spacing between details and buttons
+            const SizedBox(
+                height: 20), // Add spacing between details and buttons
             Row(
-                                  children: [
-                                    Expanded(
-                                      child: WhiteElevatedButton(
-                                          text: "Edit",
-                                          onPressed: () {
-                                           editInventory();
-                                          }),
-                                    ),
-                                    
-                                    Expanded(
-                                      child: RedElevatedButton(
-                                          text:
-                                               "Delete",
-                                          onPressed: () {
-                                            deleteInventory();
-                                          }),
-                                    ),
-                                  ],
-                                ),
-              SizedBox(height: 20),
-            
+              children: [
+                Expanded(
+                  child: WhiteElevatedButton(
+                      text: "Edit",
+                      onPressed: () {
+                        editInventory();
+                      }),
+                ),
+                Expanded(
+                  child: RedElevatedButton(
+                      text: "Delete",
+                      onPressed: () {
+                        deleteInventory();
+                      }),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
             Align(
               alignment: Alignment.center,
               child: WhiteElevatedButton(
@@ -452,7 +464,7 @@ class InventoryDetailsDialog extends StatelessWidget {
                   .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               value,
@@ -479,12 +491,12 @@ class PlantDetailsDialog extends StatelessWidget {
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(
+        side: const BorderSide(
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Plant details"),
-      content: Container(
+      title: const Text("Plant Details"),
+      content: SizedBox(
         width: double.maxFinite, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
@@ -498,7 +510,8 @@ class PlantDetailsDialog extends StatelessWidget {
                 plant.birthdate
                     .toString()
                     .substring(0, plant.birthdate.toString().length - 7)),
-            SizedBox(height: 20), // Add spacing between details and buttons
+            const SizedBox(
+                height: 20), // Add spacing between details and buttons
             Align(
               alignment: Alignment.center,
               child: WhiteElevatedButton(
@@ -528,7 +541,7 @@ class PlantDetailsDialog extends StatelessWidget {
                   .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               value,
@@ -550,19 +563,23 @@ class ProgramDetailsDialog extends StatelessWidget {
   final Function editProgram;
   final Function deleteProgram;
 
-  const ProgramDetailsDialog({super.key, required this.program, required this.editProgram, required this.deleteProgram});
+  const ProgramDetailsDialog(
+      {super.key,
+      required this.program,
+      required this.editProgram,
+      required this.deleteProgram});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
-        side: BorderSide(
+        side: const BorderSide(
             color: Colors.transparent,
             width: 2.0), // Add border color and width
       ),
-      title: Text("Program details"),
-      content: Container(
+      title: const Text("Program Details"),
+      content: SizedBox(
         width: double.maxFinite, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
@@ -575,29 +592,27 @@ class ProgramDetailsDialog extends StatelessWidget {
                 program.creationDate
                     .toString()
                     .substring(0, program.creationDate.toString().length - 7)),
-            SizedBox(height: 20), // Add spacing between details and buttons
+            const SizedBox(
+                height: 20), // Add spacing between details and buttons
             Row(
-                                  children: [
-                                    Expanded(
-                                      child: WhiteElevatedButton(
-                                          text: "Edit",
-                                          onPressed: () {
-                                           editProgram();
-                                          }),
-                                    ),
-                                    
-                                    Expanded(
-                                      child: RedElevatedButton(
-                                          text:
-                                               "Delete",
-                                          onPressed: () {
-                                            deleteProgram();
-                                          }),
-                                    ),
-                                  ],
-                                ),
-              SizedBox(height: 20),
-            
+              children: [
+                Expanded(
+                  child: WhiteElevatedButton(
+                      text: "Edit",
+                      onPressed: () {
+                        editProgram();
+                      }),
+                ),
+                Expanded(
+                  child: RedElevatedButton(
+                      text: "Delete",
+                      onPressed: () {
+                        deleteProgram();
+                      }),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             Align(
               alignment: Alignment.center,
               child: WhiteElevatedButton(
@@ -627,7 +642,7 @@ class ProgramDetailsDialog extends StatelessWidget {
                   .colorScheme.onPrimary, // Optional: Customize label color
             ),
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Expanded(
             child: Text(
               value,
@@ -649,9 +664,9 @@ class ToggleButtonContainer extends StatelessWidget {
   final String imgPath;
   final BuildContext context;
   final DocumentReference userReference;
-  
-  ToggleButtonContainer(
-      {required this.imgPath,
+  const ToggleButtonContainer(
+      {super.key,
+      required this.imgPath,
       required this.equipment,
       required this.context,
       required this.userReference});
@@ -662,13 +677,13 @@ class ToggleButtonContainer extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Container(
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(25),
-            color: equipment.status
-                ? theme.colorScheme.secondary.withOpacity(0.75)
-                : theme.colorScheme.primary.withOpacity(0.75),
-            border: Border.all(width: 2, color: Colors.white30),
-                ),
-            
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
+          color: equipment.status
+              ? theme.colorScheme.secondary.withOpacity(0.75)
+              : theme.colorScheme.primary.withOpacity(0.75),
+          border: Border.all(width: 2, color: Colors.white30),
+        ),
+
         margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
         // color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary,
         width: MediaQuery.of(context).size.width * 0.5,
@@ -694,16 +709,11 @@ class ToggleButtonContainer extends StatelessWidget {
                         alignment: Alignment.centerLeft,
                         child: Container(
                           margin: EdgeInsets.fromLTRB(2, 10, 2, 2),
-                            child: ClipOval(
-                              child: Image.asset(
-                                imgPath,
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover),
-                            ),
-                        )
-                        
-                        )),
+                          child: ClipOval(
+                            child: Image.asset(imgPath,
+                                width: 100, height: 100, fit: BoxFit.cover),
+                          ),
+                        ))),
                 Expanded(
                   child: Align(
                     alignment: Alignment.centerRight,
@@ -719,12 +729,12 @@ class ToggleButtonContainer extends StatelessWidget {
                 )
               ]),
               Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(
-                      equipment.type,
-                      style: subheadingTextStyle,
-                    ),
-                  )
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  equipment.type,
+                  style: subheadingTextStyle,
+                ),
+              )
             ],
           ),
         ),
@@ -807,7 +817,6 @@ class WavePainter2 extends CustomPainter {
   }
 }
 
-
 class Readings extends StatelessWidget {
   final String title;
   final String value;
@@ -823,17 +832,17 @@ class Readings extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Card(
+        home: Card(
       elevation: 4.0,
       margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: ListTile(
         leading: Icon(icon, color: color, size: 40),
-        title: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        title: Text(title,
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         subtitle: Text('Seasonal normal'),
-        trailing: Text(value, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+        trailing: Text(value,
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
       ),
-    )
-    );
+    ));
   }
 }
-
