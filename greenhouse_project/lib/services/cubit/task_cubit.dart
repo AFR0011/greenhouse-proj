@@ -28,8 +28,7 @@ class TaskCubit extends Cubit<TaskState> {
   void _getTasks() async {
     if (!_isActive) return;
     DocumentSnapshot userSnapshot = await userReference.get();
-    Map<String, dynamic> userData =
-        await userSnapshot.data() as Map<String, dynamic>;
+    Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
     String userRole = userData['role'];
 
     //Get user Tasks
@@ -92,14 +91,15 @@ class TaskCubit extends Cubit<TaskState> {
     }
   }
 
-  Future<void> removeTask(
+  void removeTask(
       DocumentReference item, DocumentReference userReference) async {
     if (!_isActive) return;
     emit(TaskLoading());
     try {
-      Map<String, dynamic> data =
-          item.get().then((doc) => doc.data()) as Map<String, dynamic>;
-      logs.add({
+      DocumentSnapshot snapshot = await item.get();
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+      await item.delete();
+      await logs.add({
         "action": "Delete",
         "description":
             "Task deleted by user at ${Timestamp.now().toString()} program details: ${data["title"]}",
@@ -108,11 +108,8 @@ class TaskCubit extends Cubit<TaskState> {
         "userId": userReference,
         "externalId": item,
       });
-
-      await item.delete();
-      _getTasks();
-    } catch (error) {
-      emit(TaskError(error.toString()));
+    } catch (error, stack) {
+      emit(TaskError(stack.toString()));
     }
   }
 
@@ -121,7 +118,7 @@ class TaskCubit extends Cubit<TaskState> {
     if (!_isActive) return;
     emit(TaskLoading());
     try {
-      await item.set(data, SetOptions(merge: true));
+      await item.update(data);
       _getTasks();
       logs.add({
         "action": "Update",
@@ -148,6 +145,7 @@ class TaskData {
   final String status;
   final String title;
   final DateTime dueDate;
+  final DocumentReference manager;
   final DocumentReference taskReference;
 
   TaskData(
@@ -155,6 +153,7 @@ class TaskData {
       required this.status,
       required this.title,
       required this.dueDate,
+      required this.manager,
       required this.taskReference});
 
   factory TaskData.fromFirestore(DocumentSnapshot doc) {
@@ -164,6 +163,7 @@ class TaskData {
       dueDate: (data['dueDate'] as Timestamp).toDate(),
       status: data['status'],
       title: data['title'],
+      manager: data['manager'],
       taskReference: doc.reference,
     );
   }

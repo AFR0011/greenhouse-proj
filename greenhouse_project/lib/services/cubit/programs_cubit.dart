@@ -21,9 +21,9 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     if (!_isActive) return;
     programs.orderBy('creationDate', descending: true).snapshots().listen(
         (snapshot) {
-        final List<ProgramData> programs =
-            snapshot.docs.map((doc) => ProgramData.fromFirestore(doc)).toList();
-        emit(ProgramsLoaded([...programs]));
+      final List<ProgramData> programs =
+          snapshot.docs.map((doc) => ProgramData.fromFirestore(doc)).toList();
+      emit(ProgramsLoaded([...programs]));
     }, onError: (error) {
       emit(ProgramsError(error));
     });
@@ -45,6 +45,8 @@ class ProgramsCubit extends Cubit<ProgramsState> {
         "userId": userReference,
         "externalId": externalId,
       });
+
+      _getPrograms();
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }

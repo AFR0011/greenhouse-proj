@@ -1,8 +1,6 @@
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:flutter/material.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
-// import "package:flutter/foundation.dart";
-// part "task_edit_state.dart";
 
 class TaskEditCubit extends Cubit<List<dynamic>> {
   bool _isActive = true;
