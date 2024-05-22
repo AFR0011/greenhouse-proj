@@ -12,10 +12,35 @@ AppBar createMainAppBar(BuildContext context, UserCredential userCredential,
     DocumentReference userReference, String title) {
   return AppBar(
     // Hide back button
+    flexibleSpace: Container(
+      decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green.shade700, Colors.teal.shade400],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                ),
+                
+            ),
+    ),
     automaticallyImplyLeading: false,
     toolbarHeight: 75,
     centerTitle: true,
-    title: Text(title, style: headingTextStyle),
+   title: Text(
+            title,
+            style: TextStyle(
+              fontFamily: 'Pacifico', // use a custom font
+              fontSize: 28.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  blurRadius: 10.0,
+                  color: Colors.black54,
+                  offset: Offset(2.0, 2.0),
+                ),
+              ],
+            ),
+          ),
     leading: IconButton(
       onPressed: () => Navigator.push(
           context,
@@ -36,23 +61,61 @@ AppBar createMainAppBar(BuildContext context, UserCredential userCredential,
                     ))),
         icon: Image.asset("lib/utils/Icons/Profile.png"),
       )
+      
     ],
+    shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(30.0),
+            ),
+          ),
+          elevation: 10.0,
   );
 }
 
 AppBar createAltAppbar(BuildContext context, String title) {
   return AppBar(
-    automaticallyImplyLeading: true,
-    centerTitle: true,
-    title: Text(
-      title,
-      style: headingTextStyle,
+    flexibleSpace: Container(
+      decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green.shade700, Colors.teal.shade400],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                ),
+                
+            ),
     ),
+    automaticallyImplyLeading: false,
+    toolbarHeight: 75,
+    centerTitle: true,
+   title: Text(
+            title,
+            style: TextStyle(
+              fontFamily: 'Pacifico', // use a custom font
+              fontSize: 28.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  blurRadius: 10.0,
+                  color: Colors.black54,
+                  offset: Offset(2.0, 2.0),
+                ),
+              ],
+            ),
+          ),
+    
     leading: IconButton(
       icon: const Icon(Icons.arrow_back),
       onPressed: () {
         Navigator.pop(context);
       },
     ),
+    shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(30.0),
+            ),
+          ),
+          elevation: 10.0,
   );
+
 }

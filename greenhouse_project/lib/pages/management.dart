@@ -164,48 +164,89 @@ class _ManagementPageState extends State<_ManagementPageContent> {
 
       // Scrollable list of items
       // Tasks subsection
-      body: SingleChildScrollView(
-        child: Column(children: [
-          Padding(
-            padding: EdgeInsets.all(24.0),
-            child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12.0,
-                    mainAxisSpacing: 12.0,
-                    mainAxisExtent: 250),
-                shrinkWrap: true,
-                itemCount: 2,
-                itemBuilder: (context, index) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-
-                    child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 20,sigmaY: 20),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 241, 13, 13).withOpacity(0.2),
-                          border:  Border.all(
-                            width: 1.5,
-                            color: const Color.fromARGB(255, 234, 17, 17).withOpacity(0.2)
-                          )
-                        ),
-                        child: BoxLink(
-                            text: pages[index]["title"],
-                            imgPath: pages[index]["icon"],
-                            context: context,
-                            pageRoute: pages[index]["route"]),
-                      ),
-                    ),
-                  );
-                }),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ]),
+          image: DecorationImage(
+            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.05),
+              BlendMode.dstATop,
+            ),
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(children: [
+            Padding(
+              padding: EdgeInsets.all(24.0),
+              child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12.0,
+                      mainAxisSpacing: 12.0,
+                      mainAxisExtent: 250),
+                  shrinkWrap: true,
+                  itemCount: 2,
+                  itemBuilder: (context, index) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+        
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 20,sigmaY: 20),
+                          child: BoxLink(
+                              text: pages[index]["title"],
+                              imgPath: pages[index]["icon"],
+                              context: context,
+                              pageRoute: pages[index]["route"]),
+                        
+                      
+                    ));
+                  }),
+            ),
+          ]),
+        ),
       ),
 
       // Footer nav bar
       bottomNavigationBar:
-          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-    );
+
+          PreferredSize(
+            preferredSize: Size.fromHeight(50.0),
+             child: Container(
+                     decoration: BoxDecoration(
+                       gradient: LinearGradient(
+              colors: [Colors.green.shade700, Colors.teal.shade400, Colors.blue.shade300],
+              stops: [0.2, 0.5, 0.9],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+                       ),
+                       boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+                       ],
+                     ),
+                     child: ClipRRect(
+                       borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30.0),
+              topRight: Radius.circular(30.0),
+                       ),
+            child: createFooterNav(_selectedIndex, footerNavCubit, _userRole)
+            ),
+            )),
+           );
+  
   }
 }

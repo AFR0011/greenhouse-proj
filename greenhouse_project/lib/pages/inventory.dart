@@ -158,49 +158,97 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           context, widget.userCredential, _userReference, "Inventory"),
 
       // Scrollable list of items
-      body: SingleChildScrollView(
-        // BlocBuilder for inventory items
-        child: BlocBuilder<InventoryCubit, InventoryState>(
-            builder: (context, state) {
-          // Show "loading screen" if processing equipment state
-          if (state is InventoryLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          // Show inventory items once inventory state is loaded
-          else if (state is InventoryLoaded) {
-            // Separate pending and actual inventory items
-            List<InventoryData> inventoryList = state.inventory;
-            List actualInventory = inventoryList.map((e) {
-              if (!e.isPending) return e;
-            }).toList();
-            actualInventory.removeNull();
-            List pendingInventory = inventoryList.map((e) {
-              if (e.isPending) return e;
-            }).toList();
-            pendingInventory.removeNull();
-
-            // Function call to create inventory list
-            return _createInventoryList(
-                actualInventory, pendingInventory, context);
-          }
-          // Show error message once an error occurs
-          else if (state is InventoryError) {
-            return Text(state.error.toString());
-          }
-          // If the state is not any of the predefined states;
-          // never happens; but, anything can happen
-          else {
-            return const Text("Something went wrong...");
-          }
-        }),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          image: DecorationImage(
+            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.05),
+              BlendMode.dstATop,
+            ),
+          ),
+        ),
+        child: SingleChildScrollView(
+          // BlocBuilder for inventory items
+          child: BlocBuilder<InventoryCubit, InventoryState>(
+              builder: (context, state) {
+            // Show "loading screen" if processing equipment state
+            if (state is InventoryLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            // Show inventory items once inventory state is loaded
+            else if (state is InventoryLoaded) {
+              // Separate pending and actual inventory items
+              List<InventoryData> inventoryList = state.inventory;
+              List actualInventory = inventoryList.map((e) {
+                if (!e.isPending) return e;
+              }).toList();
+              actualInventory.removeNull();
+              List pendingInventory = inventoryList.map((e) {
+                if (e.isPending) return e;
+              }).toList();
+              pendingInventory.removeNull();
+        
+              // Function call to create inventory list
+              return _createInventoryList(
+                  actualInventory, pendingInventory, context);
+            }
+            // Show error message once an error occurs
+            else if (state is InventoryError) {
+              return Text(state.error.toString());
+            }
+            // If the state is not any of the predefined states;
+            // never happens; but, anything can happen
+            else {
+              return const Text("Something went wrong...");
+            }
+          }),
+        ),
       ),
 
       // Footer nav bar
       bottomNavigationBar:
-          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-    );
+
+          PreferredSize(
+            preferredSize: Size.fromHeight(50.0),
+             child: Container(
+                     decoration: BoxDecoration(
+                       gradient: LinearGradient(
+              colors: [Colors.green.shade700, Colors.teal.shade400, Colors.blue.shade300],
+              stops: [0.2, 0.5, 0.9],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+                       ),
+                       boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+                       ],
+                     ),
+                     child: ClipRRect(
+                       borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30.0),
+              topRight: Radius.circular(30.0),
+                       ),
+            child: createFooterNav(_selectedIndex, footerNavCubit, _userRole)
+            ),
+            ),
+            ));
   }
 
   // Create inventory list function

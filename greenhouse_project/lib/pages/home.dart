@@ -143,29 +143,69 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     // Page content
     return Scaffold(
       // Main appbar (header)
-      appBar: createMainAppBar(
-          context, widget.userCredential, _userReference, "Welcome"),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80.0),
+        child: createMainAppBar(
+            context, widget.userCredential, _userReference, "Welcome"),
+      ),
 
       // Call function to build notificaitons list
-      body: _buildNotifications(),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          image: DecorationImage(
+            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.05),
+              BlendMode.dstATop,
+            ),
+          ),
+        ),
+        child:_buildNotifications()),
 
       // Footer nav bar
       bottomNavigationBar:
-          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-    );
+           PreferredSize(
+            preferredSize: Size.fromHeight(50.0),
+             child: Container(
+                     decoration: BoxDecoration(
+                       gradient: LinearGradient(
+              colors: [Colors.green.shade700, Colors.teal.shade400, Colors.blue.shade300],
+              stops: [0.2, 0.5, 0.9],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+                       ),
+                       boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+                       ],
+                     ),
+                     child: ClipRRect(
+                       borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30.0),
+              topRight: Radius.circular(30.0),
+                       ),
+                       child:  createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+             )),
+           ));
   }
 
   Widget _buildNotifications() {
     return Column(
       children: [
-        // Welcome message
-        Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 20),
-          child: Center(
-              child:
-                  Text("Welcome Back, $_userName!", style: headingTextStyle)),
-        ),
-
         // Notifications subheading
         SizedBox(
           width: MediaQuery.of(context).size.width - 20,

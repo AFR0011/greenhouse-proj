@@ -131,10 +131,56 @@ class _ChatsPageState extends State<_ChatsPageContent> {
     return Scaffold(
       appBar: createMainAppBar(
           context, widget.userCredential, _userReference, 'Chats'),
-      body: _buildChatsList(),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          image: DecorationImage(
+            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.05),
+              BlendMode.dstATop,
+            ),
+          ),
+        ),
+        child: _buildChatsList()
+        ),
       bottomNavigationBar:
-          createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-    );
+          PreferredSize(
+            preferredSize: Size.fromHeight(50.0),
+             child: Container(
+                     decoration: BoxDecoration(
+                       gradient: LinearGradient(
+              colors: [Colors.green.shade700, Colors.teal.shade400, Colors.blue.shade300],
+              stops: [0.2, 0.5, 0.9],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+                       ),
+                       boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3), // changes position of shadow
+              ),
+                       ],
+                     ),
+                     child: ClipRRect(
+                       borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30.0),
+              topRight: Radius.circular(30.0),
+                       ),
+            child: createFooterNav(_selectedIndex, footerNavCubit, _userRole)
+            ),
+            ),
+            ));
   }
 
   Widget _buildChatsList() {
@@ -200,44 +246,45 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             ),
           );
         },
-        child: Container(
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide())),
-          child: Row(
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 5, bottom: 5),
-                child: Align(
-                  alignment: Alignment.centerLeft,
+        child: Row(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 5, bottom: 5),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
                   child: ClipOval(
                       child: Image.memory(
                     chat!.receiverPicture,
                     width: 50,
                     height: 50,
+                    fit: BoxFit.cover,
                   )),
                 ),
               ),
-              Container(
-                  margin: const EdgeInsets.only(left: 5),
-                  child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text.rich(
-                        TextSpan(
-                            text:
-                                "${receiverData?['name']} ${receiverData?['surname']}",
-                            style: bodyTextStyle,
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: "     (" + receiverData!['role'] + ")",
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w300,
-                                  color: Colors.grey,
-                                  fontSize: 14.0,
-                                ),
+            ),
+            Container(
+                margin: const EdgeInsets.only(left: 5),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text.rich(
+                      TextSpan(
+                          text:
+                              "${receiverData?['name']} ${receiverData?['surname']}",
+                          style: bodyTextStyle,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: "     (" + receiverData!['role'] + ")",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w300,
+                                color: Colors.grey,
+                                fontSize: 14.0,
                               ),
-                            ]),
-                      )))
-            ],
-          ),
+                            ),
+                          ]),
+                    )))
+          ],
         ),
       ),
     );

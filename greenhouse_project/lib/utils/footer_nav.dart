@@ -78,7 +78,7 @@ BottomNavigationBar createFooterNav(
     int selectedIndex, FooterNavCubit footerNavCubit, String userRole) {
   final footerNav = BottomNavigationBar(
     elevation: 120,
-    backgroundColor: theme.colorScheme.background,
+    backgroundColor: Colors.transparent,
     type: BottomNavigationBarType.fixed,
     selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
     items: [
