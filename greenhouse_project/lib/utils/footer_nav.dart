@@ -84,21 +84,44 @@ BottomNavigationBar createFooterNav(
     items: [
       userRole != "worker"
           ? const BottomNavigationBarItem(
-              icon: Icon(Icons.precision_manufacturing_rounded),
+              icon: Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Icon(Icons.precision_manufacturing_rounded)
+              ),
               label: "Manage")
-          : BottomNavigationBarItem(
-              icon: Image.asset("lib/utils/Icons/Clipboard.png",
-                  width: 24, height: 24),
+          : const BottomNavigationBarItem(
+              icon: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.task_outlined),
+              ),
               label: "Tasks"),
       const BottomNavigationBarItem(
-          icon: Icon(Icons.inventory), label: "Inventory"),
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+        icon: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(Icons.inventory),
+        ),
+        label: "Inventory"),
+      const BottomNavigationBarItem(
+        icon: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(Icons.home),
+        ),
+        label: "Home"),
       BottomNavigationBarItem(
-          icon: Image.asset("lib/utils/Icons/Leaf.png", width: 24, height: 24),
-          label: "Grow"),
-      const BottomNavigationBarItem(icon: Icon(Icons.message), label: "Chat"),
+        icon: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Image.asset("lib/utils/Icons/Leaf.png", width: 24, height: 24),
+        ),
+        label: "Grow"),
+      const BottomNavigationBarItem(
+        icon: Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Icon(Icons.chat),
+        ),
+        label: "Chat"),
     ],
     currentIndex: selectedIndex,
+    selectedItemColor: Colors.white60,
     onTap: (index) =>
         {if (selectedIndex != index) footerNavCubit.updateSelectedIndex(index)},
   );

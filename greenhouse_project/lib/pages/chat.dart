@@ -170,9 +170,10 @@ class _ChatPageState extends State<_ChatPageContent> {
                   alignment: Alignment.centerLeft,
                   child: ClipOval(
                     child: Image.memory(
-                      chat!.receiverPicture,
-                      width: 25,
-                      height: 25,
+                      chat.receiverPicture,
+                      width: 50,
+                      height: 50,
+                      fit: BoxFit.cover,
                     ),)
                 ),
               ),
