@@ -147,6 +147,8 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             colorFilter: ColorFilter.mode(
               Colors.white.withOpacity(0.05),
               BlendMode.dstATop,
+
+              
             ),
           ),
         ),
