@@ -115,265 +115,328 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
     return Scaffold(
       // Appbar (header)
       appBar: AppBar(
-          automaticallyImplyLeading: true,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.arrow_back),
-          )),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 40.0),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width - 20,
-              child: const Text(
-                "Employees",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.left,
+        flexibleSpace: Container(
+      decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green.shade700, Colors.teal.shade400],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                ),
+                image: DecorationImage(
+                image: AssetImage('lib/utils/Icons/leaf_pat.jpg'), // your background image
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                    Colors.black.withOpacity(0.1), BlendMode.dstATop),
               ),
             ),
+    ),
+    automaticallyImplyLeading: false,
+    toolbarHeight: 75,
+    centerTitle: true,
+   title: Text(
+            "Employees",
+            style: TextStyle(
+              fontFamily: 'Pacifico', // use a custom font
+              fontSize: 28.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  blurRadius: 10.0,
+                  color: Colors.black54,
+                  offset: Offset(2.0, 2.0),
+                ),
+              ],
+            ),
           ),
-          // BlocBuilder for manageEmployees state
-          BlocBuilder<ManageEmployeesCubit, ManagementState>(
-            builder: (context, state) {
-              // Show "loading screen" if processing manageEmployees state
-              if (state is ManageEmployeesLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              // Show employees if manageEmployees state is loaded
-              else if (state is ManageEmployeesLoaded) {
-                List<EmployeeData> employeeList = state.employees; // employees list
-
-                // Display nothing if no employees
-                if (employeeList.isEmpty) {
-                  return const Center(child: Text("No Employees..."));
+    
+    leading: IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    ),
+    shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(30.0),
+            ),
+          ),
+          elevation: 10.0,
+          ),
+      body:
+       Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          image: DecorationImage(
+            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.05),
+              BlendMode.dstATop,
+            ),
+          ),
+        ),
+         child: Column(
+           crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 40.0),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width - 20,
+                child: const Text(
+                  "Employees",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.left,
+                ),
+              ),
+            ),
+            // BlocBuilder for manageEmployees state
+            BlocBuilder<ManageEmployeesCubit, ManagementState>(
+              builder: (context, state) {
+                // Show "loading screen" if processing manageEmployees state
+                if (state is ManageEmployeesLoading) {
+                  return const Center(child: CircularProgressIndicator());
                 }
-                // Display employees
-                else {
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                         SizedBox(
-                          height: MediaQuery.of(context).size.height / 3,
-                           child: ListView.builder( 
-                            shrinkWrap: true,
-                            itemCount: employeeList.length,
-                            itemBuilder: (context, index) {
-                            EmployeeData employee = employeeList[index]; // employee info
-                            void tasksFunction() {
-                                  Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        TasksPage(
-                                          userCredential: widget
-                                              .userCredential,
-                                          userReference:
-                                              employee.reference,
-                                        )));
-                            }
-                            void toggleAccount() {
-                              showDialog(
-                              context: context,
-                              builder: (context) {
-                                return AlertDialog(shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  side: BorderSide(
-                                      color: Colors.transparent,
-                                      width: 2.0), // Add border color and width
-                                ),
-                                  title: const Text("Are you sure"),
-                                    content: SizedBox(
-                                      width: double.maxFinite,
-                                      child: Column(
-                                      mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                      Center(
-                                        child: Row(
-                                          children: [
-                                            Expanded(
-                                              child: GreenElevatedButton(
-                                                  text: "Confirm",
-                                                  onPressed: () {
-                                                    if (employee
-                                                        .enabled) {
-                                                      manageEmployeesCubit
-                                                          .disableEmployee(
-                                                              employee)
-                                                          .then((_) {
-                                                             Navigator.pop(context);Navigator.pop(context);
-                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                              const SnackBar(
-                                                                  content:
-                                                                      Text("Account disabled successfuly!")));
-                                                          });
-                                                    } else {
-                                                      manageEmployeesCubit
-                                                          .enableEmployee(
-                                                              employee)
-                                                          .then((_) { 
-                                                            Navigator.pop(context);Navigator.pop(context);
-                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                  const SnackBar(
-                                                                      content:
-                                                                          Text("Account enabled successfuly!")));});
-                                                    }
-                                                  }),
-                                            ),
-                                            Expanded(
-                                              child: WhiteElevatedButton(
-                                                  text: "Go Back",
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                          context)),
-                                            ),
-                                          ],
+                // Show employees if manageEmployees state is loaded
+                else if (state is ManageEmployeesLoaded) {
+                  List<EmployeeData> employeeList = state.employees; // employees list
+         
+                  // Display nothing if no employees
+                  if (employeeList.isEmpty) {
+                    return const Center(child: Text("No Employees..."));
+                  }
+                  // Display employees
+                  else {
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                           SizedBox(
+                            height: MediaQuery.of(context).size.height / 3,
+                             child: ListView.builder( 
+                              shrinkWrap: true,
+                              itemCount: employeeList.length,
+                              itemBuilder: (context, index) {
+                              EmployeeData employee = employeeList[index]; // employee info
+                              void tasksFunction() {
+                                    Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          TasksPage(
+                                            userCredential: widget
+                                                .userCredential,
+                                            userReference:
+                                                employee.reference,
+                                          )));
+                              }
+                              void toggleAccount() {
+                                showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    side: BorderSide(
+                                        color: Colors.transparent,
+                                        width: 2.0), // Add border color and width
+                                  ),
+                                    title: const Text("Are you sure"),
+                                      content: SizedBox(
+                                        width: double.maxFinite,
+                                        child: Column(
+                                        mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                        Center(
+                                          child: Row(
+                                            children: [
+                                              Expanded(
+                                                child: GreenElevatedButton(
+                                                    text: "Confirm",
+                                                    onPressed: () {
+                                                      if (employee
+                                                          .enabled) {
+                                                        manageEmployeesCubit
+                                                            .disableEmployee(
+                                                                employee)
+                                                            .then((_) {
+                                                               Navigator.pop(context);Navigator.pop(context);
+                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                const SnackBar(
+                                                                    content:
+                                                                        Text("Account disabled successfuly!")));
+                                                            });
+                                                      } else {
+                                                        manageEmployeesCubit
+                                                            .enableEmployee(
+                                                                employee)
+                                                            .then((_) { 
+                                                              Navigator.pop(context);Navigator.pop(context);
+                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                    const SnackBar(
+                                                                        content:
+                                                                            Text("Account enabled successfuly!")));});
+                                                      }
+                                                    }),
+                                              ),
+                                              Expanded(
+                                                child: WhiteElevatedButton(
+                                                    text: "Go Back",
+                                                    onPressed: () =>
+                                                        Navigator.pop(
+                                                            context)),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                                                  ],
-                                                                ),
-                                    ));
-                              });
-                            }
-                            void profileFunction() {
-                              Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            ProfilePage(
-                                                                userCredential: widget
-                                                                    .userCredential,
-                                                                userReference: employee
-                                                                    .reference)));
-                            }
-                            return Card(
+                                                                    ],
+                                                                  ),
+                                      ));
+                                });
+                              }
+                              void profileFunction() {
+                                Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              ProfilePage(
+                                                                  userCredential: widget
+                                                                      .userCredential,
+                                                                  userReference: employee
+                                                                      .reference)));
+                              }
+                              return Card(
+                                shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0),
+                                ),
+                                elevation: 4.0,
+                                margin: EdgeInsets.only(bottom: 16.0),
+                                child: ListTile(
+                                  leading: Container(
+                                  padding: EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withOpacity(0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                child: Icon(
+                                  Icons.account_box_outlined,
+                                  color: Colors.grey[600]!,
+                                  size: 30,
+                                ),
+                                ),
+                                  title: Text(employee.name,
+                                  style: TextStyle(fontWeight: FontWeight.bold,
+                                  fontSize: 18),
+                                  ),
+                                  subtitle: Text(employee.enabled ? "Active" : "Inactive"),
+                                  trailing: WhiteElevatedButton(
+                                    text: 'Details',
+                                    onPressed: () {
+                                      showDialog(
+                                        
+                                        context: context,
+                                        builder: (context) {
+                                          
+                                      return EmployeeDetailsDialog(employee: employee, tasksFunction: tasksFunction, toggleAccount: toggleAccount,profileFunction: profileFunction,);
+                                          
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                                                     },
+                                                   ),
+                           ),],
+                      ),
+                    );
+                  }
+                }
+                // Show error message once an error occurs
+                else if (state is ManageEmployeesError) {
+                  return Center(child: Text(state.error.toString()));
+                }
+                // If the state is not any of the predefined states;
+                // never happens; but, anything can happen
+                else {
+                  return const Center(child: Text('Unexpected State'));
+                }
+              },
+            ),
+         
+            GreenElevatedButton(
+                text: 'Add employee',
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return BlocBuilder<EmployeeEditCubit, List<dynamic>>(
+                          bloc: employeeEditCubit,
+                          builder: (context, state) {
+                            return AlertDialog(
                               shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15.0),
-                              ),
-                              elevation: 4.0,
-                              margin: EdgeInsets.only(bottom: 16.0),
-                              child: ListTile(
-                                leading: Container(
-                                padding: EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.1),
-                                  shape: BoxShape.circle,
-                                ),
-                              child: Icon(
-                                Icons.account_box_outlined,
-                                color: Colors.grey[600]!,
-                                size: 30,
-                              ),
-                              ),
-                                title: Text(employee.name,
-                                style: TextStyle(fontWeight: FontWeight.bold,
-                                fontSize: 18),
-                                ),
-                                subtitle: Text(employee.enabled ? "Active" : "Inactive"),
-                                trailing: WhiteElevatedButton(
-                                  text: 'Details',
-                                  onPressed: () {
-                                    showDialog(
-                                      
-                                      context: context,
-                                      builder: (context) {
-                                        
-                                    return EmployeeDetailsDialog(employee: employee, tasksFunction: tasksFunction, toggleAccount: toggleAccount,profileFunction: profileFunction,);
-                                        
-                                      },
-                                    );
-                                  },
+                              borderRadius: BorderRadius.circular(10.0),
+                              side: BorderSide(
+                                  color: Colors.transparent,
+                                  width: 2.0), // Add border color and width
+                            ),
+                              title: const Text("Add employee"),
+                              content: SizedBox(
+                                width: double.maxFinite,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  //Textfields
+                                  children: [
+                                    // InputTextField(controller: _emailController, labelText: "email"),
+                                    SizedBox(width: double.maxFinite , child: InputDropdown(items: const {"employee": "employee", "manager": "manager"}, value:state != '' ? state : "worker", onChanged: employeeEditCubit.updateState,)),
+                                    //Submit or Cancel
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: GreenElevatedButton(
+                                              text: 'Submit',
+                                              onPressed: () async {
+                                                await manageEmployeesCubit.createEmployee(
+                                                    _emailController.text,
+                                                    state[1],
+                                                    _userReference);
+                                                Navigator.pop(context);
+                                                _emailController.clear();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(const SnackBar(
+                                                        content: Text(
+                                                            "HI THERE, THIS WORKED!!!")));
+                                              }),
+                                        ),
+                                        Expanded(
+                                          child: WhiteElevatedButton(
+                                              text: 'Cancel',
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                _emailController.clear();
+                                              }),
+                                        )
+                                      ],
+                                    )
+                                  ],
                                 ),
                               ),
                             );
-                                                   },
-                                                 ),
-                         ),],
-                    ),
-                  );
-                }
-              }
-              // Show error message once an error occurs
-              else if (state is ManageEmployeesError) {
-                return Center(child: Text(state.error.toString()));
-              }
-              // If the state is not any of the predefined states;
-              // never happens; but, anything can happen
-              else {
-                return const Center(child: Text('Unexpected State'));
-              }
-            },
-          ),
-
-          GreenElevatedButton(
-              text: 'Add employee',
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return BlocBuilder<EmployeeEditCubit, List<dynamic>>(
-                        bloc: employeeEditCubit,
-                        builder: (context, state) {
-                          return AlertDialog(
-                            shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
-                            side: BorderSide(
-                                color: Colors.transparent,
-                                width: 2.0), // Add border color and width
-                          ),
-                            title: const Text("Add employee"),
-                            content: SizedBox(
-                              width: double.maxFinite,
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                //Textfields
-                                children: [
-                                  // InputTextField(controller: _emailController, labelText: "email"),
-                                  SizedBox(width: double.maxFinite , child: InputDropdown(items: const {"employee": "employee", "manager": "manager"}, value:state != '' ? state : "worker", onChanged: employeeEditCubit.updateState,)),
-                                  //Submit or Cancel
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: GreenElevatedButton(
-                                            text: 'Submit',
-                                            onPressed: () async {
-                                              await manageEmployeesCubit.createEmployee(
-                                                  _emailController.text,
-                                                  state[1],
-                                                  _userReference);
-                                              Navigator.pop(context);
-                                              _emailController.clear();
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(const SnackBar(
-                                                      content: Text(
-                                                          "HI THERE, THIS WORKED!!!")));
-                                            }),
-                                      ),
-                                      Expanded(
-                                        child: WhiteElevatedButton(
-                                            text: 'Cancel',
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              _emailController.clear();
-                                            }),
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    });
-              })
-        ],
-      ),
+                          },
+                        );
+                      });
+                })
+          ],
+               ),
+       ),
     );
     
   }

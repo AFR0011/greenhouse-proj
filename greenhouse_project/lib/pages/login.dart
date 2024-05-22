@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage>
           child: CustomPaint(
             painter: WavePainter1(),
             child: Container(
-              height: 300,
+              height: MediaQuery.of(context).size.height*0.7,
             ),
           ),
         ),
@@ -74,7 +74,7 @@ class _LoginPageState extends State<LoginPage>
           child: CustomPaint(
             painter: WavePainter(),
             child: Container(
-              height: 300,
+              height: MediaQuery.of(context).size.height*0.7,
             ),
           ),
         ),

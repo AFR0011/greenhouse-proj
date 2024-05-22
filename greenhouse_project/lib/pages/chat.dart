@@ -236,14 +236,14 @@ class _ChatPageState extends State<_ChatPageContent> {
           ),
           SafeArea(
             child: Container(
-              margin: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.05,0,MediaQuery.of(context).size.width * 0.05,MediaQuery.of(context).size.width * 0.02),
+              margin: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01),
               child: TextField(
                 controller: _textEditingController,
                 decoration: InputDecoration(
                   hintText: "send a message...",
                   suffixIcon: sendButton(chat),
                   filled: true,
-                  fillColor: theme.colorScheme.secondary,
+                  fillColor: theme.colorScheme.secondary.withOpacity(0.4),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))
                 ),
               ),
@@ -255,28 +255,6 @@ class _ChatPageState extends State<_ChatPageContent> {
     }
   }
 
-// Build the message input box
-  Widget _buildMessageInput(ChatsData? chat) {
-    return Row(
-      children: [
-        Expanded(
-          child:InputTextField(
-            controller: _textEditingController,
-             errorText: "",
-              labelText: "send a message"),
-              
-        ),
-        
-          IconButton(
-            onPressed: () {
-              _sendMessage(chat);
-            },
-            icon: const Icon(Icons.arrow_upward, size: 20),
-          ),
-        
-      ],
-    );
-  }
 
 // Function to send a message
   void _sendMessage(ChatsData? chat) {
