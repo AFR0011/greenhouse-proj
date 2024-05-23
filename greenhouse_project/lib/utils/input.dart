@@ -325,7 +325,7 @@ class EmployeeDetailsDialog extends StatelessWidget {
                   child: RedElevatedButton(
                     text:
                         employee.enabled ? "Disable account" : "Enable account",
-                    onPressed: () => toggleAccount(employee),
+                    onPressed: () => toggleAccount(),
                   ),
                 )
               ],

@@ -515,8 +515,6 @@ class _TasksPageState extends State<_TasksPageContent> {
                       "${employee.name} ${employee.surname}": employee.reference
                     }.entries);
                   }
-                } else {
-                  // Don't build child while in here.
                 }
               },
               builder: (context, state) {
@@ -556,13 +554,17 @@ class _TasksPageState extends State<_TasksPageContent> {
                               ),
                               InputDropdown(
                                 items: dropdownItems,
-                                value: dropdownItems.entries
-                                    .firstWhere(
-                                      (element) =>
-                                          element.value == widget.userReference,
-                                      orElse: () => dropdownItems.entries.first,
-                                    )
-                                    .value,
+                                value: dropdownItems.isNotEmpty
+                                    ? dropdownItems.entries
+                                        .firstWhere(
+                                          (element) =>
+                                              element.value ==
+                                              widget.userReference,
+                                          orElse: () =>
+                                              dropdownItems.entries.first,
+                                        )
+                                        .value
+                                    : null,
                                 onChanged: taskDropdownCubit.updateDropdown,
                               ),
                               SizedBox(

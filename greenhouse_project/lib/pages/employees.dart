@@ -41,7 +41,8 @@ class EmployeesPage extends StatelessWidget {
           create: (context) => UserInfoCubit(),
         ),
         BlocProvider(create: (context) => ManageEmployeesCubit(userCredential)),
-        BlocProvider(create: (context) => EmployeeEditCubit()),
+        BlocProvider(create: (context) => EmployeeEditCubit(context)),
+        BlocProvider(create: (context) => EmployeeDropdownCubit(context)),
       ],
       child: _EmployeesPageContent(userCredential: userCredential),
     );
@@ -111,6 +112,8 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
         BlocProvider.of<ManageEmployeesCubit>(context);
     final EmployeeEditCubit employeeEditCubit =
         BlocProvider.of<EmployeeEditCubit>(context);
+    final EmployeeDropdownCubit employeeDropdownCubit =
+        context.read<EmployeeDropdownCubit>();
     return Scaffold(
       // Appbar (header)
       appBar: AppBar(
@@ -245,7 +248,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
                                                   BorderRadius.circular(10.0),
-                                              side: BorderSide(
+                                              side: const BorderSide(
                                                   color: Colors.transparent,
                                                   width:
                                                       2.0), // Add border color and width
@@ -419,17 +422,22 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   //Textfields
                                   children: [
-                                    // InputTextField(controller: _emailController, labelText: "email"),
+                                    InputTextField(
+                                        controller: _emailController,
+                                        errorText: "",
+                                        labelText: "Email"),
                                     SizedBox(
                                         width: double.maxFinite,
                                         child: InputDropdown(
                                           items: const {
-                                            "employee": "employee",
+                                            "worker": "worker",
                                             "manager": "manager"
                                           },
-                                          value: state != '' ? state : "worker",
-                                          onChanged:
-                                              employeeEditCubit.updateState,
+                                          value: state[1] != ''
+                                              ? state[1]
+                                              : "worker",
+                                          onChanged: employeeDropdownCubit
+                                              .updateDropdown,
                                         )),
                                     //Submit or Cancel
                                     Row(
@@ -448,7 +456,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                                 ScaffoldMessenger.of(context)
                                                     .showSnackBar(const SnackBar(
                                                         content: Text(
-                                                            "HI THERE, THIS WORKED!!!")));
+                                                            "Account created successfully! Instructions have been sent to user.")));
                                               }),
                                         ),
                                         Expanded(
