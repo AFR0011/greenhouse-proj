@@ -295,21 +295,15 @@ class _TasksPageState extends State<_TasksPageContent> {
     showDialog(
       context: context,
       builder: (context) {
-        return BlocConsumer<ManageEmployeesCubit, ManagementState>(
+        return BlocBuilder<ManageEmployeesCubit, ManagementState>(
           bloc: manageEmployeesCubit,
-          listener: (context, state) {
+          builder: (context, state) {
             if (state is ManageEmployeesLoaded) {
-              // Only open the dialog when employees are loaded
               for (var employee in state.employees) {
                 dropdownItems.addEntries({
                   "${employee.name} ${employee.surname}": employee.reference
                 }.entries);
               }
-              // Dialog content
-            }
-          },
-          builder: (context, state) {
-            if (state is ManageEmployeesLoaded) {
               return BlocBuilder<TaskEditCubit, List<dynamic>>(
                 bloc: taskEditCubit,
                 builder: (context, taskEditState) {
@@ -506,19 +500,15 @@ class _TasksPageState extends State<_TasksPageContent> {
     showDialog(
         context: context,
         builder: (context) {
-          return BlocConsumer<ManageEmployeesCubit, ManagementState>(
+          return BlocBuilder<ManageEmployeesCubit, ManagementState>(
               bloc: manageEmployeesCubit,
-              listener: (context, state) {
+              builder: (context, state) {
                 if (state is ManageEmployeesLoaded) {
                   for (var employee in state.employees) {
                     dropdownItems.addEntries({
                       "${employee.name} ${employee.surname}": employee.reference
                     }.entries);
                   }
-                }
-              },
-              builder: (context, state) {
-                if (state is ManageEmployeesLoaded) {
                   return BlocBuilder<TaskEditCubit, List<dynamic>>(
                     bloc: taskEditCubit,
                     builder: (context, taskEditState) {
@@ -554,17 +544,13 @@ class _TasksPageState extends State<_TasksPageContent> {
                               ),
                               InputDropdown(
                                 items: dropdownItems,
-                                value: dropdownItems.isNotEmpty
-                                    ? dropdownItems.entries
-                                        .firstWhere(
-                                          (element) =>
-                                              element.value ==
-                                              widget.userReference,
-                                          orElse: () =>
-                                              dropdownItems.entries.first,
-                                        )
-                                        .value
-                                    : null,
+                                value: dropdownItems.entries
+                                    .firstWhere(
+                                      (element) =>
+                                          element.value == widget.userReference,
+                                      orElse: () => dropdownItems.entries.first,
+                                    )
+                                    .value,
                                 onChanged: taskDropdownCubit.updateDropdown,
                               ),
                               SizedBox(
