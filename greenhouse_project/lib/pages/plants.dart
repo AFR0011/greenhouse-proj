@@ -5,12 +5,14 @@
 ///
 library;
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/plants_cubit.dart';
+import 'package:greenhouse_project/services/cubit/plants_edit_cubit.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/input.dart';
@@ -19,8 +21,10 @@ import 'package:greenhouse_project/utils/theme.dart';
 
 class PlantsPage extends StatelessWidget {
   final UserCredential userCredential;
-
-  const PlantsPage({super.key, required this.userCredential});
+  final DocumentReference userReference;
+  const PlantsPage({super.key,
+   required this.userCredential,
+   required this.userReference,});
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +37,10 @@ class PlantsPage extends StatelessWidget {
         BlocProvider(
           create: (context) => UserInfoCubit(),
         ),
-        BlocProvider(create: (context) => PlantStatusCubit()),
+        BlocProvider(create: (context) => PlantStatusCubit(userReference)),
         BlocProvider(create: (context) => ReadingsCubit()),
+        BlocProvider(create: (context) => PlantsEditCubit()),
+
       ],
       child: _PlantsPageContent(userCredential: userCredential),
     );
@@ -52,16 +58,21 @@ class _PlantsPageContent extends StatefulWidget {
 
 // Main page content
 class _PlantsPageState extends State<_PlantsPageContent> {
+
+  // User info local variables
+  late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
 
   // Text controllers
   final TextEditingController _textController = TextEditingController();
+  final TextEditingController _typeController = TextEditingController();
 
   // Dispose (destructor)
   @override
   void dispose() {
     _textController.dispose();
+    _typeController.dispose();
     super.dispose();
   }
 
@@ -86,6 +97,8 @@ class _PlantsPageState extends State<_PlantsPageContent> {
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
           // Call function to create plants page
+          _userReference = state.userReference;
+
           return Theme(data: customTheme, child: _createPlantsPage());
         }
         // Show error if there is an issues with user info
@@ -115,13 +128,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
           Padding(
             padding: const EdgeInsets.only(top: 40),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width - 20,
-              child: const Text(
-                "Plants",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.left,
-              ),
-            ),
+              width: MediaQuery.of(context).size.width - 20,),
           ),
           // BlocBuilder for plantStatus state
           BlocBuilder<PlantStatusCubit, PlantStatusState>(
@@ -181,10 +188,11 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                       text: 'Details',
                                       onPressed: () {
                                         // _showPlantDetails(plant);
+                                        BuildContext mainContext = context;
                                         showDialog(
                                             context: context,
                                             builder: (context) =>
-                                                PlantDetailsDialog(plant: plant));
+                                                PlantDetailsDialog(plant: plant, removePlant: () => showDeleteForm(mainContext, plant)));
                                       },
                                     ),
                                   ),
@@ -220,6 +228,10 @@ class _PlantsPageState extends State<_PlantsPageContent> {
           )
         ],
       ),
+
+      floatingActionButton: GreenElevatedButton(
+        text: "Add Plant",
+         onPressed: () => showAdditionForm(context)),
     );
   }
 
@@ -303,4 +315,173 @@ class _PlantsPageState extends State<_PlantsPageContent> {
       },
     );
   }
+
+   // Item addition form function
+  void showAdditionForm(BuildContext context) {
+    // Get instance of inventory cubit from main context
+    PlantStatusCubit plantStatusCubit = BlocProvider.of<PlantStatusCubit>(context);
+    PlantsEditCubit plantsEditCubit = BlocProvider.of<PlantsEditCubit>(context);
+    String dropdownValue = "1";
+    // Display item addition form
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: const BorderSide(
+                        color: Colors.transparent,
+                        width: 2.0), // Add border color and width
+                  ),
+                  title: const Text("Add Plant"),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: BlocBuilder<PlantsEditCubit, List<bool>>(
+                bloc: plantsEditCubit,
+                builder: (context, state) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InputTextField(controller: _typeController, errorText: state[0]
+                                ? ""
+                                : "Type should be longer than 1 characters.", labelText: "Type"),
+                      // TextField(
+                      //   controller: _equipmentController,
+                      //   decoration: InputDecoration(
+                      //       errorText: state[0]
+                      //           ? ""
+                      //           : "Name should be longer than 1 characters."),
+                      // ),
+                      InputTextField(controller: _textController, errorText: state[1]
+                                ? ""
+                                : "Subtype should be longer than 2 characters.", labelText: "Subtype"),
+                      //insert dropdown HERE!!
+                       DropdownButtonFormField<String>(
+                    value: dropdownValue,
+                    decoration: const InputDecoration(
+                      labelText: "Board No",
+                    ),
+                    items: <String>["1"].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: null,
+                    onTap: () {},
+                    disabledHint: Text(dropdownValue),
+                  ),
+                      // Submit and cancel buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GreenElevatedButton(
+                                text: "Submit",
+                                onPressed: () async {
+                                  List<bool> validation = [true, true];
+                                  if (_typeController.text.isEmpty) {
+                                    validation[0] = !validation[0];
+                                  }
+                                  if (_textController.text.isEmpty) {
+                                    validation[1] = !validation[1];
+                                  }
+                                          
+                                  bool isValid =
+                                      plantsEditCubit.updateState(validation);
+                                  if (!isValid) {
+                                  } else {
+                                    Map<String, dynamic> data = {
+                                      "birthdate": DateTime.now(),
+                                      "boardNo": 1,
+                                      "subtype": _textController.text,
+                                      "type": _typeController.text,
+                                    };
+                                    await plantStatusCubit
+                                        .addPlant(data, _userReference)
+                                        .then((value) {
+                                      Navigator.pop(context);
+                                      _textController.clear();
+                                      _typeController.clear();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                              content:
+                                                  Text("Plant added succesfully!")));
+                                    });
+                                  }
+                                }),
+                          ),
+                          Expanded(
+                            child: WhiteElevatedButton(
+                                text: "Cancel",
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  _textController.clear();
+                                  _typeController.clear();
+                                }),
+                          )
+                        ],
+                      )
+                    ],
+                  );
+                },
+              ),
+            ),
+          );
+        });
+  }
+
+  // Plant deletion form function
+  void showDeleteForm(BuildContext context, PlantData plant) {
+    PlantStatusCubit plantStatusCubit = BlocProvider.of<PlantStatusCubit>(context);
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                    side: BorderSide(
+                        color: Colors.transparent,
+                        width: 2.0), // Add border color and width
+                  ),
+                  title: Text("Are you sure?"),
+                  content: Container(
+                  width: double.maxFinite, // Set maximum width
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: RedElevatedButton(
+                              text: "Yes",
+                              onPressed: () async {
+                                plantStatusCubit
+                                    .removePlant(
+                                        plant.plantReference, _userReference)
+                                    .then((value) {
+                                  Navigator.pop(context);Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text("Item deleted succesfully!")));
+                                });
+                              }),
+                        ),
+                        Expanded(
+                          child: WhiteElevatedButton(
+                              text: "No",
+                              onPressed: () {
+                                Navigator.pop(context);
+                              }),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ));
+        });
+  }
+
 }

@@ -253,7 +253,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
                 // Plant status subheading and details button
                 _buildSubheadingRow(
                   "Plant Status",
-                  PlantsPage(userCredential: widget.userCredential),
+                  PlantsPage(userCredential: widget.userCredential, userReference: _userReference,),
                   Colors.greenAccent,
                   Icons.local_florist,
                 ),

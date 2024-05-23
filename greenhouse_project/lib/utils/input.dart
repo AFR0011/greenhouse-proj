@@ -482,8 +482,12 @@ class InventoryDetailsDialog extends StatelessWidget {
 
 class PlantDetailsDialog extends StatelessWidget {
   final PlantData plant;
+  final Function removePlant;
 
-  const PlantDetailsDialog({super.key, required this.plant});
+  const PlantDetailsDialog(
+      {super.key,
+      required this.plant,
+      required this.removePlant,});
 
   @override
   Widget build(BuildContext context) {
@@ -513,11 +517,17 @@ class PlantDetailsDialog extends StatelessWidget {
                 height: 20), // Add spacing between details and buttons
             Align(
               alignment: Alignment.center,
-              child: WhiteElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                text: "Close",
+              child: Row(
+                children: [
+                  WhiteElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    text: "Close",
+                  ),
+                  RedElevatedButton(
+                      onPressed: removePlant(), text: "Remove Plant")
+                ],
               ),
             ),
           ],
@@ -845,8 +855,6 @@ class Readings extends StatelessWidget {
     ));
   }
 }
-
-
 
 class CustomSlider extends StatelessWidget {
   final double currentSliderValue;

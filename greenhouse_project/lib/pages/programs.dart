@@ -152,6 +152,12 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
           );
         }
       }),
+      //floating button
+      floatingActionButton: GreenElevatedButton(
+        text: "Create program",
+        onPressed: () {
+          _showAdditionForm();
+        }),
     );
   }
 
@@ -189,7 +195,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                     ),
                     ),
                     title: Text(program.title,
-                    style: TextStyle(fontWeight: FontWeight.bold,
+                    style: const TextStyle(fontWeight: FontWeight.bold,
                                     fontSize: 18),),
                     subtitle: Text(program.creationDate.toString()),
                     trailing: FittedBox(
@@ -208,20 +214,10 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
               },
             ),
           ),
-          Row(
-            children: [
-              Center(
-                child: GreenElevatedButton(
-                    text: "Create program",
-                    onPressed: () {
-                      _showAdditionForm();
-                    }),
-              )
             ],
           )
-        ],
-      ),
-    );
+      );
+
   }
 
   // Function to show program creation form
