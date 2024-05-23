@@ -256,7 +256,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                       builder: (context, state) {
                         List<String> dropdownValues = state;
                         return Column(
-                          children: [
+                          children: [ 
+              
                             Slider(
                                 value: double.parse(_limitController.text),
                                 onChanged: (value) {
@@ -265,34 +266,59 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                       .read<ProgramEditCubit>()
                                       .updateDropdown(dropdownValues);
                                 }),
-                            DropdownButton(
-                                value: dropdownValues[0] != ""
-                                    ? dropdownValues[0]
-                                    : null,
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: 'fan',
-                                    child: Text('fan'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'pump',
-                                    child: Text('pump'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'light',
-                                    child: Text('light'),
-                                  ),
-                                ],
-                                onChanged: (selection) {
-                                  dropdownValues[0] = selection!;
-                                  context
-                                      .read<ProgramEditCubit>()
-                                      .updateDropdown(dropdownValues);
-                                }),
-                            DropdownButton(
+                            
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Center(
+                                  child: DropdownButtonFormField(
+                                      isExpanded: true,
+                                      value: dropdownValues[0] != ""
+                                          ? dropdownValues[0]
+                                          : null,
+                                      elevation: 16,
+                                      decoration: const InputDecoration(
+                                      labelText: 'Select an option',
+                                      border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                                    ),
+                                      items: const [
+                                        DropdownMenuItem(
+                                          value: 'fan',
+                                          child: Text('fan'),
+                                        ),
+                                        
+                                        DropdownMenuItem(
+                                          value: 'pump',
+                                          child: Text('pump'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'light',
+                                          child: Text('light'),
+                                        ),
+                                      ],
+                                      onChanged: (selection) {
+                                        dropdownValues[0] = selection!;
+                                        context
+                                            .read<ProgramEditCubit>()
+                                            .updateDropdown(dropdownValues);
+                                      }),
+                                ),
+                              ),
+                          
+                           Padding(
+                            padding: const EdgeInsets.all(16.0),
+                             child: Center(
+                               child: DropdownButtonFormField( 
+                                isExpanded: true,
                                 value: dropdownValues[1] != ""
                                     ? dropdownValues[1]
                                     : null,
+                                elevation: 16,
+                                decoration: const InputDecoration(
+                                labelText: 'Select an option',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                              ),
                                 items: const [
                                   DropdownMenuItem(
                                     value: 'off',
@@ -309,26 +335,40 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                       .read<ProgramEditCubit>()
                                       .updateDropdown(dropdownValues);
                                 }),
-                            DropdownButton(
-                                value: dropdownValues[2] != ""
-                                    ? dropdownValues[2]
-                                    : null,
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: 'lt',
-                                    child: Text('less than'),
+                             ),
+                           ),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Center(
+                                child: DropdownButtonFormField(
+                                    isExpanded: true,   
+                                    value: dropdownValues[2] != ""
+                                        ? dropdownValues[2]
+                                        : null,
+                                    elevation: 16,
+                                    decoration: const InputDecoration(
+                                    labelText: 'Select an option',
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(Radius.circular(20))),
                                   ),
-                                  DropdownMenuItem(
-                                    value: 'gt',
-                                    child: Text('greater than'),
-                                  ),
-                                ],
-                                onChanged: (selection) {
-                                  dropdownValues[2] = selection!;
-                                  context
-                                      .read<ProgramEditCubit>()
-                                      .updateDropdown(dropdownValues);
-                                }),
+                                    items: const [
+                                      DropdownMenuItem(
+                                        value: 'lt',
+                                        child: Text('less than'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: 'gt',
+                                        child: Text('greater than'),
+                                      ),
+                                    ],
+                                    onChanged: (selection) {
+                                      dropdownValues[2] = selection!;
+                                      context
+                                          .read<ProgramEditCubit>()
+                                          .updateDropdown(dropdownValues);
+                                    }),
+                              ),
+                            ),
                           ],
                         );
                       },
@@ -497,3 +537,49 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
         });
   }
 }
+
+class CustomSlider extends StatefulWidget {
+  @override
+  _CustomSliderState createState() => _CustomSliderState();
+}
+
+class _CustomSliderState extends State<CustomSlider> {
+  double _currentSliderValue = 20;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliderTheme(
+      data: SliderTheme.of(context).copyWith(
+        activeTrackColor: Colors.tealAccent,
+        inactiveTrackColor: Colors.tealAccent.shade100,
+        trackShape: RoundedRectSliderTrackShape(),
+        trackHeight: 4.0,
+        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
+        thumbColor: Colors.teal,
+        overlayColor: Colors.teal.withOpacity(0.2),
+        overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+        tickMarkShape: RoundSliderTickMarkShape(),
+        activeTickMarkColor: Colors.tealAccent,
+        inactiveTickMarkColor: Colors.tealAccent.shade100,
+        valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+        valueIndicatorColor: Colors.teal,
+        valueIndicatorTextStyle: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      child: Slider(
+        value: _currentSliderValue,
+        min: 0,
+        max: 100,
+        divisions: 5,
+        label: _currentSliderValue.round().toString(),
+        onChanged: (double value) {
+          setState(() {
+            _currentSliderValue = value;
+          });
+        },
+      ),
+    );
+  }
+}
+

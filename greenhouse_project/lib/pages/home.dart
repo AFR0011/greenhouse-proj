@@ -7,7 +7,9 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/login.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
@@ -151,26 +153,80 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
 
       // Call function to build notificaitons list
       body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.lightBlueAccent.shade100.withOpacity(0.6),
-              Colors.teal.shade100.withOpacity(0.6),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          image: DecorationImage(
-            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.05),
-              BlendMode.dstATop,
-            ),
+      height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.lightBlueAccent.shade100.withOpacity(0.6),
+            Colors.teal.shade100.withOpacity(0.6),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        image: DecorationImage(
+          image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.white.withOpacity(0.05),
+            BlendMode.dstATop,
           ),
         ),
-        child:_buildNotifications()),
+      ),
+      child:Column(
+        children: [
+          Container(
+            width: double.maxFinite,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.green.shade700, Colors.teal.shade400],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                ),
+                
+            ),
+            child: Center(
+              child: ToggleButtons(
+                  renderBorder: false,
+                  fillColor: Colors.teal.withOpacity(1),
+                  selectedColor: Colors.white,
+                  splashColor: Colors.tealAccent,
+                  hoverColor: Colors.tealAccent.withOpacity(0.1),
+                  children: <Widget>[
+                      Container(
+                        width: MediaQuery.of(context).size.width*0.5,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              'Notifications',
+                              style: TextStyle(fontSize: 16),
+                          ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width*0.5,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              'Dashbord',
+                              style: TextStyle(fontSize: 16),
+                          ),
+                          ),
+                        ),
+                      ),
+                  ],
+                  onPressed: (int index) {},
+                  isSelected: [true,false],
+                  ),
+            ),
+          ),
+          _buildNotifications(),
+        ],
+      )),
 
       // Footer nav bar
       bottomNavigationBar:

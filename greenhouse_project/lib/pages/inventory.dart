@@ -261,7 +261,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         children: [
           // Main inventory items
           SizedBox(
-            height: MediaQuery.of(context).size.height / 3,
+            height: MediaQuery.of(context).size.height *.35,
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: actualInventory.length,
@@ -318,7 +318,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             child: const Text("Pending updates", style: subheadingTextStyle),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height / 3,
+            height: MediaQuery.of(context).size.height *.25,
             child: pendingInventory.isNotEmpty
                 ? ListView.builder(
                     shrinkWrap: true,
