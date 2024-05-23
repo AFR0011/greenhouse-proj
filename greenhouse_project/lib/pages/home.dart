@@ -144,119 +144,122 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
 
     // Page content
     return Scaffold(
-      // Main appbar (header)
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80.0),
-        child: createMainAppBar(
-            context, widget.userCredential, _userReference, "Welcome"),
-      ),
+        // Main appbar (header)
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80.0),
+          child: createMainAppBar(
+              context, widget.userCredential, _userReference, "Welcome"),
+        ),
 
-      // Call function to build notificaitons list
-      body: Container(
-      height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.lightBlueAccent.shade100.withOpacity(0.6),
-            Colors.teal.shade100.withOpacity(0.6),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        image: DecorationImage(
-          image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            Colors.white.withOpacity(0.05),
-            BlendMode.dstATop,
-          ),
-        ),
-      ),
-      child:Column(
-        children: [
-          Container(
-            width: double.maxFinite,
+        // Call function to build notificaitons list
+        body: Container(
+            height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.green.shade700, Colors.teal.shade400],
+                colors: [
+                  Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                  Colors.teal.shade100.withOpacity(0.6),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                ),
-                
-            ),
-            child: Center(
-              child: ToggleButtons(
-                  renderBorder: false,
-                  fillColor: Colors.teal.withOpacity(1),
-                  selectedColor: Colors.white,
-                  splashColor: Colors.tealAccent,
-                  hoverColor: Colors.tealAccent.withOpacity(0.1),
-                  children: <Widget>[
-                      Container(
-                        width: MediaQuery.of(context).size.width*0.5,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                              'Notifications',
-                              style: TextStyle(fontSize: 16),
-                          ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width*0.5,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                              'Dashbord',
-                              style: TextStyle(fontSize: 16),
-                          ),
-                          ),
-                        ),
-                      ),
-                  ],
-                  onPressed: (int index) {},
-                  isSelected: [true,false],
-                  ),
-            ),
-          ),
-          _buildNotifications(),
-        ],
-      )),
-
-      // Footer nav bar
-      bottomNavigationBar:
-           PreferredSize(
-            preferredSize: Size.fromHeight(50.0),
-             child: Container(
-                     decoration: BoxDecoration(
-                       gradient: LinearGradient(
-              colors: [Colors.green.shade700, Colors.teal.shade400, Colors.blue.shade300],
-              stops: [0.2, 0.5, 0.9],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-                       ),
-                       boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
               ),
-                       ],
-                     ),
-                     child: ClipRRect(
-                       borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30.0),
-              topRight: Radius.circular(30.0),
-                       ),
-                       child:  createFooterNav(_selectedIndex, footerNavCubit, _userRole),
-             )),
-           ));
+              image: DecorationImage(
+                image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.05),
+                  BlendMode.dstATop,
+                ),
+              ),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: double.maxFinite,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.green.shade700, Colors.teal.shade400],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Center(
+                    child: ToggleButtons(
+                      renderBorder: false,
+                      fillColor: Colors.teal.withOpacity(1),
+                      selectedColor: Colors.white,
+                      splashColor: Colors.tealAccent,
+                      hoverColor: Colors.tealAccent.withOpacity(0.1),
+                      children: <Widget>[
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Notifications',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Dashbord',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      onPressed: (int index) {},
+                      isSelected: [true, false],
+                    ),
+                  ),
+                ),
+                _buildNotifications(),
+              ],
+            )),
+
+        // Footer nav bar
+        bottomNavigationBar: PreferredSize(
+          preferredSize: Size.fromHeight(50.0),
+          child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.green.shade700,
+                    Colors.teal.shade400,
+                    Colors.blue.shade300
+                  ],
+                  stops: [0.2, 0.5, 0.9],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30.0),
+                  topRight: Radius.circular(30.0),
+                ),
+                child:
+                    createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+              )),
+        ));
   }
 
   Widget _buildNotifications() {
@@ -329,7 +332,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
 
       // Call function to build notificaitons list
       body: Column(
-        
         children: [
           const Text(
               "Your account has been disabled by the greenhouse administration.\n If you don't work here anymore, please delete your account."),

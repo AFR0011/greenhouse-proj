@@ -23,7 +23,8 @@ class EmployeeDropdownCubit extends Cubit<String> {
 
 class EmployeeEditCubit extends Cubit<List<dynamic>> {
   bool _isActive = true;
-  EmployeeEditCubit() : super([true, "worker"]);
+  final BuildContext context;
+  EmployeeEditCubit(this.context) : super([true, "worker"]);
 
   bool updateState(List<dynamic> validation) {
     if (!_isActive) return false;

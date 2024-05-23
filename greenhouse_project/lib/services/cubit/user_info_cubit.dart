@@ -54,11 +54,11 @@ class UserInfoCubit extends HomeCubit {
   }
 
   void deleteUserAccount(
-      UserCredential userCredential, DocumentReference userReference) {
+      UserCredential userCredential, DocumentReference userReference) async {
     if (!_isActive) return;
     try {
-      userCredential.user?.delete();
-      userReference.delete();
+      await userCredential.user?.delete();
+      await userReference.delete();
     } catch (e) {
       emit(UserInfoError(e.toString()));
     }
