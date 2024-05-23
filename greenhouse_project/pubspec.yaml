@@ -43,7 +43,6 @@ dependencies:
   font_awesome_flutter: ^10.7.0
   auto_size_text: ^3.0.0
   cloud_firestore: ^4.15.8
-  syncfusion_flutter_charts: ^25.1.37
   firebase_database: ^10.4.10
   list_utilities: ^1.0.3
   emailjs: ^1.3.0
@@ -52,6 +51,7 @@ dependencies:
   firebase_remote_config: ^4.4.4
   image_picker: ^1.1.1
   glassmorphism: ^3.0.0
+  fl_chart: ^0.68.0
 
 
 dev_dependencies:

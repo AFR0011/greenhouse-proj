@@ -16,6 +16,7 @@ import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/chart.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
@@ -151,81 +152,83 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
               context, widget.userCredential, _userReference, "Welcome"),
         ),
 
-        // Call function to build notificaitons list
-        body: Container(
-            height: MediaQuery.of(context).size.height,
+      // Call function to build notificaitons list
+      body: Container(
+      height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.lightBlueAccent.shade100.withOpacity(0.6),
+            Colors.teal.shade100.withOpacity(0.6),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        image: DecorationImage(
+          image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+          fit: BoxFit.cover,
+          colorFilter: ColorFilter.mode(
+            Colors.white.withOpacity(0.05),
+            BlendMode.dstATop,
+          ),
+        ),
+      ),
+      child:Column(
+        children: [
+          Container(
+            width: double.maxFinite,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.lightBlueAccent.shade100.withOpacity(0.6),
-                  Colors.teal.shade100.withOpacity(0.6),
-                ],
+                colors: [Colors.green.shade700, Colors.teal.shade400],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-              ),
-              image: DecorationImage(
-                image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.05),
-                  BlendMode.dstATop,
                 ),
-              ),
+                
             ),
-            child: Column(
-              children: [
-                Container(
-                  width: double.maxFinite,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.green.shade700, Colors.teal.shade400],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Center(
-                    child: ToggleButtons(
-                      renderBorder: false,
-                      fillColor: Colors.teal.withOpacity(1),
-                      selectedColor: Colors.white,
-                      splashColor: Colors.tealAccent,
-                      hoverColor: Colors.tealAccent.withOpacity(0.1),
-                      children: <Widget>[
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Notifications',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
+            child: Center(
+              child: ToggleButtons(
+                  renderBorder: false,
+                  fillColor: Colors.teal.withOpacity(1),
+                  selectedColor: Colors.white,
+                  splashColor: Colors.tealAccent,
+                  hoverColor: Colors.tealAccent.withOpacity(0.1),
+                  children: <Widget>[
+                      Container(
+                        width: MediaQuery.of(context).size.width*0.5,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              'Notifications',
+                              style: TextStyle(fontSize: 16),
+                          ),
                           ),
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Dashbord',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width*0.5,
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                              'Dashbord',
+                              style: TextStyle(fontSize: 16),
+                          ),
                           ),
                         ),
-                      ],
-                      onPressed: (int index) {},
-                      isSelected: [true, false],
-                    ),
+                      ),
+                  ],
+                  onPressed: (int index) {},
+                  isSelected: [true,false],
                   ),
-                ),
-                _buildNotifications(),
-              ],
-            )),
+            ),
+          ),
+          // _buildNotifications(),
+          _buildDashbord()
+        ],
+      )),
 
         // Footer nav bar
         bottomNavigationBar: PreferredSize(
@@ -265,15 +268,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   Widget _buildNotifications() {
     return Column(
       children: [
-        // Notifications subheading
-        SizedBox(
-          width: MediaQuery.of(context).size.width - 20,
-          child: const Text(
-            "Notifications",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.left,
-          ),
-        ),
 
         // BlocBuilder for notifications
         BlocBuilder<NotificationsCubit, HomeState>(
@@ -320,6 +314,15 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
       ],
     );
   }
+  Widget _buildDashbord(){
+    return Container(
+      height: MediaQuery.of(context).size.height*0.6,
+      width: MediaQuery.of(context).size.width*.8,
+      
+        child:  ChartClass(),
+      
+    );
+  }
 
   _createHomePageDisabled() {
     UserInfoCubit userInfoCubit = context.read<UserInfoCubit>();
@@ -344,8 +347,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                         widget.userCredential, _userReference);
                     showDialog(
                         context: context,
-                        builder: (context) => Dialog(
-                              child: Column(
+                        builder: (context) => AlertDialog(
+                              content: Column(
                                 children: [
                                   const Text("All done!"),
                                   Center(
