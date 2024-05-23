@@ -2,6 +2,9 @@
 /// Handles plant status page state management
 library;
 
+import "dart:js_interop";
+
+import "package:cloud_firestore/cloud_firestore.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
 import "package:flutter/foundation.dart";
@@ -9,10 +12,16 @@ import "package:flutter/foundation.dart";
 part 'plants_state.dart';
 
 class PlantStatusCubit extends Cubit<PlantStatusState> {
-  CollectionReference plants = FirebaseFirestore.instance.collection("plants");
+  CollectionReference plants =
+    FirebaseFirestore.instance.collection("plants");
+
+  final CollectionReference logs =
+    FirebaseFirestore.instance.collection('logs');
+
+  final DocumentReference userReference;
 
   bool _isActive = true;
-  PlantStatusCubit() : super(PlantsLoading()) {
+  PlantStatusCubit(this.userReference) : super(PlantsLoading()) {
     _getPlants();
   }
 
@@ -33,6 +42,49 @@ class PlantStatusCubit extends Cubit<PlantStatusState> {
   Future<void> close() {
     _isActive = false;
     return super.close();
+  }
+
+  Future<void> addPlant(Map<String, dynamic> data, DocumentReference userReference) async{
+    if(!_isActive) return;
+    try{
+      DocumentReference externalId = await plants.add(data);
+
+      logs.add({
+        "action": "create",
+        "description": "Plant added by user at ${Timestamp.now().toString()}",
+        "timestamp": Timestamp.now(),
+        "type": "Plant",
+        "userId": userReference,
+        "externalId": externalId,
+      });
+    } catch (error,stack) {
+      emit(PlantsError(error.toString()));
+      print(stack);
+      print(error);
+    }
+  }
+
+  Future<void> removePlant(DocumentReference item, DocumentReference userReference) async{
+    if (!_isActive) return;
+    emit(PlantsLoading());
+
+    try{
+      DocumentSnapshot snapshot = await item.get();
+      Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+
+      await item.delete();
+      await logs.add({
+        "action": "Delete",
+        "description":
+            "Plant deleted by user at ${Timestamp.now().toString()} Plant details: ${data["type"]}",
+        "timestamp": Timestamp.now(),
+        "type": "Plant",
+        "userId": userReference,
+        "externalId": item,
+      });
+    } catch (error, stack) {
+      emit(PlantsError(stack.toString()));
+    }
   }
 }
 

@@ -6,6 +6,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -211,7 +212,33 @@ class _ChatPageState extends State<_ChatPageContent> {
   // Build the list of chat messages
   Widget _buildChatContent(List<MessageData?> messages, ChatsData chat) {
     if (messages.isEmpty) {
-      return const Center(child: Text("Write your first message!"));
+      return Column(
+        children: [
+          const Expanded(
+            child:
+              Center(
+                child: Text("Write your first message!")
+                ),
+          ),
+              SafeArea(
+                child: Container(
+                  margin: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01),
+                  child: TextField(
+                    controller: _textEditingController,
+                    decoration: InputDecoration(
+                      hintText: "send a message...",
+                      suffixIcon: sendButton(chat),
+                      filled: true,
+                      fillColor: theme.colorScheme.secondary.withOpacity(0.4),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))
+                    ),
+                  ),
+                    
+                    ),
+              ),
+            ],
+      );
+
     } else {
       return Column(
         children: [

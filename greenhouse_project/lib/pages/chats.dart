@@ -180,7 +180,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
               ],
             ),
             child: ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30.0),
                   topRight: Radius.circular(30.0),
                 ),
@@ -191,6 +191,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
         floatingActionButton: GreenElevatedButton(
             text: "New Chat",
             onPressed: () {
+              ChatsCubit chatsCubit = context.read<ChatsCubit>();
               ChatUsersCubit chatUsersCubit = context.read<ChatUsersCubit>();
               showDialog(
                   context: context,
@@ -245,12 +246,16 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 12)),
-                                      subtitle: const Text('employee.role',
-                                          style: TextStyle(
+                                      subtitle: Text(employee.role,
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.w300,
                                             color: Colors.grey,
                                             fontSize: 8.0,
-                                          )),
+                                          )
+                                          ),
+                                          onTap: () {
+                                            chatsCubit.createChat(employee.reference);
+                                          },
                                     );
                                   },
                                 ),

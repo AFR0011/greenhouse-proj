@@ -241,14 +241,22 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                        ],
                      ),
                      child: ClipRRect(
-                       borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30.0),
-              topRight: Radius.circular(30.0),
+                       borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30.0),
+                        topRight: Radius.circular(30.0),
                        ),
             child: createFooterNav(_selectedIndex, footerNavCubit, _userRole)
             ),
             ),
-            ));
+
+            ),
+      floatingActionButton: GreenElevatedButton(
+        text: "Add Item",
+        // Display addition form
+        onPressed: () {
+          _showAdditionForm(context);
+        }),
+    );
   }
 
   // Create inventory list function
@@ -381,17 +389,6 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                       style: TextStyle(color: Colors.grey),
                     ),
                   ),
-          ),
-      
-          // Add item button
-          Center(
-            child: GreenElevatedButton(
-                text: "Add Item",
-      
-                // Display addition form
-                onPressed: () {
-                  _showAdditionForm(context);
-                }),
           )
         ],
       ),

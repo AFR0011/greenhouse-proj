@@ -1,8 +1,12 @@
+import 'dart:js';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/pages/chat.dart';
 
 part 'chats_state.dart';
 
@@ -51,8 +55,51 @@ class ChatsCubit extends Cubit<ChatsState> {
     return chats.firstWhere((chat) => chatReference == chat?.reference);
   }
 
-  void createChat(){
-    
+  Future<void> createChat(DocumentReference receiverReference) async{
+    try{
+      //get user ref
+      QuerySnapshot userQuery = await users.where('email', isEqualTo: user?.user?.email).get();
+      DocumentReference userReference = userQuery.docs.first.reference;
+
+      //check if chat a exists already
+      QuerySnapshot existChatQuery = await chats
+      .where(Filter.or(Filter('users', isEqualTo: userReference),
+        Filter('users', isEqualTo: receiverReference))).get();
+
+      for(var doc in existChatQuery.docs) {
+        List<DocumentReference> users = doc['users'].cast<DocumentReference>().toList();
+        if (users.contains(userReference) && users.contains(receiverReference)) {
+          // navigate to existing chat
+          DocumentReference existChatReference = doc.reference;
+          _navigateToChat(existChatReference);
+          return;
+        }
+      }
+
+      //create a new chat 
+      DocumentReference newChatReference = await chats.add({
+        'users' : [userReference, receiverReference],
+        'creationDate' : Timestamp.now(),
+      });
+
+      //Navigate to new chat
+      _navigateToChat(newChatReference);
+
+    }catch (error) {
+      emit(ChatsError(error.toString()));
+    }
+  }
+
+  void _navigateToChat(DocumentReference chatReference){
+    Navigator.push(
+      context as BuildContext,
+      MaterialPageRoute(
+        builder: (context) => ChatPage(
+          userCredential: user!,
+          chatReference: chatReference,
+        ),
+      ),
+    );
   }
 
   @override

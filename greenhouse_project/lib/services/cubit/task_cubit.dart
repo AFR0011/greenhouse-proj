@@ -102,7 +102,7 @@ class TaskCubit extends Cubit<TaskState> {
       await logs.add({
         "action": "Delete",
         "description":
-            "Task deleted by user at ${Timestamp.now().toString()} program details: ${data["title"]}",
+            "Task deleted by user at ${Timestamp.now().toString()} Task details: ${data["title"]}",
         "timestamp": Timestamp.now(),
         "type": "task",
         "userId": userReference,

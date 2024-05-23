@@ -156,125 +156,178 @@ class _TasksPageState extends State<_TasksPageContent> {
               context, widget.userCredential, _userReference, "Tasks")
           : createAltAppbar(context, "Tasks"),
       // Tasks section
-      body: Column(
-        children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width - 20,
-          ),
-          // BlocBuilder for tasks
-          BlocBuilder<TaskCubit, TaskState>(
-            builder: (context, state) {
-              // Show "loading screen" if processing tasks state
-              if (state is TaskLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              // Show tasks if tasks state is loaded
-              else if (state is TaskLoaded) {
-                List<TaskData> taskList = state.tasks; // tasks list
-
-                // Display nothing if no tasks
-                if (taskList.isEmpty) {
-                  return const Center(child: Text("No Tasks..."));
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+            decoration:_userRole == "worker"? BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                  Colors.teal.shade100.withOpacity(0.6),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              image: DecorationImage(
+                image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.05),
+                  BlendMode.dstATop,
+                ),
+              ),
+            ) : BoxDecoration(),
+        child: Column(
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width - 20,
+            ),
+            // BlocBuilder for tasks
+            BlocBuilder<TaskCubit, TaskState>(
+              builder: (context, state) {
+                // Show "loading screen" if processing tasks state
+                if (state is TaskLoading) {
+                  return const Center(child: CircularProgressIndicator());
                 }
-                // Display tasks
-                else {
-                  return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height / 3,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: taskList.length,
-                              itemBuilder: (context, index) {
-                                TaskData task = taskList[index]; // task info
-                                return Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  elevation: 4.0,
-                                  margin: EdgeInsets.only(bottom: 16.0),
-                                  child: ListTile(
-                                    leading: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.withOpacity(0.1),
-                                        shape: BoxShape.circle,
+                // Show tasks if tasks state is loaded
+                else if (state is TaskLoaded) {
+                  List<TaskData> taskList = state.tasks; // tasks list
+        
+                  // Display nothing if no tasks
+                  if (taskList.isEmpty) {
+                    return const Center(child: Text("No Tasks..."));
+                  }
+                  // Display tasks
+                  else {
+                    return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.66,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: taskList.length,
+                                itemBuilder: (context, index) {
+                                  TaskData task = taskList[index]; // task info
+                                  return Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    elevation: 4.0,
+                                    margin: EdgeInsets.only(bottom: 16.0),
+                                    child: ListTile(
+                                      leading: Container(
+                                        padding: EdgeInsets.all(8.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.withOpacity(0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.task_outlined,
+                                          color: Colors.grey[600]!,
+                                          size: 30,
+                                        ),
                                       ),
-                                      child: Icon(
-                                        Icons.task_outlined,
-                                        color: Colors.grey[600]!,
-                                        size: 30,
+                                      title: Text(
+                                        task.title,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18),
+                                      ),
+                                      subtitle: Text(task.dueDate.toString()),
+                                      trailing: WhiteElevatedButton(
+                                        text: 'Details',
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return TaskDetailsDialog(
+                                                  task: task,
+                                                  userRole: _userRole,
+                                                  managerReference:
+                                                      _userRole == "worker"
+                                                          ? task.manager
+                                                          : null,
+                                                  editOrComplete:
+                                                      _userRole == "worker"
+                                                          ? completeTask
+                                                          : showEditForm,
+                                                  deleteOrContact:
+                                                      _userRole == "worker"
+                                                          ? contactManager
+                                                          : showDeleteForm);
+                                            },
+                                          );
+                                        },
                                       ),
                                     ),
-                                    title: Text(
-                                      task.title,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                    subtitle: Text(task.dueDate.toString()),
-                                    trailing: WhiteElevatedButton(
-                                      text: 'Details',
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return TaskDetailsDialog(
-                                                task: task,
-                                                userRole: _userRole,
-                                                managerReference:
-                                                    _userRole == "worker"
-                                                        ? task.manager
-                                                        : null,
-                                                editOrComplete:
-                                                    _userRole == "worker"
-                                                        ? completeTask
-                                                        : showEditForm,
-                                                deleteOrContact:
-                                                    _userRole == "worker"
-                                                        ? contactManager
-                                                        : showDeleteForm);
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ));
+                          ],
+                        ));
+                  }
                 }
-              }
-              // Show error message once an error occurs
-              else if (state is TaskError) {
-                return Center(child: Text(state.error.toString()));
-              }
-              // If the state is not any of the predefined states;
-              // never happens; but, anything can happen
-              else {
-                return const Center(child: Text('Unexpected State'));
-              }
-            },
-          ),
-          _userRole != "worker"
-              ? GreenElevatedButton(
-                  text: 'Add Task', onPressed: () => showAddDialog())
-              : const SizedBox(),
-        ],
+                // Show error message once an error occurs
+                else if (state is TaskError) {
+                  return Center(child: Text(state.error.toString()));
+                }
+                // If the state is not any of the predefined states;
+                // never happens; but, anything can happen
+                else {
+                  return const Center(child: Text('Unexpected State'));
+                }
+              },
+            ),
+          ],
+        ),
       ),
 
       // Footer nav bar
       bottomNavigationBar: _userRole == "worker"
-          ? createFooterNav(
-              _selectedIndex,
-              footerNavCubit,
-              _userRole,
-            )
+          ? PreferredSize(
+            preferredSize: Size.fromHeight(50.0),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.green.shade700,
+                    Colors.teal.shade400,
+                    Colors.blue.shade300
+                  ],
+                  stops: [0.2, 0.5, 0.9],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30.0),
+                  topRight: Radius.circular(30.0),
+                ),
+                child: createFooterNav(
+                    _selectedIndex,
+                    footerNavCubit,
+                    _userRole,
+                  ),
+              ),
+            ),
+          )
           : const SizedBox(),
+
+          floatingActionButton: _userRole != "worker"
+            ? GreenElevatedButton(
+              text: "Add Task", onPressed: () => showAddDialog())
+              : const SizedBox(),
     );
   }
 
