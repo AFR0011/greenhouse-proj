@@ -3,9 +3,11 @@
 /// *Make sure data is periodically updated (e.g, every 30 seconds)
 library;
 
+import "dart:math";
+
 import "package:cloud_firestore/cloud_firestore.dart";
+import 'package:fl_chart/fl_chart.dart';
 import "package:flutter/material.dart";
-import "package:syncfusion_flutter_charts/charts.dart";
 
 class _ChartData {
   _ChartData({this.x, this.y});
@@ -13,58 +15,137 @@ class _ChartData {
   final int? y;
 }
 
-//Holds the data source of chart
-class ChartClass extends StatefulWidget {
-  final String sensor;
-  const ChartClass({super.key, required this.sensor});
 
-  @override
-  State<ChartClass> createState() => _ChartClassState();
-}
-
-class _ChartClassState extends State<ChartClass> {
-  List<_ChartData> chartData = <_ChartData>[];
-  bool _dataFetched = false; // Flag to track whether data has been fetched
-
-  @override
-  void initState() {
-    if (!_dataFetched) {
-      getDataFromFirestore().then((results) {
-        setState(() {});
-      });
-    }
-    super.initState();
-  }
-
-  Future<void> getDataFromFirestore() async {
-    var data = await FirebaseFirestore.instance.collection("readings").get();
-    List<_ChartData> list = data.docs.map((e) {
-      DateTime timestamp = DateTime.fromMillisecondsSinceEpoch(int.parse(e.id));
-      double sensorValue = e.data()["1"][widget.sensor];
-      return _ChartData(x: timestamp, y: sensorValue.toInt());
-    }).toList();
-
-    setState(() {
-      chartData = list;
-      _dataFetched = true; // Set flag to true after fetching data
-    });
-  }
-
-  Widget createChart() {
-    return SfCartesianChart(
-        title: ChartTitle(text: widget.sensor),
-        primaryXAxis: const DateTimeAxis(),
-        primaryYAxis: const NumericAxis(),
-        series: [
-          LineSeries<_ChartData, DateTime>(
-              dataSource: chartData,
-              xValueMapper: (_ChartData data, _) => data.x,
-              yValueMapper: (_ChartData data, _) => data.y),
-        ]);
-  }
+class ChartClass extends StatelessWidget {
+  
 
   @override
   Widget build(BuildContext context) {
-    return createChart();
+
+    return SizedBox(
+      height: MediaQuery.of(context).size.width*0.5,
+      width: MediaQuery.of(context).size.width*0.9,
+      child: Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24.0),
+                    child: LineChart(
+                      LineChartData(
+                        gridData: FlGridData(
+                          show: true,
+                          drawVerticalLine: true,
+                          getDrawingHorizontalLine: (value) {
+                            return FlLine(
+                              color: Colors.teal.withOpacity(0.2),
+                              strokeWidth: 1,
+                            );
+                          },
+                          getDrawingVerticalLine: (value) {
+                            return FlLine(
+                              color: Colors.teal.withOpacity(0.2),
+                              strokeWidth: 1,
+                            );
+                          },
+                        ),
+                        titlesData: FlTitlesData(
+                          show: true,
+                          rightTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          topTitles: AxisTitles(
+                            sideTitles: SideTitles(showTitles: false),
+                          ),
+                          bottomTitles: 
+                          AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 30,
+                              interval: 4,
+                              getTitlesWidget: (value, meta) {
+                                return Text(
+                                  value.toString(),
+                                  style: TextStyle(
+                                    color: Colors.teal.shade700,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 42,
+                              interval: 1,
+                              getTitlesWidget: (value, meta) {
+                                return Text(
+                                  '${value.toInt()}°C',
+                                  style: TextStyle(
+                                    color: Colors.teal.shade700,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        borderData: FlBorderData(
+                          show: true,
+                          border: Border.all(color: Colors.teal.shade700, width: 2),
+                        ),
+                        minX: 0,
+                        maxX: 24,
+                        minY: 0,
+                        maxY: 6,
+                        lineBarsData: [
+                          LineChartBarData(
+                            spots: [
+                              FlSpot(0, 3),
+                              FlSpot(1, 1),
+                              FlSpot(2, 4),
+                              FlSpot(3, 3),
+                              FlSpot(4, 2),
+                              FlSpot(5, 5),
+                              FlSpot(6, 3),
+                            ],
+                            isCurved: true,
+                            color: 
+                              Colors.teal.shade700,
+                            
+                            barWidth: 4,
+                            belowBarData: BarAreaData(
+                              show: true,
+                              color: 
+                                Colors.teal.shade400.withOpacity(0.2)
+                              ,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.teal.shade400.withOpacity(0.4),
+                                  Colors.teal.shade100.withOpacity(0.2),
+                                ],
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                              ),
+                            ),
+                            dotData: FlDotData(
+                              show: true,
+                              getDotPainter: (spot, percent, bar, index) {
+                                return FlDotCirclePainter(
+                                  radius: 6,
+                                  color: Colors.teal.shade700,
+                                  strokeWidth: 3,
+                                  strokeColor: Colors.teal.shade100,
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+    );
+            
+
   }
+
 }

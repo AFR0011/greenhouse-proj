@@ -115,19 +115,18 @@ class InputDropdown extends StatelessWidget {
     });
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Container(
-        child: Center(
-          child: DropdownButtonFormField(
-            isExpanded: true,
-            value: value,
-            onChanged: (value) => onChanged(value),
-            decoration: const InputDecoration(
-              labelText: 'Select an option',
-              border: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
-            ),
-            items: itemsList,
+      child: Center(
+        child: DropdownButtonFormField(
+          isExpanded: true,
+          value: value,
+          elevation: 16,
+          onChanged: (value) => onChanged(value),
+          decoration: const InputDecoration(
+            labelText: 'Select an option',
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20))),
           ),
+          items: itemsList,
         ),
       ),
     );
@@ -844,5 +843,45 @@ class Readings extends StatelessWidget {
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
       ),
     ));
+  }
+}
+
+
+
+class CustomSlider extends StatelessWidget {
+  final double currentSliderValue;
+  final Function(double) updateSlider;
+
+  CustomSlider({required this.updateSlider, required this.currentSliderValue});
+  @override
+  Widget build(BuildContext context) {
+    return SliderTheme(
+      data: SliderTheme.of(context).copyWith(
+        activeTrackColor: Colors.tealAccent,
+        inactiveTrackColor: Colors.tealAccent.shade100,
+        trackShape: RoundedRectSliderTrackShape(),
+        trackHeight: 4.0,
+        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
+        thumbColor: Colors.teal,
+        overlayColor: Colors.teal.withOpacity(0.2),
+        overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
+        tickMarkShape: RoundSliderTickMarkShape(),
+        activeTickMarkColor: Colors.tealAccent,
+        inactiveTickMarkColor: Colors.tealAccent.shade100,
+        valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+        valueIndicatorColor: Colors.teal,
+        valueIndicatorTextStyle: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      child: Slider(
+        value: currentSliderValue,
+        min: 0,
+        max: 100,
+        divisions: 5,
+        label: currentSliderValue.round().toString(),
+        onChanged: updateSlider,
+      ),
+    );
   }
 }
