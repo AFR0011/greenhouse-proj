@@ -63,9 +63,35 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   late String _userName = "";
   late DocumentReference _userReference;
   late bool _enabled;
-
+  List<bool> _isSelected = [true, false];
   // Custom theme
   final ThemeData customTheme = theme;
+  
+   Widget _getDisplayWidget() {
+    if (_isSelected[0]) {
+      return _buildDashbord()
+      ;
+    } else {
+      return _buildNotifications();
+    }
+  }
+
+  void _onToggle(int index) {
+    setState(() {
+      for (int i = 0; i < _isSelected.length; i++) {
+        _isSelected[i] = i == index;
+      }
+    });
+  }
+
+  int _selectedIndexWidget = 2;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndexWidget = index;
+    });
+  }
+
 
   // Text controllers
   final TextEditingController _searchController = TextEditingController();
@@ -200,7 +226,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                           child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                              'Notifications',
+                              'Dashbord',
                               style: TextStyle(fontSize: 16),
                           ),
                           ),
@@ -213,20 +239,22 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                           child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                              'Dashbord',
+                              'Notifications',
                               style: TextStyle(fontSize: 16),
                           ),
                           ),
                         ),
                       ),
                   ],
-                  onPressed: (int index) {},
-                  isSelected: [true,false],
+                  isSelected: _isSelected,
+                  onPressed: _onToggle,
+                  
                   ),
+
+                
             ),
           ),
-          // _buildNotifications(),
-          _buildDashbord()
+          _getDisplayWidget()
         ],
       )),
 
