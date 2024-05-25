@@ -234,7 +234,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                                         ),
                                         child: ClipOval(
                                           child: Image.memory(
-                                            employee!.picture,
+                                            employee.picture,
                                             width: 50,
                                             height: 50,
                                             fit: BoxFit.cover,
@@ -251,11 +251,11 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                                             fontWeight: FontWeight.w300,
                                             color: Colors.grey,
                                             fontSize: 8.0,
-                                          )
-                                          ),
-                                          onTap: () {
-                                            chatsCubit.createChat(employee.reference);
-                                          },
+                                          )),
+                                      onTap: () {
+                                        chatsCubit.createChat(
+                                            context, employee.reference);
+                                      },
                                     );
                                   },
                                 ),
@@ -354,21 +354,10 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                     margin: const EdgeInsets.only(left: 5),
                     child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Text.rich(
-                          TextSpan(
-                              text:
-                                  "${receiverData?['name']} ${receiverData?['surname']}",
-                              style: bodyTextStyle,
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: "     (" + receiverData!['role'] + ")",
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w300,
-                                    color: Colors.grey,
-                                    fontSize: 14.0,
-                                  ),
-                                )
-                              ]),
+                        child: Text(
+                          overflow: TextOverflow.ellipsis,
+                          "${receiverData?['name']} ${receiverData?['surname']}",
+                          style: bodyTextStyle,
                         ))),
               ],
             ),

@@ -27,7 +27,8 @@ class _BoxLinkState extends State<BoxLink> {
   @override
   void initState() {
     super.initState();
-    containerColor = theme.colorScheme.primary; // Initialize with primary color
+    containerColor =
+        theme.colorScheme.background; // Initialize with primary color
   }
 
   @override
@@ -36,9 +37,9 @@ class _BoxLinkState extends State<BoxLink> {
 
     return Container(
       decoration: BoxDecoration(
-       borderRadius: BorderRadius.circular(25),
-       color: containerColor.withOpacity(0.75),
-       border: Border.all(width: 2, color: Colors.white30),
+        borderRadius: BorderRadius.circular(25),
+        color: containerColor.withOpacity(0.2),
+        border: Border.all(width: 2, color: Colors.white30),
       ),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 0.5, sigmaY: 0.5),
@@ -50,9 +51,9 @@ class _BoxLinkState extends State<BoxLink> {
               begin: Alignment.topLeft,
               end: Alignment.bottomCenter,
               colors: [Colors.white60, Colors.white10],
-          ),
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(width: 2, color: Colors.white10),
+            ),
+            borderRadius: BorderRadius.circular(25),
+            border: Border.all(width: 2, color: Colors.white10),
           ),
           child: InkWell(
             onTap: () {

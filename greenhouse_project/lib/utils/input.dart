@@ -20,7 +20,7 @@ import 'package:greenhouse_project/utils/theme.dart';
 
 class InputTextField extends StatelessWidget {
   final TextEditingController controller;
-  final String errorText;
+  final String? errorText;
   final String labelText;
 
   const InputTextField(
@@ -31,17 +31,20 @@ class InputTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-        labelText: labelText,
-        errorText: errorText,
-        filled: true,
-        fillColor: theme.colorScheme.secondary,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20),
+    return Container(
+      margin: EdgeInsets.only(bottom: 16),
+      child: TextField(
+        controller: controller,
+        decoration: InputDecoration(
+          constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.75),
+          labelText: labelText,
+          errorText: errorText,
+          filled: true,
+          fillColor: theme.colorScheme.secondary,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
         ),
       ),
     );
@@ -840,8 +843,8 @@ class Readings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Card(
+    return Container(
+        child: Card(
       elevation: 4.0,
       margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: ListTile(
@@ -886,7 +889,7 @@ class CustomSlider extends StatelessWidget {
         value: currentSliderValue,
         min: 0,
         max: 100,
-        divisions: 5,
+        divisions: 100,
         label: currentSliderValue.round().toString(),
         onChanged: updateSlider,
       ),
