@@ -200,7 +200,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                 if (e.isPending) return e;
               }).toList();
               pendingInventory.removeNull();
-        
+
               // Function call to create inventory list
               return _createInventoryList(
                   actualInventory, pendingInventory, context);
@@ -219,114 +219,118 @@ class _InventoryPageState extends State<_InventoryPageContent> {
       ),
 
       // Footer nav bar
-      bottomNavigationBar:
-
-          PreferredSize(
-            preferredSize: Size.fromHeight(50.0),
-             child: Container(
-                     decoration: BoxDecoration(
-                       gradient: LinearGradient(
-              colors: [Colors.green.shade700, Colors.teal.shade400, Colors.blue.shade300],
+      bottomNavigationBar: PreferredSize(
+        preferredSize: Size.fromHeight(50.0),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.green.shade700,
+                Colors.teal.shade400,
+                Colors.blue.shade300
+              ],
               stops: [0.2, 0.5, 0.9],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-                       ),
-                       boxShadow: [
+            ),
+            boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2),
                 spreadRadius: 5,
                 blurRadius: 7,
                 offset: Offset(0, 3), // changes position of shadow
               ),
-                       ],
-                     ),
-                     child: ClipRRect(
-                       borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(30.0),
-                        topRight: Radius.circular(30.0),
-                       ),
-            child: createFooterNav(_selectedIndex, footerNavCubit, _userRole)
-            ),
-            ),
-
-            ),
+            ],
+          ),
+          child: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(30.0),
+                topRight: Radius.circular(30.0),
+              ),
+              child:
+                  createFooterNav(_selectedIndex, footerNavCubit, _userRole)),
+        ),
+      ),
       floatingActionButton: GreenElevatedButton(
-        text: "Add Item",
-        // Display addition form
-        onPressed: () {
-          _showAdditionForm(context);
-        }),
+          text: "Add Item",
+          // Display addition form
+          onPressed: () {
+            _showAdditionForm(context);
+          }),
     );
   }
 
   // Create inventory list function
   Widget _createInventoryList(
       List actualInventory, List pendingInventory, BuildContext mainContext) {
-    return 
-    Padding(
+    return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
           // Main inventory items
           SizedBox(
-            height: MediaQuery.of(context).size.height *.35,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: actualInventory.length,
-              itemBuilder: (context, index) {
-                
-                InventoryData inventory = actualInventory[index];
-                return Card(
-                          shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                elevation: 4.0,
-                margin: EdgeInsets.only(bottom: 16.0),
-                child: ListTile(
-                  leading: Container(
-                    padding: EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                    ),
-                  child: Icon(
-                    Icons.inventory_2_outlined,
-                    color: Colors.grey[600]!,
-                    size: 30,
-                  ),
-                  ),
-                  
-                    title: Text(inventory.name,
-                    style: TextStyle(fontWeight: FontWeight.bold,
-                    fontSize: 18),
-                    ),
-                    subtitle: Text(inventory.timeAdded.toString()),
-                  
-                    // Buttons for edit and deleting items
-                    trailing: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: WhiteElevatedButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (context) =>
-                                    InventoryDetailsDialog(inventory: inventory, editInventory: () => showEditForm(mainContext, inventory), deleteInventory: () => showDeleteForm(mainContext, inventory)));
-                          },
-                          text: "Details",
-                        )),
-                  ),
-                
-            );})),
-              
-            
-      
+              height: MediaQuery.of(context).size.height * .35,
+              child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: actualInventory.length,
+                  itemBuilder: (context, index) {
+                    InventoryData inventory = actualInventory[index];
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
+                      elevation: 4.0,
+                      margin: EdgeInsets.only(bottom: 16.0),
+                      child: ListTile(
+                        leading: Container(
+                          padding: EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.inventory_2_outlined,
+                            color: Colors.grey[600]!,
+                            size: 30,
+                          ),
+                        ),
+
+                        title: Text(
+                          inventory.name,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                        subtitle: Text(inventory.timeAdded.toString()),
+
+                        // Buttons for edit and deleting items
+                        trailing: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: WhiteElevatedButton(
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) =>
+                                        InventoryDetailsDialog(
+                                            inventory: inventory,
+                                            editInventory: () => showEditForm(
+                                                mainContext, inventory),
+                                            deleteInventory: () =>
+                                                showDeleteForm(
+                                                    mainContext, inventory)));
+                              },
+                              text: "Details",
+                            )),
+                      ),
+                    );
+                  })),
+
           // Pending inventory item updates
           Container(
             margin: EdgeInsets.only(top: 10, bottom: 10),
             child: const Text("Pending updates", style: subheadingTextStyle),
           ),
           SizedBox(
-            height: MediaQuery.of(context).size.height *.25,
+            height: MediaQuery.of(context).size.height * .25,
             child: pendingInventory.isNotEmpty
                 ? ListView.builder(
                     shrinkWrap: true,
@@ -334,53 +338,56 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                     itemBuilder: (context, index) {
                       InventoryData inventory = pendingInventory[index];
                       return Card(
-                                  shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        elevation: 4.0,
-                        margin: EdgeInsets.only(bottom: 16.0),
-                        child: ListTile(
-                          leading: Container(
-                            padding: EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              color: Colors.green.withOpacity(0.1),
-                              shape: BoxShape.circle,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0),
+                          ),
+                          elevation: 4.0,
+                          margin: EdgeInsets.only(bottom: 16.0),
+                          child: ListTile(
+                            leading: Container(
+                              padding: EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.inventory_2_outlined,
+                                color: Colors.grey[600]!,
+                                size: 30,
+                              ),
                             ),
-                          child: Icon(
-                            Icons.inventory_2_outlined,
-                            color: Colors.grey[600]!,
-                            size: 30,
-                          ),
-                          ),
-                        title: Text(inventory.name,
-                        style: TextStyle(fontWeight: FontWeight.bold,
-                          fontSize: 18),
-                          ),
-                        subtitle: Text(inventory.timeAdded.toString()),
-                        trailing: _userRole == 'manager'
-                            ? FittedBox(
-                                child: Row(
-                                children: [
-                                  GreenElevatedButton(
-                                      text: "Approve",
-                                      onPressed: () {
-                                        context
-                                            .read<InventoryCubit>()
-                                            .approveItem(inventory.reference,
-                                                _userReference);
-                                      }),
-                                  RedElevatedButton(
-                                      text: "Deny",
-                                      onPressed: () {
-                                        context
-                                            .read<InventoryCubit>()
-                                            .removeInventory(inventory.reference,
-                                                _userReference);
-                                      })
-                                ],
-                              ))
-                            : Text(inventory.amount.toString()),
-                      ));
+                            title: Text(
+                              inventory.name,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18),
+                            ),
+                            subtitle: Text(inventory.timeAdded.toString()),
+                            trailing: _userRole == 'manager'
+                                ? FittedBox(
+                                    child: Row(
+                                    children: [
+                                      GreenElevatedButton(
+                                          text: "Approve",
+                                          onPressed: () {
+                                            context
+                                                .read<InventoryCubit>()
+                                                .approveItem(
+                                                    inventory.reference,
+                                                    _userReference);
+                                          }),
+                                      RedElevatedButton(
+                                          text: "Deny",
+                                          onPressed: () {
+                                            context
+                                                .read<InventoryCubit>()
+                                                .removeInventory(
+                                                    inventory.reference,
+                                                    _userReference);
+                                          })
+                                    ],
+                                  ))
+                                : Text(inventory.amount.toString()),
+                          ));
                     },
                   )
                 : const Center(
@@ -408,24 +415,28 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         builder: (context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    side: BorderSide(
-                        color: Colors.transparent,
-                        width: 2.0), // Add border color and width
-                  ),
-                  title: const Text("Add item"),
+              borderRadius: BorderRadius.circular(10.0),
+              side: BorderSide(
+                  color: Colors.transparent,
+                  width: 2.0), // Add border color and width
+            ),
+            title: const Text("Add item"),
             content: SizedBox(
               width: double.maxFinite,
               child: BlocBuilder<InventoryEditCubit, List<bool>>(
                 bloc: inventoryEditCubit,
                 builder: (context, state) {
                   return Column(
-                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    mainAxisSize:
+                        MainAxisSize.min, // Set column to minimum size
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      InputTextField(controller: _equipmentController, errorText: state[0]
-                                ? ""
-                                : "Name should be longer than 1 characters.", labelText: "Name"),
+                      InputTextField(
+                          controller: _equipmentController,
+                          errorText: state[0]
+                              ? ""
+                              : "Name should be longer than 1 characters.",
+                          labelText: "Name"),
                       // TextField(
                       //   controller: _equipmentController,
                       //   decoration: InputDecoration(
@@ -433,9 +444,12 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                       //           ? ""
                       //           : "Name should be longer than 1 characters."),
                       // ),
-                      InputTextField(controller: _descController, errorText: state[1]
-                                ? ""
-                                : "Description should be longer than 2 characters.", labelText: "Description"),
+                      InputTextField(
+                          controller: _descController,
+                          errorText: state[1]
+                              ? ""
+                              : "Description should be longer than 2 characters.",
+                          labelText: "Description"),
                       // TextField(
                       //   controller: _descController,
                       //   decoration: InputDecoration(
@@ -450,18 +464,17 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                           FilteringTextInputFormatter.digitsOnly
                         ],
                         decoration: InputDecoration(
-                          constraints:BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
                           labelText: "Amount",
                           filled: true,
                           fillColor: theme.colorScheme.secondary,
-                            errorText:
-                                state[2] ? "" : "Amount should be more than 0.",
-                                border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                                ),
+                          errorText:
+                              state[2] ? "" : "Amount should be more than 0.",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
                       ),
-              
+
                       // Submit and cancel buttons
                       Row(
                         children: [
@@ -480,13 +493,14 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                       int.parse(_amountController.text) <= 0) {
                                     validation[2] = !validation[2];
                                   }
-                                          
-                                  bool isValid =
-                                      inventoryEditCubit.updateState(validation);
+
+                                  bool isValid = inventoryEditCubit
+                                      .updateState(validation);
                                   if (!isValid) {
                                   } else {
                                     Map<String, dynamic> data = {
-                                      "amount": num.parse(_amountController.text),
+                                      "amount":
+                                          num.parse(_amountController.text),
                                       "description": _descController.text,
                                       "name": _equipmentController.text,
                                       "timeAdded": DateTime.now(),
@@ -500,10 +514,10 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                       _equipmentController.clear();
                                       _descController.clear();
                                       _amountController.clear();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                              content:
-                                                  Text("Item added succesfully!")));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  "Item added succesfully!")));
                                     });
                                   }
                                 }),
@@ -544,25 +558,30 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           _amountController.text = inventory.amount.toString();
 
           return AlertDialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10.0),
-                  side: BorderSide(
-                      color: Colors.transparent,
-                      width: 2.0), // Add border color and width
-                ),
-          title: Text("Edit inventory"),
-            content: 
-             BlocBuilder<InventoryEditCubit, List<bool>>(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+              side: BorderSide(
+                  color: Colors.transparent,
+                  width: 2.0), // Add border color and width
+            ),
+            title: Text("Edit inventory"),
+            content: BlocBuilder<InventoryEditCubit, List<bool>>(
               bloc: inventoryEditCubit,
               builder: (context, state) {
                 return Container(
-                  width: double.maxFinite, 
+                  width: double.maxFinite,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    mainAxisSize:
+                        MainAxisSize.min, // Set column to minimum size
                     crossAxisAlignment: CrossAxisAlignment.start,
                     // Textfields
                     children: [
-                      InputTextField(controller:  _equipmentController, errorText: state[0]? "": "Name should be longer than 1 characters.", labelText: "Name"),
+                      InputTextField(
+                          controller: _equipmentController,
+                          errorText: state[0]
+                              ? ""
+                              : "Name should be longer than 1 characters.",
+                          labelText: "Name"),
                       // TextField(
                       //   controller: _equipmentController,
                       //   decoration: InputDecoration(
@@ -570,7 +589,12 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                       //           ? ""
                       //           : "Name should be longer than 1 characters."),
                       // ),
-                      InputTextField(controller: _descController, errorText: state[1]? "": "Description should be longer than 2 characters.", labelText: "Description"),
+                      InputTextField(
+                          controller: _descController,
+                          errorText: state[1]
+                              ? ""
+                              : "Description should be longer than 2 characters.",
+                          labelText: "Description"),
                       // TextField(
                       //   controller: _descController,
                       //   decoration: InputDecoration(
@@ -579,30 +603,30 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                       //           : "Description should be longer than 2 characters."),
                       // ),
                       TextFormField(
-                        controller: _amountController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: <TextInputFormatter>[
-                          FilteringTextInputFormatter.digitsOnly
-                        ],
-                        decoration: InputDecoration(
-                          constraints:BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-                          labelText: "Amount",
-                          filled: true,
-                          fillColor: theme.colorScheme.secondary,
+                          controller: _amountController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          decoration: InputDecoration(
+                            labelText: "Amount",
+                            filled: true,
+                            fillColor: theme.colorScheme.secondary,
                             errorText:
                                 state[2] ? "" : "Amount should be more than 0.",
-                                border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),)
-                        // controller: _amountController,
-                        // keyboardType: TextInputType.number,
-                        // inputFormatters: <TextInputFormatter>[
-                        //   FilteringTextInputFormatter.digitsOnly
-                        // ],
-                        // decoration: InputDecoration(
-                        //     errorText:
-                        //         state[2] ? "" : "Amount should be more than 0."),
-                      ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          )
+                          // controller: _amountController,
+                          // keyboardType: TextInputType.number,
+                          // inputFormatters: <TextInputFormatter>[
+                          //   FilteringTextInputFormatter.digitsOnly
+                          // ],
+                          // decoration: InputDecoration(
+                          //     errorText:
+                          //         state[2] ? "" : "Amount should be more than 0."),
+                          ),
                       // Submit and Cancel buttons
                       Row(
                         children: [
@@ -621,33 +645,34 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                       int.parse(_amountController.text) <= 0) {
                                     validation[2] = !validation[2];
                                   }
-                                              
-                                  bool isValid =
-                                      inventoryEditCubit.updateState(validation);
+
+                                  bool isValid = inventoryEditCubit
+                                      .updateState(validation);
                                   if (!isValid) {
                                   } else {
                                     Map<String, dynamic> data = {
-                                      "amount": num.parse(_amountController.text),
+                                      "amount":
+                                          num.parse(_amountController.text),
                                       "description": _descController.text,
                                       "name": _equipmentController.text,
                                       "timeAdded": DateTime.now(),
                                       "pending":
                                           _userRole == 'manager' ? false : true,
                                     };
-                                              
+
                                     inventoryCubit
-                                        .updateInventory(inventory.reference, data,
-                                            _userReference)
+                                        .updateInventory(inventory.reference,
+                                            data, _userReference)
                                         .then((value) {
                                       Navigator.pop(context);
                                       Navigator.pop(context);
                                       _equipmentController.clear();
                                       _descController.clear();
                                       _amountController.clear();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                              content:
-                                                  Text("Item edited succesfully!")));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  "Item edited succesfully!")));
                                     });
                                   }
                                 }),
@@ -680,15 +705,15 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         context: context,
         builder: (context) {
           return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    side: BorderSide(
-                        color: Colors.transparent,
-                        width: 2.0), // Add border color and width
-                  ),
-                  title: Text("Are you sure?"),
-                  content: Container(
-                  width: double.maxFinite, // Set maximum width
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                side: BorderSide(
+                    color: Colors.transparent,
+                    width: 2.0), // Add border color and width
+              ),
+              title: Text("Are you sure?"),
+              content: Container(
+                width: double.maxFinite, // Set maximum width
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -703,11 +728,12 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                     .removeInventory(
                                         inventory.reference, _userReference)
                                     .then((value) {
-                                  Navigator.pop(context);Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content:
-                                              Text("Item deleted succesfully!")));
+                                          content: Text(
+                                              "Item deleted succesfully!")));
                                 });
                               }),
                         ),

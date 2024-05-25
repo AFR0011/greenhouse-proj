@@ -16,7 +16,6 @@ import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/employee_edit_cubit.dart';
-import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/theme.dart';
@@ -395,80 +394,90 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
         ),
       ),
       floatingActionButton: GreenElevatedButton(
-        text: 'Add Employee',
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return BlocBuilder<EmployeeEditCubit, List<dynamic>>(
-                bloc: employeeEditCubit,
-                builder: (context, state) {
-                  return AlertDialog(
-                    shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    side: const BorderSide(
-                      color: Colors.transparent,
-                      width: 2.0), // Add border color and width
-                    ),
-                  title: const Text("Add employee"),
-                  content: SizedBox(
-                    width: double.maxFinite,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      //Textfields
-                      children: [
-                        // InputTextField(controller: _emailController, labelText: "email"),
-                        SizedBox(
+          text: 'Add Employee',
+          onPressed: () {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return BlocBuilder<EmployeeEditCubit, List<dynamic>>(
+                    bloc: employeeEditCubit,
+                    builder: (context, state) {
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          side: const BorderSide(
+                              color: Colors.transparent,
+                              width: 2.0), // Add border color and width
+                        ),
+                        title: const Text("Add employee"),
+                        content: SizedBox(
                           width: double.maxFinite,
-                          child: InputDropdown(
-                            items: const {
-                              "employee": "employee",
-                              "manager": "manager"
-                            },
-                          value: state != '' ? state : "worker",
-                          onChanged:
-                          employeeEditCubit.updateState,
-                        )),
-                        //Submit or Cancel
-                        Row(
-                          children: [
-                            Expanded(
-                              child: GreenElevatedButton(
-                              text: 'Submit',
-                              onPressed: () async {
-                                await manageEmployeesCubit
-                                .createEmployee(
-                                  _emailController.text,
-                                  state[1],_userReference
-                                );
-                                  Navigator.pop(context);
-                                  _emailController.clear();
-                                  ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(
-                                    content: Text(
-                                     "HI THERE, THIS WORKED!!!")));
-                                }),
-                            ),
-                              Expanded(
-                                child: WhiteElevatedButton(
-                                  text: 'Cancel',
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                     _emailController.clear();
-                                }),
+                          child: Column(
+                            mainAxisSize:
+                                MainAxisSize.min, // Set column to minimum size
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            //Textfields
+                            children: [
+                              InputTextField(
+                                  controller: _emailController,
+                                  errorText: state[0]
+                                      ? null
+                                      : "Email cannot be empty!",
+                                  labelText: "email"),
+                              SizedBox(
+                                  width: double.maxFinite,
+                                  child: InputDropdown(
+                                    items: const {
+                                      "worker": "worker",
+                                      "manager": "manager"
+                                    },
+                                    value: state[1] != '' ? state[1] : "worker",
+                                    onChanged: employeeEditCubit.updateState,
+                                  )),
+                              //Submit or Cancel
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: GreenElevatedButton(
+                                        text: 'Submit',
+                                        onPressed: () async {
+                                          if (!_emailController.text
+                                              .contains(RegExp(r'.+@.+\..+'))) {
+                                            employeeEditCubit
+                                                .updateState([false, state[1]]);
+                                            return;
+                                          }
+                                          await manageEmployeesCubit
+                                              .createEmployee(
+                                                  _emailController.text,
+                                                  state[1],
+                                                  _userReference);
+                                          Navigator.pop(context);
+                                          _emailController.clear();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                                  content: Text(
+                                                      "User account created successfully! Instructions have been sent via email.")));
+                                        }),
+                                  ),
+                                  Expanded(
+                                    child: WhiteElevatedButton(
+                                        text: 'Cancel',
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          _emailController.clear();
+                                        }),
+                                  )
+                                ],
                               )
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                );
-              },
-            );
-          });
-        }
-      ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                });
+          }),
     );
   }
 
