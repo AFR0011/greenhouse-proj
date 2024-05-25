@@ -135,12 +135,25 @@ final ThemeData darkTheme = ThemeData(
 
 
 class WavePainter extends CustomPainter {
+   final image;
+
+  WavePainter(this.image);
+
   @override
   void paint(Canvas canvas, Size size) {
+    // Gradient
+    final gradient = LinearGradient(
+      colors: [Colors.green, Colors.blue],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
     final paint = Paint()
-      ..color = Colors.green
+      ..shader = gradient.createShader(rect)
       ..style = PaintingStyle.fill;
 
+    // Path for the wave
     final path = Path();
     path.lineTo(0, size.height * 0.75);
     path.quadraticBezierTo(
@@ -150,7 +163,22 @@ class WavePainter extends CustomPainter {
     path.lineTo(size.width, 0);
     path.close();
 
+    // Draw gradient wave
     canvas.drawPath(path, paint);
+
+    // Image pattern
+    if (image != null) {
+      final imagePaint = Paint()
+        ..shader = ImageShader(
+          image,
+          TileMode.repeated,
+          TileMode.repeated,
+          Matrix4.identity().scaled(size.width / image.width, size.height / image.height).storage,
+        );
+
+      // Draw image pattern wave
+      canvas.drawPath(path, imagePaint);
+    }
   }
 
   @override

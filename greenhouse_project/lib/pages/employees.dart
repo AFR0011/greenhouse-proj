@@ -249,8 +249,9 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                                       2.0), // Add border color and width
                                             ),
                                             title: const Text("Are you sure"),
-                                            content: SizedBox(
-                                              width: double.maxFinite,
+                                            content: Container(
+                                               constraints: const BoxConstraints(maxWidth: 400),
+                                               width: MediaQuery.of(context).size.width*.6,
                                               child: Column(
                                                 mainAxisSize: MainAxisSize
                                                     .min, // Set column to minimum size
@@ -411,8 +412,9 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                               width: 2.0), // Add border color and width
                         ),
                         title: const Text("Add employee"),
-                        content: SizedBox(
-                          width: double.maxFinite,
+                        content: Container(
+                          constraints: const BoxConstraints(maxWidth: 400),
+                          width: MediaQuery.of(context).size.width*.6,
                           child: Column(
                             mainAxisSize:
                                 MainAxisSize.min, // Set column to minimum size
@@ -506,8 +508,9 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                     width: 2.0), // Add border color and width
               ),
               title: const Text("Are you sure"),
-              content: SizedBox(
-                width: double.maxFinite,
+              content: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                width: MediaQuery.of(context).size.width*.6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,

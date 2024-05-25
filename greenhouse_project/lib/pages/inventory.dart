@@ -422,8 +422,9 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                   width: 2.0), // Add border color and width
             ),
             title: const Text("Add item"),
-            content: SizedBox(
-              width: double.maxFinite,
+            content: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              width: MediaQuery.of(context).size.width*.6,
               child: BlocBuilder<InventoryEditCubit, List<bool>>(
                 bloc: inventoryEditCubit,
                 builder: (context, state) {
@@ -438,26 +439,14 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                               ? ""
                               : "Name should be longer than 1 characters.",
                           labelText: "Name"),
-                      // TextField(
-                      //   controller: _equipmentController,
-                      //   decoration: InputDecoration(
-                      //       errorText: state[0]
-                      //           ? ""
-                      //           : "Name should be longer than 1 characters."),
-                      // ),
+                     
                       InputTextField(
                           controller: _descController,
                           errorText: state[1]
                               ? ""
                               : "Description should be longer than 2 characters.",
                           labelText: "Description"),
-                      // TextField(
-                      //   controller: _descController,
-                      //   decoration: InputDecoration(
-                      //       errorText: state[1]
-                      //           ? ""
-                      //           : "Description should be longer than 2 characters."),
-                      // ),
+                      
                       TextFormField(
                         controller: _amountController,
                         keyboardType: TextInputType.number,
@@ -570,7 +559,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
               bloc: inventoryEditCubit,
               builder: (context, state) {
                 return Container(
-                  width: double.maxFinite,
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  width: MediaQuery.of(context).size.width*.6,
                   child: Column(
                     mainAxisSize:
                         MainAxisSize.min, // Set column to minimum size
@@ -714,7 +704,8 @@ class _InventoryPageState extends State<_InventoryPageContent> {
               ),
               title: Text("Are you sure?"),
               content: Container(
-                width: double.maxFinite, // Set maximum width
+                constraints: const BoxConstraints(maxWidth: 400),
+                width: MediaQuery.of(context).size.width*.6, // Set maximum width
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
