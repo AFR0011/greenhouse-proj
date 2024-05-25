@@ -88,9 +88,7 @@ class ChatsCubit extends Cubit<ChatsState> {
 
       //Navigate to new chat
       _navigateToChat(context, newChatReference);
-    } catch (error, stack) {
-      print(error);
-      print(stack);
+    } catch (error) {
       emit(ChatsError(error.toString()));
     }
   }

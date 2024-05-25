@@ -6,14 +6,11 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/chat_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
-import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/message_bubble.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
@@ -168,26 +165,25 @@ class _ChatPageState extends State<_ChatPageContent> {
               Container(
                 margin: const EdgeInsets.only(top: 5, bottom: 5),
                 child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: ClipOval(
-                    child: Image.memory(
-                      chat.receiverPicture,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    ),)
-                ),
+                    alignment: Alignment.centerLeft,
+                    child: ClipOval(
+                      child: Image.memory(
+                        chat.receiverPicture,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
+                    )),
               ),
               Container(
-                margin: const EdgeInsets.only(left: 5),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "${chat.receiverData?['name']} ${chat.receiverData?['surname']}",
-                    style: bodyTextStyle,
-                  ),
-                )
-              )
+                  margin: const EdgeInsets.only(left: 5),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "${chat.receiverData?['name']} ${chat.receiverData?['surname']}",
+                      style: bodyTextStyle,
+                    ),
+                  ))
             ],
           ),
         ),
@@ -215,30 +211,29 @@ class _ChatPageState extends State<_ChatPageContent> {
       return Column(
         children: [
           const Expanded(
-            child:
-              Center(
-                child: Text("Write your first message!")
-                ),
+            child: Center(child: Text("Write your first message!")),
           ),
-              SafeArea(
-                child: Container(
-                  margin: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01),
-                  child: TextField(
-                    controller: _textEditingController,
-                    decoration: InputDecoration(
-                      hintText: "send a message...",
-                      suffixIcon: sendButton(chat),
-                      filled: true,
-                      fillColor: theme.colorScheme.secondary.withOpacity(0.4),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))
-                    ),
-                  ),
-                    
-                    ),
+          SafeArea(
+            child: Container(
+              margin: EdgeInsets.fromLTRB(
+                  MediaQuery.of(context).size.width * 0.01,
+                  MediaQuery.of(context).size.width * 0.01,
+                  MediaQuery.of(context).size.width * 0.01,
+                  MediaQuery.of(context).size.width * 0.01),
+              child: TextField(
+                controller: _textEditingController,
+                decoration: InputDecoration(
+                    hintText: "send a message...",
+                    suffixIcon: sendButton(chat),
+                    filled: true,
+                    fillColor: theme.colorScheme.secondary.withOpacity(0.4),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20))),
               ),
-            ],
+            ),
+          ),
+        ],
       );
-
     } else {
       return Column(
         children: [
@@ -264,29 +259,35 @@ class _ChatPageState extends State<_ChatPageContent> {
           ),
           SafeArea(
             child: Container(
-              margin: EdgeInsets.fromLTRB(MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01,MediaQuery.of(context).size.width * 0.01),
+              margin: EdgeInsets.fromLTRB(
+                  MediaQuery.of(context).size.width * 0.01,
+                  MediaQuery.of(context).size.width * 0.01,
+                  MediaQuery.of(context).size.width * 0.01,
+                  MediaQuery.of(context).size.width * 0.01),
               child: TextField(
                 controller: _textEditingController,
                 decoration: InputDecoration(
-                  hintText: "send a message...",
-                  suffixIcon: sendButton(chat),
-                  filled: true,
-                  fillColor: theme.colorScheme.secondary.withOpacity(0.4),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))
-                ),
+                    hintText: "send a message...",
+                    suffixIcon: sendButton(chat),
+                    filled: true,
+                    fillColor: theme.colorScheme.secondary.withOpacity(0.4),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20))),
               ),
-                
-                ),
+            ),
           ),
         ],
       );
     }
   }
 
-
 // Function to send a message
   void _sendMessage(ChatsData? chat) {
+    double scrollOffset =
+        (_scrollController.hasClients ? _scrollController.offset : 0) + 1;
+    double addOffset = 0;
     if (_textEditingController.text.isNotEmpty) {
+      addOffset = (_textEditingController.text.length / 25).ceil() * 25;
       context.read<ChatCubit>().sendMessage(
             _textEditingController.text,
             chat?.receiverData?['reference'],
@@ -294,17 +295,21 @@ class _ChatPageState extends State<_ChatPageContent> {
             chat!.reference,
           );
       _textEditingController.text = "";
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+              _scrollController.position.maxScrollExtent + addOffset,
+              duration: Duration(milliseconds: (1000 / scrollOffset).ceil()),
+              curve: Curves.decelerate);
+        }
+      });
     }
   }
 
-
-Widget sendButton(chat){
-      
-      return IconButton(onPressed: () {
-        _sendMessage(chat);
-        _scrollController.jumpTo(_scrollController.position.extentTotal-750);
-      },
-      icon: Icon(Icons.send_outlined),
-      color: Colors.grey ); 
-}
+  Widget sendButton(chat) {
+    return IconButton(
+        onPressed: () => _sendMessage(chat),
+        icon: const Icon(Icons.send_outlined),
+        color: Colors.grey);
+  }
 }

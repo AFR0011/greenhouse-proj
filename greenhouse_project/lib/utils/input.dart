@@ -210,7 +210,6 @@ class ToggleButtonContainer extends StatelessWidget {
   }
 }
 
-
 class Readings extends StatelessWidget {
   final String title;
   final String value;

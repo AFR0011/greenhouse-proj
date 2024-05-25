@@ -23,9 +23,11 @@ import 'package:greenhouse_project/utils/theme.dart';
 class PlantsPage extends StatelessWidget {
   final UserCredential userCredential;
   final DocumentReference userReference;
-  const PlantsPage({super.key,
-   required this.userCredential,
-   required this.userReference,});
+  const PlantsPage({
+    super.key,
+    required this.userCredential,
+    required this.userReference,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,6 @@ class PlantsPage extends StatelessWidget {
         BlocProvider(create: (context) => PlantStatusCubit(userReference)),
         BlocProvider(create: (context) => ReadingsCubit()),
         BlocProvider(create: (context) => PlantsEditCubit()),
-
       ],
       child: _PlantsPageContent(userCredential: userCredential),
     );
@@ -59,7 +60,6 @@ class _PlantsPageContent extends StatefulWidget {
 
 // Main page content
 class _PlantsPageState extends State<_PlantsPageContent> {
-
   // User info local variables
   late DocumentReference _userReference;
   // Custom theme
@@ -129,7 +129,8 @@ class _PlantsPageState extends State<_PlantsPageContent> {
           Padding(
             padding: const EdgeInsets.only(top: 40),
             child: SizedBox(
-              width: MediaQuery.of(context).size.width - 20,),
+              width: MediaQuery.of(context).size.width - 20,
+            ),
           ),
           // BlocBuilder for plantStatus state
           BlocBuilder<PlantStatusCubit, PlantStatusState>(
@@ -148,66 +149,77 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                 }
                 // Display plants
                 else {
+                  BuildContext mainContext = context;
                   return Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
                         SizedBox(
-                          height: MediaQuery.of(context).size.height / 10,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: plantList.length,
-                              itemBuilder: (context, index) {
-                                PlantData plant = plantList[index]; //plant data
-                            
-                                // Display plant info
-                                return Card(
-                                  shape: RoundedRectangleBorder(
+                          height: MediaQuery.of(context).size.height / 2,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: plantList.length,
+                            itemBuilder: (context, index) {
+                              PlantData plant = plantList[index]; //plant data
+
+                              // Display plant info
+                              return Card(
+                                shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  elevation: 4.0,
-                                  margin: EdgeInsets.only(bottom: 16.0),
-                                  child: ListTile(
-                                    leading: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.1),
-                                        shape: BoxShape.circle,
-                                      ),
+                                ),
+                                elevation: 4.0,
+                                margin: EdgeInsets.only(bottom: 16.0),
+                                child: ListTile(
+                                  leading: Container(
+                                    padding: EdgeInsets.all(8.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
                                     child: Icon(
                                       Icons.grass_outlined,
                                       color: Colors.green[800]!,
                                       size: 30,
                                     ),
-                                    ),
-                                    title: Text(plant.type,
-                                    style: TextStyle(fontWeight: FontWeight.bold,
-                                    fontSize: 18),),
-                                    subtitle: Text(plant.subtype),
-                                    trailing: WhiteElevatedButton(
-                                      // Show details and sensor readings
-                                      text: 'Details',
-                                      onPressed: () {
-                                        // _showPlantDetails(plant);
-                                        BuildContext mainContext = context;
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) =>
-                                                PlantDetailsDialog(plant: plant, removePlant: () => showDeleteForm(mainContext, plant)));
-                                      },
-                                    ),
                                   ),
-                                );
-                              },
-                            ),
-                  )],),
+                                  title: Text(
+                                    plant.type,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18),
+                                  ),
+                                  subtitle: Text(plant.subtype),
+                                  trailing: WhiteElevatedButton(
+                                    // Show details and sensor readings
+                                    text: 'Details',
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) =>
+                                              PlantDetailsDialog(
+                                                  plant: plant,
+                                                  mainContext: mainContext,
+                                                  removePlant: showDeleteForm));
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      ],
+                    ),
                   );
                 }
               }
 
               // Show error message once an error occurs
               else if (state is PlantsError) {
-                return Center(child: Text('Error: ${state.error}'));
+                return Column(
+                  children: [
+                    Center(child: Text('Error: ${state.error}')),
+                  ],
+                );
               }
               // If the state is not any of the predefined states;
               // never happens; but, anything can happen
@@ -221,47 +233,24 @@ class _PlantsPageState extends State<_PlantsPageContent> {
             padding: EdgeInsets.all(16.0),
             child: Column(
               children: [
-                Readings(title: 'Temperature', value: '24°C', icon: Icons.wb_sunny, color: Colors.orange),
-                Readings(title: "Soil humidity", value: "75%", icon: Icons.grass, color: Colors.brown)
-
-            ],
+                Readings(
+                    title: 'Temperature',
+                    value: '24°C',
+                    icon: Icons.wb_sunny,
+                    color: Colors.orange),
+                Readings(
+                    title: "Soil humidity",
+                    value: "75%",
+                    icon: Icons.grass,
+                    color: Colors.brown)
+              ],
             ),
           )
         ],
       ),
 
       floatingActionButton: GreenElevatedButton(
-        text: "Add Plant",
-         onPressed: () => showAdditionForm(context)),
-    );
-  }
-
-  // Function to show plant details
-  void _showPlantDetails(PlantData plant) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          child: Column(
-            children: [
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(Icons.close),
-              ),
-              Text("Title: ${plant.type}"),
-              Text("Description: ${plant.subtype}"),
-              Text("Due Date: ${plant.birthdate}"),
-              const Text(
-                "Readings",
-                style: subheadingTextStyle,
-              ),
-              _showReadings(plant),
-            ],
-          ),
-        );
-      },
+          text: "Add Plant", onPressed: () => showAdditionForm(context)),
     );
   }
 
@@ -317,10 +306,11 @@ class _PlantsPageState extends State<_PlantsPageContent> {
     );
   }
 
-   // Item addition form function
+  // Item addition form function
   void showAdditionForm(BuildContext context) {
     // Get instance of inventory cubit from main context
-    PlantStatusCubit plantStatusCubit = BlocProvider.of<PlantStatusCubit>(context);
+    PlantStatusCubit plantStatusCubit =
+        BlocProvider.of<PlantStatusCubit>(context);
     PlantsEditCubit plantsEditCubit = BlocProvider.of<PlantsEditCubit>(context);
     String dropdownValue = "1";
     // Display item addition form
@@ -329,44 +319,59 @@ class _PlantsPageState extends State<_PlantsPageContent> {
         builder: (context) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    side: const BorderSide(
-                        color: Colors.transparent,
-                        width: 2.0), // Add border color and width
-                  ),
-                  title: const Text("Add Plant"),
+              borderRadius: BorderRadius.circular(10.0),
+              side: const BorderSide(
+                  color: Colors.transparent,
+                  width: 2.0), // Add border color and width
+            ),
+            title: const Text("Add Plant"),
             content: Container(
               constraints: const BoxConstraints(maxWidth: 400),
-              width: MediaQuery.of(context).size.width*.6,
+              width: MediaQuery.of(context).size.width * .6,
               child: BlocBuilder<PlantsEditCubit, List<bool>>(
                 bloc: plantsEditCubit,
                 builder: (context, state) {
                   return Column(
-                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    mainAxisSize:
+                        MainAxisSize.min, // Set column to minimum size
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      InputTextField(controller: _typeController, errorText: state[0]
-                                ? ""
-                                : "Type should be longer than 1 characters.", labelText: "Type"),
-                      InputTextField(controller: _textController, errorText: state[1]
-                                ? ""
-                                : "Subtype should be longer than 2 characters.", labelText: "Subtype"),
+                      InputTextField(
+                          controller: _typeController,
+                          errorText: state[0]
+                              ? ""
+                              : "Type should be longer than 1 characters.",
+                          labelText: "Type"),
+                      // TextField(
+                      //   controller: _equipmentController,
+                      //   decoration: InputDecoration(
+                      //       errorText: state[0]
+                      //           ? ""
+                      //           : "Name should be longer than 1 characters."),
+                      // ),
+                      InputTextField(
+                          controller: _textController,
+                          errorText: state[1]
+                              ? ""
+                              : "Subtype should be longer than 2 characters.",
+                          labelText: "Subtype"),
                       //insert dropdown HERE!!
-                       DropdownButtonFormField<String>(
-                    value: dropdownValue,
-                    decoration: const InputDecoration(
-                      labelText: "Board No",
-                    ),
-                    items: <String>["1"].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                    onChanged: null,
-                    onTap: () {},
-                    disabledHint: Text(dropdownValue),
-                  ),
+                      DropdownButtonFormField<String>(
+                        value: dropdownValue,
+                        decoration: const InputDecoration(
+                          labelText: "Board No",
+                        ),
+                        items: <String>["1"]
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        onChanged: null,
+                        onTap: () {},
+                        disabledHint: Text(dropdownValue),
+                      ),
                       // Submit and cancel buttons
                       Row(
                         children: [
@@ -381,7 +386,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                   if (_textController.text.isEmpty) {
                                     validation[1] = !validation[1];
                                   }
-                                          
+
                                   bool isValid =
                                       plantsEditCubit.updateState(validation);
                                   if (!isValid) {
@@ -398,10 +403,10 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                       Navigator.pop(context);
                                       _textController.clear();
                                       _typeController.clear();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(
-                                              content:
-                                                  Text("Plant added succesfully!")));
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  "Plant added succesfully!")));
                                     });
                                   }
                                 }),
@@ -428,40 +433,43 @@ class _PlantsPageState extends State<_PlantsPageContent> {
 
   // Plant deletion form function
   void showDeleteForm(BuildContext context, PlantData plant) {
-    PlantStatusCubit plantStatusCubit = BlocProvider.of<PlantStatusCubit>(context);
+    PlantStatusCubit plantStatusCubit =
+        BlocProvider.of<PlantStatusCubit>(context);
     showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    side: BorderSide(
-                        color: Colors.transparent,
-                        width: 2.0), // Add border color and width
-                  ),
-                  title: Text("Are you sure?"),
-                  content: Container(
-                    constraints: const BoxConstraints(maxWidth: 400),
-                    width: MediaQuery.of(context).size.width*.6, // Set maximum width
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                side: BorderSide(
+                    color: Colors.transparent,
+                    width: 2.0), // Add border color and width
+              ),
+              title: Text("Are you sure?"),
+              content: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                width:
+                    MediaQuery.of(context).size.width * .6, // Set maximum width
+                child: Column(
+                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
                       children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: RedElevatedButton(
+                        Expanded(
+                          child: RedElevatedButton(
                               text: "Yes",
                               onPressed: () async {
                                 plantStatusCubit
                                     .removePlant(
                                         plant.plantReference, _userReference)
                                     .then((value) {
-                                  Navigator.pop(context);Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content:
-                                              Text("Item deleted succesfully!")));
+                                          content: Text(
+                                              "Item deleted succesfully!")));
                                 });
                               }),
                         ),
@@ -479,5 +487,4 @@ class _PlantsPageState extends State<_PlantsPageContent> {
               ));
         });
   }
-
 }
