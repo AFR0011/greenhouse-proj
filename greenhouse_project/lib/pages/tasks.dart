@@ -12,12 +12,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
+import 'package:flutter_holo_date_picker/widget/date_picker_widget.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/task_cubit.dart';
 import 'package:greenhouse_project/services/cubit/task_edit_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
@@ -218,7 +221,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                         child: Column(
                           children: [
                             SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.66,
+                              height: MediaQuery.of(context).size.height * 0.5,
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: taskList.length,
@@ -391,8 +394,9 @@ class _TasksPageState extends State<_TasksPageContent> {
                       ),
                     ),
                     title: const Text("Edit task"),
-                    content: SizedBox(
-                      width: double.maxFinite,
+                    content: Container(
+                      constraints: const BoxConstraints(maxWidth: 400),
+                      width: MediaQuery.of(context).size.width*.6,
                       child: Column(
                         mainAxisSize:
                             MainAxisSize.min, // Set column to minimum size
@@ -423,14 +427,25 @@ class _TasksPageState extends State<_TasksPageContent> {
                             onChanged: taskDropdownCubit.updateDropdown,
                           ),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height / 2.5,
-                            child: CupertinoDatePicker(
-                              minimumDate: DateTime.now(),
-                              onDateTimeChanged: (selection) {
-                                taskEditCubit.updateState(
-                                    [true, true, selection, taskEditState[3]]);
-                              },
-                            ),
+                            height: MediaQuery.of(context).size.height / 5,
+                            child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: DatePickerWidget(
+              looping: false, // default is not looping
+              firstDate: DateTime.now(),
+              lastDate: DateTime(2040, 1, 1),
+              initialDate: DateTime.now(),
+              dateFormat: "dd-MMM-yyyy",
+              locale: DatePicker.localeFromString('en'),
+              onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
+              pickerTheme: DateTimePickerTheme(
+                itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
+                dividerColor: Colors.blue,
+              ),
+            ),
+          ),
+        ),
                           ),
                           // Submit & Cancel
                           Row(
@@ -518,8 +533,9 @@ class _TasksPageState extends State<_TasksPageContent> {
                     width: 2.0), // Add border color and width
               ),
               title: const Text("Are you sure?"),
-              content: SizedBox(
-                width: double.maxFinite, // Set maximum width
+              content: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                width: MediaQuery.of(context).size.width*.6, // Set maximum width
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -589,8 +605,9 @@ class _TasksPageState extends State<_TasksPageContent> {
                           ),
                         ),
                         title: const Text("Add task"),
-                        content: SizedBox(
-                          width: double.maxFinite,
+                        content: Container(
+                          constraints: const BoxConstraints(maxWidth: 400),
+                          width: MediaQuery.of(context).size.width*.6,
                           child: Column(
                             mainAxisSize:
                                 MainAxisSize.min, // Set column to minimum size
@@ -621,21 +638,27 @@ class _TasksPageState extends State<_TasksPageContent> {
                                     .value,
                                 onChanged: taskDropdownCubit.updateDropdown,
                               ),
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height / 2.5,
-                                child: CupertinoDatePicker(
-                                  minimumDate: DateTime.now(),
-                                  onDateTimeChanged: (selection) {
-                                    taskEditCubit.updateState([
-                                      true,
-                                      true,
-                                      selection,
-                                      taskEditState[3]
-                                    ]);
-                                  },
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+                              child: Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 25),
+                                child: DatePickerWidget(
+                                  looping: false, // default is not looping
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime(2040, 1, 1),
+                                  initialDate: DateTime.now(),
+                                  dateFormat: "dd-MMM-yyyy",
+                                  locale: DatePicker.localeFromString('en'),
+                                  onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
+                                  pickerTheme: DateTimePickerTheme(
+                                    itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
+                                    dividerColor: Colors.blue,
+                                  ),
                                 ),
                               ),
+                                                        ),
+                            ),
                               //Submit & Cancel
                               Row(
                                 children: [
