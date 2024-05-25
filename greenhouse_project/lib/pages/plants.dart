@@ -15,6 +15,7 @@ import 'package:greenhouse_project/services/cubit/plants_cubit.dart';
 import 'package:greenhouse_project/services/cubit/plants_edit_cubit.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
@@ -342,8 +343,9 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                         width: 2.0), // Add border color and width
                   ),
                   title: const Text("Add Plant"),
-            content: SizedBox(
-              width: double.maxFinite,
+            content: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              width: MediaQuery.of(context).size.width*.6,
               child: BlocBuilder<PlantsEditCubit, List<bool>>(
                 bloc: plantsEditCubit,
                 builder: (context, state) {
@@ -354,13 +356,6 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                       InputTextField(controller: _typeController, errorText: state[0]
                                 ? ""
                                 : "Type should be longer than 1 characters.", labelText: "Type"),
-                      // TextField(
-                      //   controller: _equipmentController,
-                      //   decoration: InputDecoration(
-                      //       errorText: state[0]
-                      //           ? ""
-                      //           : "Name should be longer than 1 characters."),
-                      // ),
                       InputTextField(controller: _textController, errorText: state[1]
                                 ? ""
                                 : "Subtype should be longer than 2 characters.", labelText: "Subtype"),
@@ -454,15 +449,16 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                   ),
                   title: Text("Are you sure?"),
                   content: Container(
-                  width: double.maxFinite, // Set maximum width
-                child: Column(
-                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    width: MediaQuery.of(context).size.width*.6, // Set maximum width
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: RedElevatedButton(
+                        Row(
+                          children: [
+                            Expanded(
+                              child: RedElevatedButton(
                               text: "Yes",
                               onPressed: () async {
                                 plantStatusCubit

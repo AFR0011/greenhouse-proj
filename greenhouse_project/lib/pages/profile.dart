@@ -286,17 +286,18 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                         width: 2.0), // Add border color and width
                           ),
                           title: const Text("Edit profil"),
-                          content: SizedBox(
-                            width: double.maxFinite,
+                          content: Container(
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        width: MediaQuery.of(context).size.width*.6,
                             child:  BlocProvider(
-      create: (context) => ProfileEditCubit(),
-      // BlocBuilder for profile edit state
-      child: BlocBuilder<ProfileEditCubit, List<bool>>(
-        builder: (context, state) {
-          return Column(
-            mainAxisSize: MainAxisSize.min, // Set column to minimum size
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            create: (context) => ProfileEditCubit(),
+            // BlocBuilder for profile edit state
+            child: BlocBuilder<ProfileEditCubit, List<bool>>(
+              builder: (context, state) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
               InputTextField(
                   controller: _nameController,
                   errorText: state[0]
@@ -349,8 +350,9 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                                           width: 2.0), // Add border color and width
                                     ),
                                     title: const Text("Enter password"),
-                                    content: SizedBox(
-                                      width: double.maxFinite,
+                                    content: Container(
+                                      constraints: const BoxConstraints(maxWidth: 400),
+                                      width: MediaQuery.of(context).size.width*.6,
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min, // Set column to minimum size
                                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -443,43 +445,6 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     const SnackBar(
         content:
             Text("Profile updated successfully!")));
-    // showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         shape: RoundedRectangleBorder(
-    //         borderRadius: BorderRadius.circular(10.0),
-    //         side: BorderSide(
-    //             color: Colors.transparent,
-    //             width: 2.0), // Add border color and width
-    //                                 ),
-    //         content: SizedBox(
-    //           width: double.maxFinite,
-    //           child: Column(
-    //           mainAxisSize: MainAxisSize.min, // Set column to minimum size
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //             children: [
-    //               const Center(
-    //                 child: Text("Profile Updated Succesfully."),
-    //               ),
-    //               Center(
-    //                 child: GreenElevatedButton(
-    //                   text: "OK",
-    //                   onPressed: () {
-    //                     // Wait a few seconds for info to load
-    //                     Future.delayed(const Duration(seconds: 5));
-    //                     // Pop all dialogs
-    //                     Navigator.pop(context);
-    //                     Navigator.pop(context);
-    //                     Navigator.pop(context);
-    //                   },
-    //                 ),
-    //               ),
-    //             ],
-    //           ),
-    //         ),
-    //       );
-    //     });
   }
 }
 

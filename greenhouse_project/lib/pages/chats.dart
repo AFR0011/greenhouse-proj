@@ -219,8 +219,9 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                                     color: Colors.transparent,
                                     width: 2.0), // Add border color and width
                               ),
-                              content: SizedBox(
-                                width: double.maxFinite,
+                              content: Container(
+                                constraints: const BoxConstraints(maxWidth: 400),
+                                width: MediaQuery.of(context).size.width*.6,
                                 child: ListView.builder(
                                   padding: const EdgeInsets.all(16.0),
                                   shrinkWrap: true,

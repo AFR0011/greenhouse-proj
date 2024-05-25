@@ -13,6 +13,7 @@ import 'package:greenhouse_project/services/cubit/programs_cubit.dart';
 import 'package:greenhouse_project/services/cubit/program_edit_cubit.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
+import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -263,8 +264,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                   width: 2.0), // Add border color and width
             ),
             title: const Text("Create program"),
-            content: SizedBox(
-              width: double.maxFinite,
+            content: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              width: MediaQuery.of(context).size.width*.6,
               child: Column(
                 mainAxisSize: MainAxisSize.min, // Set column to minimum size
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,6 +288,38 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                   ? null
                                   : "Description cannot be be empty!",
                               labelText: "Description"),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Center(
+                              child: DropdownButtonFormField(
+                                  isExpanded: true,
+                                  value: inputValues[5] != ""
+                                      ? inputValues[5]
+                                      : null,
+                                  elevation: 16,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Condition',
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20))),
+                                  ),
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 'lt',
+                                      child: Text('less than'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'gt',
+                                      child: Text('greater than'),
+                                    ),
+                                  ],
+                                  onChanged: (selection) {
+                                    inputValues[5] = selection;
+                                    programEditCubit
+                                        .checkValidationAndUpdate(inputValues);
+                                  }),
+                            ),
+                          ),
                           CustomSlider(
                               updateSlider: (double value) {
                                 List<dynamic> values = inputValues;
@@ -357,38 +391,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                   ],
                                   onChanged: (selection) {
                                     inputValues[4] = selection;
-                                    programEditCubit
-                                        .checkValidationAndUpdate(inputValues);
-                                  }),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Center(
-                              child: DropdownButtonFormField(
-                                  isExpanded: true,
-                                  value: inputValues[5] != ""
-                                      ? inputValues[5]
-                                      : null,
-                                  elevation: 16,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Condition',
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20))),
-                                  ),
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'lt',
-                                      child: Text('less than'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'gt',
-                                      child: Text('greater than'),
-                                    ),
-                                  ],
-                                  onChanged: (selection) {
-                                    inputValues[5] = selection;
                                     programEditCubit
                                         .checkValidationAndUpdate(inputValues);
                                   }),
@@ -480,8 +482,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                     width: 2.0), // Add border color and width
               ),
               title: const Text("Edit program"),
-              content: SizedBox(
-                width: double.maxFinite,
+              content: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                width: MediaQuery.of(context).size.width*.6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -502,6 +505,38 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                       builder: (context, state) {
                         return Column(
                           children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Center(
+                                child: DropdownButtonFormField(
+                                    isExpanded: true,
+                                    value: inputValues[5] != ""
+                                        ? inputValues[5]
+                                        : null,
+                                    elevation: 16,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Condition',
+                                      border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
+                                    ),
+                                    items: const [
+                                      DropdownMenuItem(
+                                        value: 'lt',
+                                        child: Text('less than'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: 'gt',
+                                        child: Text('greater than'),
+                                      ),
+                                    ],
+                                    onChanged: (selection) {
+                                      inputValues[5] = selection;
+                                      programEditCubit.checkValidationAndUpdate(
+                                          inputValues);
+                                    }),
+                              ),
+                            ),
                             CustomSlider(
                                 updateSlider: (double value) {
                                   List<dynamic> values = inputValues;
@@ -573,38 +608,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     ],
                                     onChanged: (selection) {
                                       inputValues[4] = selection;
-                                      programEditCubit.checkValidationAndUpdate(
-                                          inputValues);
-                                    }),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Center(
-                                child: DropdownButtonFormField(
-                                    isExpanded: true,
-                                    value: inputValues[5] != ""
-                                        ? inputValues[5]
-                                        : null,
-                                    elevation: 16,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Condition',
-                                      border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(20))),
-                                    ),
-                                    items: const [
-                                      DropdownMenuItem(
-                                        value: 'lt',
-                                        child: Text('less than'),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: 'gt',
-                                        child: Text('greater than'),
-                                      ),
-                                    ],
-                                    onChanged: (selection) {
-                                      inputValues[5] = selection;
                                       programEditCubit.checkValidationAndUpdate(
                                           inputValues);
                                     }),
@@ -682,8 +685,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                     width: 2.0), // Add border color and width
               ),
               title: const Text("Are you sure?"),
-              content: SizedBox(
-                width: double.maxFinite,
+              content: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                width: MediaQuery.of(context).size.width*.6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,

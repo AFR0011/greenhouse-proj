@@ -131,3 +131,107 @@ final ThemeData darkTheme = ThemeData(
     backgroundColor: primaryGreen,
   ),
 );
+
+
+
+class WavePainter extends CustomPainter {
+   final image;
+
+  WavePainter(this.image);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Gradient
+    final gradient = LinearGradient(
+      colors: [Colors.green, Colors.blue],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final paint = Paint()
+      ..shader = gradient.createShader(rect)
+      ..style = PaintingStyle.fill;
+
+    // Path for the wave
+    final path = Path();
+    path.lineTo(0, size.height * 0.75);
+    path.quadraticBezierTo(
+        size.width * 0.25, size.height, size.width * 0.5, size.height * 0.75);
+    path.quadraticBezierTo(
+        size.width * 0.75, size.height * 0.5, size.width, size.height * 0.75);
+    path.lineTo(size.width, 0);
+    path.close();
+
+    // Draw gradient wave
+    canvas.drawPath(path, paint);
+
+    // Image pattern
+    if (image != null) {
+      final imagePaint = Paint()
+        ..shader = ImageShader(
+          image,
+          TileMode.repeated,
+          TileMode.repeated,
+          Matrix4.identity().scaled(size.width / image.width, size.height / image.height).storage,
+        );
+
+      // Draw image pattern wave
+      canvas.drawPath(path, imagePaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+class WavePainter1 extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = theme.colorScheme.primary
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.lineTo(0, size.height * .95);
+    path.quadraticBezierTo(
+        size.width * 0.35, size.height, size.width * 0.55, size.height * 0.75);
+    path.quadraticBezierTo(
+        size.width * 0.75, size.height * 0.5, size.width, size.height * 0.75);
+    path.lineTo(size.width, 0);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+}
+
+class WavePainter2 extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = theme.colorScheme.primary
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.lineTo(0, size.height * .95);
+
+    path.quadraticBezierTo(
+        size.width, size.height * 1.5, size.width * 1.5, size.height * 0.95);
+    path.lineTo(size.width, 0);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+}

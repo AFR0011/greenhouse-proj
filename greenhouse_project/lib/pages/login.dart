@@ -10,8 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
-import 'package:greenhouse_project/utils/bakground.dart';
-import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 import 'home.dart';
@@ -72,7 +70,7 @@ class _LoginPageState extends State<LoginPage>
           left: 0,
           right: 0,
           child: CustomPaint(
-            painter: WavePainter(),
+            painter: WavePainter(Image.asset('lib/utils/Icons/leaf_pat.jpg')),
             child: Container(
               height: MediaQuery.of(context).size.height*0.7,
             ),
@@ -86,12 +84,11 @@ class _LoginPageState extends State<LoginPage>
                 child: CircularProgressIndicator(),
               );
             }
-            return Stack(children: [
-              // Background
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: SafeArea(
+            return Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: SafeArea(
+                child: Container(
+                  width: double.maxFinite,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -103,27 +100,35 @@ class _LoginPageState extends State<LoginPage>
                           textAlign: TextAlign.center,
                         ),
                       ),
-                      TextField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: theme.colorScheme.secondary.withOpacity(0.5),
-                          labelText: 'Email',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20)),
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        width: MediaQuery.of(context).size.width*.6,
+                        child: TextField(
+                          controller: emailController,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: theme.colorScheme.secondary.withOpacity(0.5),
+                            labelText: 'Email',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20.0),
-                      TextField(
-                        controller: passwordController,
-                        obscureText: _isSecurePassword,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.white70.withOpacity(0.5),
-                          labelText: 'Password',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          suffixIcon: togglePassword(),
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 400),
+                  width: MediaQuery.of(context).size.width*.6,
+                        child: TextField(
+                          controller: passwordController,
+                          obscureText: _isSecurePassword,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white70.withOpacity(0.5),
+                            labelText: 'Password',
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20)),
+                            suffixIcon: togglePassword(),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20.0),
@@ -143,7 +148,7 @@ class _LoginPageState extends State<LoginPage>
                   ),
                 ),
               ),
-            ]);
+            );
           },
           listener: (context, state) {
             // If authentication is successful, navigate to home page
