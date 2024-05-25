@@ -267,6 +267,38 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                   ? null
                                   : "Description cannot be be empty!",
                               labelText: "Description"),
+                          Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Center(
+                              child: DropdownButtonFormField(
+                                  isExpanded: true,
+                                  value: inputValues[5] != ""
+                                      ? inputValues[5]
+                                      : null,
+                                  elevation: 16,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Condition',
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20))),
+                                  ),
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 'lt',
+                                      child: Text('less than'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'gt',
+                                      child: Text('greater than'),
+                                    ),
+                                  ],
+                                  onChanged: (selection) {
+                                    inputValues[5] = selection;
+                                    programEditCubit
+                                        .checkValidationAndUpdate(inputValues);
+                                  }),
+                            ),
+                          ),
                           CustomSlider(
                               updateSlider: (double value) {
                                 List<dynamic> values = inputValues;
@@ -338,38 +370,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                   ],
                                   onChanged: (selection) {
                                     inputValues[4] = selection;
-                                    programEditCubit
-                                        .checkValidationAndUpdate(inputValues);
-                                  }),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Center(
-                              child: DropdownButtonFormField(
-                                  isExpanded: true,
-                                  value: inputValues[5] != ""
-                                      ? inputValues[5]
-                                      : null,
-                                  elevation: 16,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Condition',
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20))),
-                                  ),
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'lt',
-                                      child: Text('less than'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'gt',
-                                      child: Text('greater than'),
-                                    ),
-                                  ],
-                                  onChanged: (selection) {
-                                    inputValues[5] = selection;
                                     programEditCubit
                                         .checkValidationAndUpdate(inputValues);
                                   }),
@@ -483,6 +483,38 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                       builder: (context, state) {
                         return Column(
                           children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Center(
+                                child: DropdownButtonFormField(
+                                    isExpanded: true,
+                                    value: inputValues[5] != ""
+                                        ? inputValues[5]
+                                        : null,
+                                    elevation: 16,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Condition',
+                                      border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20))),
+                                    ),
+                                    items: const [
+                                      DropdownMenuItem(
+                                        value: 'lt',
+                                        child: Text('less than'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: 'gt',
+                                        child: Text('greater than'),
+                                      ),
+                                    ],
+                                    onChanged: (selection) {
+                                      inputValues[5] = selection;
+                                      programEditCubit.checkValidationAndUpdate(
+                                          inputValues);
+                                    }),
+                              ),
+                            ),
                             CustomSlider(
                                 updateSlider: (double value) {
                                   List<dynamic> values = inputValues;
@@ -554,38 +586,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     ],
                                     onChanged: (selection) {
                                       inputValues[4] = selection;
-                                      programEditCubit.checkValidationAndUpdate(
-                                          inputValues);
-                                    }),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Center(
-                                child: DropdownButtonFormField(
-                                    isExpanded: true,
-                                    value: inputValues[5] != ""
-                                        ? inputValues[5]
-                                        : null,
-                                    elevation: 16,
-                                    decoration: const InputDecoration(
-                                      labelText: 'Condition',
-                                      border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(20))),
-                                    ),
-                                    items: const [
-                                      DropdownMenuItem(
-                                        value: 'lt',
-                                        child: Text('less than'),
-                                      ),
-                                      DropdownMenuItem(
-                                        value: 'gt',
-                                        child: Text('greater than'),
-                                      ),
-                                    ],
-                                    onChanged: (selection) {
-                                      inputValues[5] = selection;
                                       programEditCubit.checkValidationAndUpdate(
                                           inputValues);
                                     }),

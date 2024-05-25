@@ -36,8 +36,6 @@ class InputTextField extends StatelessWidget {
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
-          constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.75),
           labelText: labelText,
           errorText: errorText,
           filled: true,
@@ -487,10 +485,11 @@ class PlantDetailsDialog extends StatelessWidget {
   final PlantData plant;
   final Function removePlant;
 
-  const PlantDetailsDialog(
-      {super.key,
-      required this.plant,
-      required this.removePlant,});
+  const PlantDetailsDialog({
+    super.key,
+    required this.plant,
+    required this.removePlant,
+  });
 
   @override
   Widget build(BuildContext context) {
