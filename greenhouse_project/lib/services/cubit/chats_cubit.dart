@@ -55,44 +55,49 @@ class ChatsCubit extends Cubit<ChatsState> {
     return chats.firstWhere((chat) => chatReference == chat?.reference);
   }
 
-  Future<void> createChat(DocumentReference receiverReference) async{
-    try{
+  Future<void> createChat(
+      BuildContext context, DocumentReference receiverReference) async {
+    try {
       //get user ref
-      QuerySnapshot userQuery = await users.where('email', isEqualTo: user?.user?.email).get();
+      QuerySnapshot userQuery =
+          await users.where('email', isEqualTo: user?.user?.email).get();
       DocumentReference userReference = userQuery.docs.first.reference;
 
       //check if chat a exists already
       QuerySnapshot existChatQuery = await chats
-      .where(Filter.or(Filter('users', isEqualTo: userReference),
-        Filter('users', isEqualTo: receiverReference))).get();
+          .where(Filter.or(Filter('users', arrayContains: userReference),
+              Filter('users', arrayContains: receiverReference)))
+          .get();
 
-      for(var doc in existChatQuery.docs) {
-        List<DocumentReference> users = doc['users'].cast<DocumentReference>().toList();
-        if (users.contains(userReference) && users.contains(receiverReference)) {
+      for (var doc in existChatQuery.docs) {
+        List<DocumentReference> users = [doc['users'][0], doc['users'][1]];
+        if (users.contains(userReference) &&
+            users.contains(receiverReference)) {
           // navigate to existing chat
           DocumentReference existChatReference = doc.reference;
-          _navigateToChat(existChatReference);
+          _navigateToChat(context, existChatReference);
           return;
         }
       }
 
-      //create a new chat 
+      //create a new chat
       DocumentReference newChatReference = await chats.add({
-        'users' : [userReference, receiverReference],
-        'creationDate' : Timestamp.now(),
+        'users': [userReference, receiverReference],
+        'creationDate': Timestamp.now(),
       });
 
       //Navigate to new chat
-      _navigateToChat(newChatReference);
-
-    }catch (error) {
+      _navigateToChat(context, newChatReference);
+    } catch (error, stack) {
+      print(error);
+      print(stack);
       emit(ChatsError(error.toString()));
     }
   }
 
-  void _navigateToChat(DocumentReference chatReference){
+  void _navigateToChat(BuildContext context, DocumentReference chatReference) {
     Navigator.push(
-      context as BuildContext,
+      context,
       MaterialPageRoute(
         builder: (context) => ChatPage(
           userCredential: user!,

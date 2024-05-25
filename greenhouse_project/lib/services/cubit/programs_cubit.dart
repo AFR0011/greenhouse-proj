@@ -29,7 +29,7 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     });
   }
 
-  Future<void> addProgram(
+  void addProgram(
       Map<String, dynamic> data, DocumentReference userReference) async {
     if (!_isActive) return;
 
@@ -45,20 +45,18 @@ class ProgramsCubit extends Cubit<ProgramsState> {
         "userId": userReference,
         "externalId": externalId,
       });
-
-      _getPrograms();
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }
   }
 
   void removeProgram(
-      DocumentReference item, DocumentReference userReference) async {
+      DocumentReference program, DocumentReference userReference) async {
     if (!_isActive) return;
 
     emit(ProgramsLoading());
     try {
-      DocumentSnapshot docSnapshot = await item.get();
+      DocumentSnapshot docSnapshot = await program.get();
       Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
       logs.add({
         "action": "delete",
@@ -69,28 +67,27 @@ class ProgramsCubit extends Cubit<ProgramsState> {
         "userId": userReference,
       });
 
-      item.delete();
+      await program.delete();
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }
   }
 
-  Future<void> updatePrograms(DocumentReference item, Map<String, dynamic> data,
+  void updatePrograms(DocumentReference program, Map<String, dynamic> data,
       DocumentReference userReference) async {
     if (!_isActive) return;
 
     emit(ProgramsLoading());
     try {
-      await item.set(data, SetOptions(merge: true));
-      _getPrograms();
-      logs.add({
+      await program.update(data);
+      await logs.add({
         "action": "Update",
         "description":
             "Program updated by user at ${Timestamp.now().toString()}",
         "timestamp": Timestamp.now(),
         "type": "Program",
         "userId": userReference,
-        "externalId": item,
+        "externalId": program,
       });
     } catch (error) {
       emit(ProgramsError(error.toString()));
@@ -105,12 +102,13 @@ class ProgramsCubit extends Cubit<ProgramsState> {
 }
 
 class ProgramData {
-  final int action;
-  final int condition;
-  final int limit;
+  final String action;
+  final String condition;
+  final double limit;
   final String equipment;
   final DateTime creationDate;
   final String title;
+  final String description;
   final DocumentReference reference;
 
   ProgramData(
@@ -120,6 +118,7 @@ class ProgramData {
       required this.equipment,
       required this.creationDate,
       required this.title,
+      required this.description,
       required this.reference});
 
   factory ProgramData.fromFirestore(DocumentSnapshot doc) {
@@ -130,6 +129,7 @@ class ProgramData {
         limit: data['limit'],
         equipment: data['equipment'],
         title: data['title'],
+        description: data['description'],
         creationDate: (data['creationDate'] as Timestamp).toDate(),
         reference: doc.reference);
   }
