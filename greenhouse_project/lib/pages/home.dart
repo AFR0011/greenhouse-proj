@@ -173,7 +173,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     return Scaffold(
         // Main appbar (header)
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80.0),
+          preferredSize: const Size.fromHeight(80.0),
           child: createMainAppBar(
               context, widget.userCredential, _userReference, "Welcome"),
         ),
@@ -191,7 +191,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           end: Alignment.bottomRight,
         ),
         image: DecorationImage(
-          image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+          image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
           fit: BoxFit.cover,
           colorFilter: ColorFilter.mode(
             Colors.white.withOpacity(0.05),
@@ -218,13 +218,15 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   selectedColor: Colors.white,
                   splashColor: Colors.tealAccent,
                   hoverColor: Colors.tealAccent.withOpacity(0.1),
+                  isSelected: _isSelected,
+                  onPressed: _onToggle,
                   children: <Widget>[
-                      Container(
+                      SizedBox(
                         width: MediaQuery.of(context).size.width*0.5,
-                        child: Align(
+                        child: const Align(
                           alignment: Alignment.center,
                           child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8.0),
                           child: Text(
                               'Dashbord',
                               style: TextStyle(fontSize: 16),
@@ -232,12 +234,12 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                           ),
                         ),
                       ),
-                      Container(
+                      SizedBox(
                         width: MediaQuery.of(context).size.width*0.5,
-                        child: Align(
+                        child: const Align(
                           alignment: Alignment.center,
                           child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(8.0),
                           child: Text(
                               'Notifications',
                               style: TextStyle(fontSize: 16),
@@ -246,8 +248,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                         ),
                       ),
                   ],
-                  isSelected: _isSelected,
-                  onPressed: _onToggle,
                   
                   ),
 
@@ -260,7 +260,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
 
         // Footer nav bar
         bottomNavigationBar: PreferredSize(
-          preferredSize: Size.fromHeight(50.0),
+          preferredSize: const Size.fromHeight(50.0),
           child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -278,12 +278,12 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                     color: Colors.black.withOpacity(0.2),
                     spreadRadius: 5,
                     blurRadius: 7,
-                    offset: Offset(0, 3), // changes position of shadow
+                    offset: const Offset(0, 3), // changes position of shadow
                   ),
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30.0),
                   topRight: Radius.circular(30.0),
                 ),
@@ -296,7 +296,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   Widget _buildNotifications() {
     return Column(
       children: [
-
+        SizedBox(height: 16,),
         // BlocBuilder for notifications
         BlocBuilder<NotificationsCubit, HomeState>(
           builder: (context, state) {
@@ -321,8 +321,32 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                     NotificationData notification =
                         notificationsList[index]; // notification data
                     // Notification message
-                    return ListTile(
-                      title: Text(notification.message),
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(12,0,12,0),
+                      child: Card(
+                        
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                        elevation: 4.0,
+                        margin: const EdgeInsets.only(bottom: 16.0),
+                        child: ListTile(
+                          leading: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.cyan.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.notification_important_outlined,
+                            color: Colors.orange,
+                            size: 30.0,
+                          ),
+                        ),
+                          title: Text(notification.message,style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0,
+                                ),),
+                        ),
+                      ),
                     );
                   },
                 );
