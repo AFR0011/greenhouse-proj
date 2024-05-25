@@ -245,8 +245,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                   width: 2.0), // Add border color and width
             ),
             title: const Text("Create program"),
-            content: SizedBox(
-              width: double.maxFinite,
+            content: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              width: MediaQuery.of(context).size.width*.6,
               child: Column(
                 mainAxisSize: MainAxisSize.min, // Set column to minimum size
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -462,8 +463,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                     width: 2.0), // Add border color and width
               ),
               title: const Text("Edit program"),
-              content: SizedBox(
-                width: double.maxFinite,
+              content: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                width: MediaQuery.of(context).size.width*.6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -664,8 +666,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                     width: 2.0), // Add border color and width
               ),
               title: const Text("Are you sure?"),
-              content: SizedBox(
-                width: double.maxFinite,
+              content: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                width: MediaQuery.of(context).size.width*.6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,

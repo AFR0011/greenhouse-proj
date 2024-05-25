@@ -36,8 +36,9 @@ class TaskDetailsDialog extends StatelessWidget {
             width: 2.0), // Add border color and width
       ),
       title: const Text("Task Details"),
-      content: SizedBox(
-        width: double.maxFinite, // Set maximum width
+      content: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        width: MediaQuery.of(context).size.width*.6, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,8 +166,9 @@ class EmployeeDetailsDialog extends StatelessWidget {
             width: 2.0), // Add border color and width
       ),
       title: const Text("Employee Details"),
-      content: SizedBox(
-        width: double.maxFinite, // Set maximum width
+      content: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        width: MediaQuery.of(context).size.width*.6,// Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,8 +278,9 @@ class InventoryDetailsDialog extends StatelessWidget {
             width: 2.0), // Add border color and width
       ),
       title: const Text("Inventory Details"),
-      content: SizedBox(
-        width: double.maxFinite, // Set maximum width
+      content: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        width: MediaQuery.of(context).size.width*.6, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,8 +381,9 @@ class PlantDetailsDialog extends StatelessWidget {
             width: 2.0), // Add border color and width
       ),
       title: const Text("Plant Details"),
-      content: SizedBox(
-        width: double.maxFinite, // Set maximum width
+      content: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        width: MediaQuery.of(context).size.width*.6,// Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -467,8 +471,9 @@ class ProgramDetailsDialog extends StatelessWidget {
             width: 2.0), // Add border color and width
       ),
       title: const Text("Program Details"),
-      content: SizedBox(
-        width: double.maxFinite, // Set maximum width
+      content: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        width: MediaQuery.of(context).size.width*.6, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,

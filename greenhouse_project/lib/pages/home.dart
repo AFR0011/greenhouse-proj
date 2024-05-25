@@ -367,7 +367,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
   Widget _buildDashbord(){
-    return Container(
+    return SizedBox(
       height: MediaQuery.of(context).size.height*0.6,
       width: MediaQuery.of(context).size.width*.8,
       
