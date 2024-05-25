@@ -7,6 +7,7 @@
 library;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/login.dart';
@@ -16,6 +17,7 @@ import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 
 // ignore: must_be_immutable
 class SettingsPage extends StatelessWidget {
@@ -76,30 +78,117 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             data: customTheme,
             child: Scaffold(
               appBar: createAltAppbar(context, "Settings"),
-              body: Column(
-                children: [
-                  const Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "",
-                          style: subheadingTextStyle,
-                        ),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
-                          child: null),
+              body: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                      Colors.teal.shade100.withOpacity(0.6),
                     ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                   ),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: GreenElevatedButton(
-                        text: "Sign Out",
-                        onPressed: () =>
-                            context.read<AuthCubit>().authLogoutRequest()),
-                  )
-                ],
+                image: DecorationImage(
+                  image: const AssetImage('lib/utils/Icons/setting_bg.jpg'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.1),
+                    BlendMode.dstATop,
+                  ),
+                ),
+                ),
+                child: Column(
+                  children: [
+                    const Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            "",
+                            style: subheadingTextStyle,
+                          ),
+                        ),
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
+                            child: null),
+                
+                
+                      ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          //Notifications switch
+                          const Text(
+                            "Notificatiions",
+                            style: subheadingTextStyle,
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: LiteRollingSwitch(
+                              value: true,
+                              textOn: "On",
+                              textOff: "Off",
+                              colorOn: Colors.greenAccent,
+                              colorOff: Colors.redAccent,
+                              iconOn: Icons.done,
+                              iconOff: Icons.alarm_off,
+                              textSize: 18.0,
+                              width: 130,
+                              onTap: (){},
+                              onSwipe: (){},
+                              onDoubleTap: (){},
+                              onChanged: (bool position) {},
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    //Dark mode switch
+                     Padding(
+                      padding: EdgeInsets.fromLTRB(0, 5, 0, 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Dark Mode",
+                              style: subheadingTextStyle,
+                            ),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: LiteRollingSwitch(
+                                value: true,
+                                textOn: "On",
+                                textOnColor: Colors.white,
+                                textOff: "Off",
+                                textOffColor: Colors.black,
+                                colorOn: Colors.black,
+                                colorOff: Colors.grey.shade400,
+                                iconOn: Icons.dark_mode,
+                                iconOff: Icons.light_mode_outlined,
+                                textSize: 18.0,
+                                width: 130,
+                                onTap: (){},
+                                onSwipe: (){},
+                                onDoubleTap: (){},
+                                onChanged: (bool position) {},
+                              ),
+                            ),
+                          ],
+                        ),
+                    ),
+                  ],
+                ),
               ),
-            )));
+              //Sign Out Button
+            floatingActionButton: GreenElevatedButton(
+              text: "Sign Out",
+              onPressed: () =>
+               context.read<AuthCubit>().authLogoutRequest()),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+          )
+        )
+    );
   }
 }

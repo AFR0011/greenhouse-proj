@@ -175,7 +175,22 @@ class _TasksPageState extends State<_TasksPageContent> {
                   BlendMode.dstATop,
                 ),
               ),
-            ) : BoxDecoration(),
+            ) : BoxDecoration(gradient: LinearGradient(
+                colors: [
+                  Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                  Colors.teal.shade100.withOpacity(0.6),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              image: DecorationImage(
+                image: AssetImage('lib/utils/Icons/tasks.png'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.05),
+                  BlendMode.dstATop,
+                ),
+              ),),
         child: Column(
           children: [
             SizedBox(

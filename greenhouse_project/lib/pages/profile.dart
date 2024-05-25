@@ -172,40 +172,60 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
 
     return Scaffold(
       appBar: createAltAppbar(context, "Profile"),
-      body: Column(
-        children: [
-          const SizedBox(height: 20.0),
-          GestureDetector(
-            child: ClipOval(
-                child: Image.memory(
-              userData.picture,
-              fit: BoxFit.cover,
-              width: 100,
-              height: 100,
-            )),
-            onTap: () {
-              profileCubit.selectImage();
-            },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          // Display user profile picture
-
-          // Display user name
-          const SizedBox(height: 20.0),
-          ProfileTextField(name: "Name", data: userData.name, icon: userIcon(),),
-          // _buildProfileField("Name", userData.name),
-          // Display user email
-          // _buildProfileField("Email", userData.email),
-          const SizedBox(height: 20.0),
-          ProfileTextField(name: "Email", data: userData.email, icon: emailIcon(),),
-          // Display password (if user is viewing their own profile)
-          const SizedBox(height: 20.0),
-          if (userData.email == widget.userCredential.user?.email)
-            ProfileTextField(name: "Password", data: "********", icon: passwordIcon(),),
-            // _buildProfileField("Password", "*******"),
-          // Action buttons based on user role and authorization
-          const SizedBox(height: 20.0),
-          _buildActionButtons(userData),
-        ],
+          image: DecorationImage(
+            image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.1),
+              BlendMode.dstATop,
+            ),
+          ),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 20.0),
+            GestureDetector(
+              child: ClipOval(
+                  child: Image.memory(
+                userData.picture,
+                fit: BoxFit.cover,
+                width: 100,
+                height: 100,
+              )),
+              onTap: () {
+                profileCubit.selectImage();
+              },
+            ),
+            // Display user profile picture
+        
+            // Display user name
+            const SizedBox(height: 20.0),
+            ProfileTextField(name: "Name", data: userData.name, icon: userIcon(),),
+            // _buildProfileField("Name", userData.name),
+            // Display user email
+            // _buildProfileField("Email", userData.email),
+            const SizedBox(height: 20.0),
+            ProfileTextField(name: "Email", data: userData.email, icon: emailIcon(),),
+            // Display password (if user is viewing their own profile)
+            const SizedBox(height: 20.0),
+            if (userData.email == widget.userCredential.user?.email)
+              ProfileTextField(name: "Password", data: "********", icon: passwordIcon(),),
+              // _buildProfileField("Password", "*******"),
+            // Action buttons based on user role and authorization
+            const SizedBox(height: 20.0),
+            _buildActionButtons(userData),
+          ],
+        ),
       ),
     );
   }

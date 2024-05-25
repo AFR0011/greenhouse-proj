@@ -122,31 +122,51 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
       appBar: createAltAppbar(context, "Programs"),
       // Blocbuilder for programs state
       body:
-          BlocBuilder<ProgramsCubit, ProgramsState>(builder: (context, state) {
-        // Show "loading screen" if processing programs state
-        if (state is ProgramsLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        // Show programs once programs state is loaded
-        else if (state is ProgramsLoaded) {
-          List<ProgramData> programsList = state.programs; // programs list
-          // Function call to create programs list
-          return _createProgramsList(programsList);
-        } // Show error if there is an issues with user info
-        else if (state is ProgramsError) {
-          print(state.error);
-          return Center(child: Text('Error: ${state.error}'));
-        }
-        // If somehow state doesn't match predefined states;
-        // never happens; but, anything can happen
-        else {
-          return const Center(
-            child: Text('Unexpected state'),
-          );
-        }
-      }),
+          Container(
+            decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          image: DecorationImage(
+            image: const AssetImage('lib/utils/Icons/pattern.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.2),
+              BlendMode.dstATop,
+            ),
+          ),
+        ),
+            child: BlocBuilder<ProgramsCubit, ProgramsState>(builder: (context, state) {
+                    // Show "loading screen" if processing programs state
+                    if (state is ProgramsLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+                    }
+                    // Show programs once programs state is loaded
+                    else if (state is ProgramsLoaded) {
+            List<ProgramData> programsList = state.programs; // programs list
+            // Function call to create programs list
+            return _createProgramsList(programsList);
+                    } // Show error if there is an issues with user info
+                    else if (state is ProgramsError) {
+            print(state.error);
+            return Center(child: Text('Error: ${state.error}'));
+                    }
+                    // If somehow state doesn't match predefined states;
+                    // never happens; but, anything can happen
+                    else {
+            return const Center(
+              child: Text('Unexpected state'),
+            );
+                    }
+                  }),
+          ),
       //floating button
       floatingActionButton: GreenElevatedButton(
           text: "Create program",
@@ -163,7 +183,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
         child: Column(
           children: [
             SizedBox(
-              height: MediaQuery.of(context).size.height / 3,
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: programsList.length,

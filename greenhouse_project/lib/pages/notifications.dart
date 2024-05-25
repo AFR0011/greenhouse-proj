@@ -150,13 +150,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   Widget _buildNotifications() {
     return Column(
       children: [
-        // Welcome message
-        Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 20),
-          child: Center(
-              child:
-                  Text("Welcome Back, $_userName!", style: headingTextStyle)),
-        ),
 
         // Notifications subheading
         SizedBox(

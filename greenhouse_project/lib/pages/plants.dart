@@ -122,111 +122,119 @@ class _PlantsPageState extends State<_PlantsPageContent> {
       // Appbar (header)
       appBar: createAltAppbar(context, "Plants"),
       // Plants section
-      body: Column(
-        children: [
-          // Plants subheading
-          Padding(
-            padding: const EdgeInsets.only(top: 40),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width - 20,),
-          ),
-          // BlocBuilder for plantStatus state
-          BlocBuilder<PlantStatusCubit, PlantStatusState>(
-            builder: (context, state) {
-              // show "loading screen" if processing plantStatus state
-              if (state is PlantsLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              // Show plants once plantStatus state is loaded
-              else if (state is PlantsLoaded) {
-                List<PlantData> plantList = state.plants; // plants list
-
-                // Display nothing if no plants
-                if (plantList.isEmpty) {
-                  return const Center(child: Text("No Plants..."));
-                }
-                // Display plants
-                else {
-                  return Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height / 10,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: plantList.length,
-                              itemBuilder: (context, index) {
-                                PlantData plant = plantList[index]; //plant data
-                            
-                                // Display plant info
-                                return Card(
-                                  shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  elevation: 4.0,
-                                  margin: EdgeInsets.only(bottom: 16.0),
-                                  child: ListTile(
-                                    leading: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.1),
-                                        shape: BoxShape.circle,
-                                      ),
-                                    child: Icon(
-                                      Icons.grass_outlined,
-                                      color: Colors.green[800]!,
-                                      size: 30,
-                                    ),
-                                    ),
-                                    title: Text(plant.type,
-                                    style: TextStyle(fontWeight: FontWeight.bold,
-                                    fontSize: 18),),
-                                    subtitle: Text(plant.subtype),
-                                    trailing: WhiteElevatedButton(
-                                      // Show details and sensor readings
-                                      text: 'Details',
-                                      onPressed: () {
-                                        // _showPlantDetails(plant);
-                                        BuildContext mainContext = context;
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) =>
-                                                PlantDetailsDialog(plant: plant, removePlant: () => showDeleteForm(mainContext, plant)));
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                  )],),
-                  );
-                }
-              }
-
-              // Show error message once an error occurs
-              else if (state is PlantsError) {
-                return Center(child: Text('Error: ${state.error}'));
-              }
-              // If the state is not any of the predefined states;
-              // never happens; but, anything can happen
-              else {
-                return const Center(child: Text('Unexpected State'));
-              }
-            },
-          ),
-
-          Container(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Readings(title: 'Temperature', value: '24°C', icon: Icons.wb_sunny, color: Colors.orange),
-                Readings(title: "Soil humidity", value: "75%", icon: Icons.grass, color: Colors.brown)
-
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
             ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          image: DecorationImage(
+            image: const AssetImage('lib/utils/Icons/pattern.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.2),
+              BlendMode.dstATop,
             ),
-          )
-        ],
+          ),
+        ),
+        child: Column(
+          children: [
+            // Plants subheading
+            Padding(
+              padding: const EdgeInsets.only(top: 40),
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width - 20,),
+            ),
+            // BlocBuilder for plantStatus state
+            BlocBuilder<PlantStatusCubit, PlantStatusState>(
+              builder: (context, state) {
+                // show "loading screen" if processing plantStatus state
+                if (state is PlantsLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                // Show plants once plantStatus state is loaded
+                else if (state is PlantsLoaded) {
+                  List<PlantData> plantList = state.plants; // plants list
+        
+                  // Display nothing if no plants
+                  if (plantList.isEmpty) {
+                    return const Center(child: Text("No Plants..."));
+                  }
+                  // Display plants
+                  else {
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: plantList.length,
+                                itemBuilder: (context, index) {
+                                  PlantData plant = plantList[index]; //plant data
+                              
+                                  // Display plant info
+                                  return Card(
+                                    shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    elevation: 4.0,
+                                    margin: EdgeInsets.only(bottom: 16.0),
+                                    child: ListTile(
+                                      leading: Container(
+                                        padding: EdgeInsets.all(8.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                      child: Icon(
+                                        Icons.grass_outlined,
+                                        color: Colors.green[800]!,
+                                        size: 30,
+                                      ),
+                                      ),
+                                      title: Text(plant.type,
+                                      style: TextStyle(fontWeight: FontWeight.bold,
+                                      fontSize: 18),),
+                                      subtitle: Text(plant.subtype),
+                                      trailing: WhiteElevatedButton(
+                                        // Show details and sensor readings
+                                        text: 'Details',
+                                        onPressed: () {
+                                          // _showPlantDetails(plant);
+                                          BuildContext mainContext = context;
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) =>
+                                                  PlantDetailsDialog(plant: plant, removePlant: () => showDeleteForm(mainContext, plant)));
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                    )],),
+                    );
+                  }
+                }
+        
+                // Show error message once an error occurs
+                else if (state is PlantsError) {
+                  return Center(child: Text('Error: ${state.error}'));
+                }
+                // If the state is not any of the predefined states;
+                // never happens; but, anything can happen
+                else {
+                  return const Center(child: Text('Unexpected State'));
+                }
+              },
+            ),
+          ],
+        ),
       ),
 
       floatingActionButton: GreenElevatedButton(

@@ -192,19 +192,39 @@ class _ChatPageState extends State<_ChatPageContent> {
           ),
         ),
       ),
-      body: BlocBuilder<ChatCubit, ChatState>(
-        builder: (context, state) {
-          // Handle different states of the chat
-          if (state is ChatLoading) {
-            return const CircularProgressIndicator();
-          } else if (state is ChatLoaded) {
-            return _buildChatContent(state.messages, chat);
-          } else if (state is ChatError) {
-            return const Text("Something went wrong...");
-          } else {
-            return const Center(child: Text('Unexpected State'));
-          }
-        },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          image: DecorationImage(
+            image: const AssetImage('lib/utils/Icons/chat_bg.webp'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.2),
+              BlendMode.dstATop,
+            ),
+          ),
+        ),
+        child: BlocBuilder<ChatCubit, ChatState>(
+          builder: (context, state) {
+            // Handle different states of the chat
+            if (state is ChatLoading) {
+              return const CircularProgressIndicator();
+            } else if (state is ChatLoaded) {
+              return _buildChatContent(state.messages, chat);
+            } else if (state is ChatError) {
+              return const Text("Something went wrong...");
+            } else {
+              return const Center(child: Text('Unexpected State'));
+            }
+          },
+        ),
       ),
     );
   }
@@ -302,7 +322,7 @@ Widget sendButton(chat){
       
       return IconButton(onPressed: () {
         _sendMessage(chat);
-        _scrollController.jumpTo(_scrollController.position.extentTotal-750);
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
       },
       icon: Icon(Icons.send_outlined),
       color: Colors.grey ); 

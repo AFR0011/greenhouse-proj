@@ -3,6 +3,8 @@
 /// TODO:
 /// - Display chats properly (with username etc.)
 ///
+// ignore_for_file: prefer_interpolation_to_compose_strings
+
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -147,7 +149,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                 end: Alignment.bottomRight,
               ),
               image: DecorationImage(
-                image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
                 fit: BoxFit.cover,
                 colorFilter: ColorFilter.mode(
                   Colors.white.withOpacity(0.05),
@@ -157,7 +159,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             ),
             child: _buildChatsList()),
         bottomNavigationBar: PreferredSize(
-          preferredSize: Size.fromHeight(50.0),
+          preferredSize: const Size.fromHeight(50.0),
           child: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -166,7 +168,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                   Colors.teal.shade400,
                   Colors.blue.shade300
                 ],
-                stops: [0.2, 0.5, 0.9],
+                stops: const [0.2, 0.5, 0.9],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -175,7 +177,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                   color: Colors.black.withOpacity(0.2),
                   spreadRadius: 5,
                   blurRadius: 7,
-                  offset: Offset(0, 3), // changes position of shadow
+                  offset: const Offset(0, 3), // changes position of shadow
                 ),
               ],
             ),
@@ -227,7 +229,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                                     final employee = chatUsersList[index];
                                     return ListTile(
                                       leading: Container(
-                                        padding: EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(8.0),
                                         decoration: BoxDecoration(
                                           color: Colors.green.withOpacity(0.1),
                                           shape: BoxShape.circle,
@@ -319,7 +321,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
           borderRadius: BorderRadius.circular(15.0),
         ),
         elevation: 4.0,
-        margin: EdgeInsets.only(bottom: 16.0),
+        margin: const EdgeInsets.only(bottom: 16.0),
         child: GestureDetector(
           onTap: () {
             // Navigate to the chat page when a chat is tapped

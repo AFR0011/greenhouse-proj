@@ -64,7 +64,7 @@ AppBar createMainAppBar(BuildContext context, UserCredential userCredential,
                       userCredential: userCredential,
                       userReference: userReference,
                     ))),
-        icon: Image.asset("lib/utils/Icons/Profile.png"),
+        icon: const Icon(Icons.supervised_user_circle_outlined, size: 50, color: Colors.white60),
       )
       
     ],

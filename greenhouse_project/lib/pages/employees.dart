@@ -176,7 +176,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
             end: Alignment.bottomRight,
           ),
           image: DecorationImage(
-            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            image: AssetImage('lib/utils/Icons/worker.png'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.white.withOpacity(0.05),
