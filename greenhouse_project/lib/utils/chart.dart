@@ -3,7 +3,6 @@
 /// *Make sure data is periodically updated (e.g, every 30 seconds)
 library;
 
-import "dart:math";
 
 import "package:cloud_firestore/cloud_firestore.dart";
 import 'package:fl_chart/fl_chart.dart';

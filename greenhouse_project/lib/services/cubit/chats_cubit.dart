@@ -1,4 +1,4 @@
-import 'dart:js';
+// ignore: avoid_web_libraries_in_flutte
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
