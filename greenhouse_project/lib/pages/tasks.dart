@@ -12,6 +12,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
+import 'package:flutter_holo_date_picker/widget/date_picker_widget.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
@@ -203,7 +205,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                         child: Column(
                           children: [
                             SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.66,
+                              height: MediaQuery.of(context).size.height * 0.5,
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: taskList.length,
@@ -408,14 +410,25 @@ class _TasksPageState extends State<_TasksPageContent> {
                             onChanged: taskDropdownCubit.updateDropdown,
                           ),
                           SizedBox(
-                            height: MediaQuery.of(context).size.height / 2.5,
-                            child: CupertinoDatePicker(
-                              minimumDate: DateTime.now(),
-                              onDateTimeChanged: (selection) {
-                                taskEditCubit.updateState(
-                                    [true, true, selection, taskEditState[3]]);
-                              },
-                            ),
+                            height: MediaQuery.of(context).size.height / 5,
+                            child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 25),
+            child: DatePickerWidget(
+              looping: false, // default is not looping
+              firstDate: DateTime(1990, 01, 01),
+              lastDate: DateTime(2030, 1, 1),
+              initialDate: DateTime(1991, 10, 12),
+              dateFormat: "dd-MMM-yyyy",
+              locale: DatePicker.localeFromString('en'),
+              onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
+              pickerTheme: DateTimePickerTheme(
+                itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
+                dividerColor: Colors.blue,
+              ),
+            ),
+          ),
+        ),
                           ),
                           // Submit & Cancel
                           Row(
@@ -606,21 +619,27 @@ class _TasksPageState extends State<_TasksPageContent> {
                                     .value,
                                 onChanged: taskDropdownCubit.updateDropdown,
                               ),
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height / 2.5,
-                                child: CupertinoDatePicker(
-                                  minimumDate: DateTime.now(),
-                                  onDateTimeChanged: (selection) {
-                                    taskEditCubit.updateState([
-                                      true,
-                                      true,
-                                      selection,
-                                      taskEditState[3]
-                                    ]);
-                                  },
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+                              child: Center(
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 25),
+                                child: DatePickerWidget(
+                                  looping: false, // default is not looping
+                                  firstDate: DateTime(1990, 01, 01),
+                                  lastDate: DateTime(2030, 1, 1),
+                                  initialDate: DateTime(1991, 10, 12),
+                                  dateFormat: "dd-MMM-yyyy",
+                                  locale: DatePicker.localeFromString('en'),
+                                  onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
+                                  pickerTheme: DateTimePickerTheme(
+                                    itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
+                                    dividerColor: Colors.blue,
+                                  ),
                                 ),
                               ),
+                                                        ),
+                            ),
                               //Submit & Cancel
                               Row(
                                 children: [
