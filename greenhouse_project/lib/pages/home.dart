@@ -19,6 +19,7 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/chart.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -69,8 +70,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   
    Widget _getDisplayWidget() {
     if (_isSelected[0]) {
-      return _buildDashbord()
-      ;
+      return _buildDashbord();
     } else {
       return _buildNotifications();
     }
@@ -92,17 +92,12 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     });
   }
 
-
-  // Text controllers
-  final TextEditingController _searchController = TextEditingController();
-
   // Index of footer nav selection
   final int _selectedIndex = 2;
 
   // Dispose (destructor)
   @override
   void dispose() {
-    _searchController.dispose();
     super.dispose();
   }
 
@@ -180,7 +175,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
 
       // Call function to build notificaitons list
       body: Container(
-      height: MediaQuery.of(context).size.height,
+      height: MediaQuery.of(context).size.height *0.75,
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -250,7 +245,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   ],
                   
                   ),
-
+      
                 
             ),
           ),
@@ -367,12 +362,37 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
   Widget _buildDashbord(){
-    return Container(
-      height: MediaQuery.of(context).size.height*0.6,
-      width: MediaQuery.of(context).size.width*.8,
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const Text(
+            "Graphs",
+            style: headingTextStyle,
+            textAlign: TextAlign.center,
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height*0.6,
+            width: MediaQuery.of(context).size.width*.8,
+            
+              child:  ChartClass(),
+          ),
+          const Text(
+            "Readings",
+            style: headingTextStyle,
+            textAlign: TextAlign.center,
+          ),
+          Container(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Readings(title: 'Temperature', value: '24°C', icon: Icons.wb_sunny, color: Colors.orange),
+                  Readings(title: "Soil humidity", value: "75%", icon: Icons.grass, color: Colors.brown)
       
-        child:  ChartClass(),
-      
+              ],
+              ),
+            )
+        ],
+      ),
     );
   }
 

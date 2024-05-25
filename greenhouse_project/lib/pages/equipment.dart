@@ -109,62 +109,82 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   Widget _createEquipmentPage() {
     return Scaffold(
       appBar: createAltAppbar(context, "Equipments"),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // BlocBuilder for Equipment Status
-            BlocBuilder<EquipmentStatusCubit, EquipmentStatusState>(
-              builder: (context, state) {
-                // Show "loading screen" if processing equipment state
-                if (state is StatusLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                  // Show equipment status once equipment status state is loaded
-                } else if (state is StatusLoaded) {
-                  List<EquipmentStatus> equipmentList =
-                      state.status; //equipment list
-                  // Display nothing if no equipment
-                  if (equipmentList.isEmpty) {
-                    return const Center(child: Text("No Equipments..."));
-                  }
-                  // Display equipment
-                  else {
-                    final imgpath = [
-                    {'path': "lib/utils/Icons/pump.png"},
-                    {'path': "lib/utils/Icons/idea.png"},
-                    {'path': "lib/utils/Icons/fan.png"},
-                  ] as List<Map<String, dynamic>>;
-                    return GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2),
-                      shrinkWrap: true,
-                      itemCount: equipmentList.length,
-                      itemBuilder: (context, index) {
-                        EquipmentStatus equipment =
-                            equipmentList[index]; //equipment data
-                        // Display equipment info
-                        return ToggleButtonContainer(
-                          context: context,
-                          equipment: equipment,
-                          userReference: _userReference,
-                          imgPath: imgpath[index]['path'],
-                        );
-                      },
-                    );
-                  }
-                }
-                // Show error message once an error occurs
-                else if (state is StatusError) {
-                  return Center(child: Text('Error: ${state.error}'));
-                }
-                // If the state is not any of the predefined states;
-                // never happens; but, anything can happen
-                else {
-                  return const Center(child: Text('Unexpected State'));
-                }
-              },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          image: DecorationImage(
+            image: const AssetImage('lib/utils/Icons/pattern.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.2),
+              BlendMode.dstATop,
             ),
-          ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // BlocBuilder for Equipment Status
+              BlocBuilder<EquipmentStatusCubit, EquipmentStatusState>(
+                builder: (context, state) {
+                  // Show "loading screen" if processing equipment state
+                  if (state is StatusLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                    // Show equipment status once equipment status state is loaded
+                  } else if (state is StatusLoaded) {
+                    List<EquipmentStatus> equipmentList =
+                        state.status; //equipment list
+                    // Display nothing if no equipment
+                    if (equipmentList.isEmpty) {
+                      return const Center(child: Text("No Equipments..."));
+                    }
+                    // Display equipment
+                    else {
+                      final imgpath = [
+                      {'path': "lib/utils/Icons/pump.png"},
+                      {'path': "lib/utils/Icons/idea.png"},
+                      {'path': "lib/utils/Icons/fan.png"},
+                    ] as List<Map<String, dynamic>>;
+                      return GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2),
+                        shrinkWrap: true,
+                        itemCount: equipmentList.length,
+                        itemBuilder: (context, index) {
+                          EquipmentStatus equipment =
+                              equipmentList[index]; //equipment data
+                          // Display equipment info
+                          return ToggleButtonContainer(
+                            context: context,
+                            equipment: equipment,
+                            userReference: _userReference,
+                            imgPath: imgpath[index]['path'],
+                          );
+                        },
+                      );
+                    }
+                  }
+                  // Show error message once an error occurs
+                  else if (state is StatusError) {
+                    return Center(child: Text('Error: ${state.error}'));
+                  }
+                  // If the state is not any of the predefined states;
+                  // never happens; but, anything can happen
+                  else {
+                    return const Center(child: Text('Unexpected State'));
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
