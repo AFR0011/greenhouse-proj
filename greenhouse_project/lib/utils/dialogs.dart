@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +37,7 @@ class TaskDetailsDialog extends StatelessWidget {
       title: const Text("Task Details"),
       content: Container(
         constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width*.6, // Set maximum width
+        width: MediaQuery.of(context).size.width * .6, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,7 +167,7 @@ class EmployeeDetailsDialog extends StatelessWidget {
       title: const Text("Employee Details"),
       content: Container(
         constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width*.6,// Set maximum width
+        width: MediaQuery.of(context).size.width * .6, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -280,7 +279,7 @@ class InventoryDetailsDialog extends StatelessWidget {
       title: const Text("Inventory Details"),
       content: Container(
         constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width*.6, // Set maximum width
+        width: MediaQuery.of(context).size.width * .6, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -364,12 +363,13 @@ class InventoryDetailsDialog extends StatelessWidget {
 class PlantDetailsDialog extends StatelessWidget {
   final PlantData plant;
   final Function removePlant;
+  final BuildContext mainContext;
 
-  const PlantDetailsDialog({
-    super.key,
-    required this.plant,
-    required this.removePlant,
-  });
+  const PlantDetailsDialog(
+      {super.key,
+      required this.plant,
+      required this.removePlant,
+      required this.mainContext});
 
   @override
   Widget build(BuildContext context) {
@@ -383,7 +383,7 @@ class PlantDetailsDialog extends StatelessWidget {
       title: const Text("Plant Details"),
       content: Container(
         constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width*.6,// Set maximum width
+        width: MediaQuery.of(context).size.width * .6, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,7 +409,8 @@ class PlantDetailsDialog extends StatelessWidget {
                     text: "Close",
                   ),
                   RedElevatedButton(
-                      onPressed: removePlant(), text: "Remove Plant")
+                      onPressed: removePlant(mainContext, plant),
+                      text: "Remove Plant")
                 ],
               ),
             ),
@@ -473,7 +474,7 @@ class ProgramDetailsDialog extends StatelessWidget {
       title: const Text("Program Details"),
       content: Container(
         constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width*.6, // Set maximum width
+        width: MediaQuery.of(context).size.width * .6, // Set maximum width
         child: Column(
           mainAxisSize: MainAxisSize.min, // Set column to minimum size
           crossAxisAlignment: CrossAxisAlignment.start,

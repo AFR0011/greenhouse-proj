@@ -31,13 +31,13 @@ class ChatCubit extends Cubit<ChatState> {
         .where('chat', isEqualTo: chatReference)
         .orderBy('timestamp', descending: false)
         .snapshots()
-        .listen((snapshot) {
+        .listen((snapshot) async {
       final List<MessageData> messages =
           snapshot.docs.map((doc) => MessageData.fromFirestore(doc)).toList();
 
-      emit(ChatLoaded([...messages]));
+      if (_isActive) emit(ChatLoaded([...messages]));
     }, onError: (error) {
-      emit(ChatError(error.toString()));
+      if (_isActive) emit(ChatError(error.toString()));
     });
   }
 
