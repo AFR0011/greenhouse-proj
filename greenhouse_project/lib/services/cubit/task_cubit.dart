@@ -78,11 +78,18 @@ class TaskCubit extends Cubit<TaskState> {
         "worker": worker
       });
 
-      logs.add({
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+
+      await logs.add({
         "action": "create",
-        "description": "Task added by user at ${Timestamp.now().toString()}",
+        "description":
+            "task \"$title\" added by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
-        "type": "task",
+        "type": "Program",
         "userId": userReference,
         "externalId": externalId,
       });
@@ -96,17 +103,27 @@ class TaskCubit extends Cubit<TaskState> {
     if (!_isActive) return;
     emit(TaskLoading());
     try {
+      DocumentReference externalId = item;
+
       DocumentSnapshot snapshot = await item.get();
       Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
       await item.delete();
+
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String title = data["title"];
+
       await logs.add({
-        "action": "Delete",
+        "action": "delete",
         "description":
-            "Task deleted by user at ${Timestamp.now().toString()} Task details: ${data["title"]}",
+            "task \"$title\" deleted by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
-        "type": "task",
+        "type": "Program",
         "userId": userReference,
-        "externalId": item,
+        "externalId": externalId,
       });
     } catch (error, stack) {
       emit(TaskError(stack.toString()));
@@ -118,15 +135,25 @@ class TaskCubit extends Cubit<TaskState> {
     if (!_isActive) return;
     emit(TaskLoading());
     try {
+      DocumentReference externalId = item;
+
       await item.update(data);
-      _getTasks();
-      logs.add({
-        "action": "Update",
-        "description": "Task updated by user at ${Timestamp.now().toString()}",
+
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String title = data["title"];
+
+      await logs.add({
+        "action": "create",
+        "description":
+            "task \"$title\" added by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
-        "type": "Task",
+        "type": "Program",
         "userId": userReference,
-        "externalId": item,
+        "externalId": externalId,
       });
     } catch (error) {
       emit(TaskError(error.toString()));

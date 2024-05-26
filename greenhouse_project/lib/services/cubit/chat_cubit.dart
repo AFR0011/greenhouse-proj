@@ -46,6 +46,13 @@ class ChatCubit extends Cubit<ChatState> {
       DocumentReference sender, DocumentReference chat) async {
     if (!_isActive) return;
 
+    DocumentSnapshot senderSnapshot = await sender.get();
+    String name, surname;
+    String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+    String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+    name = await senderSnapshot.get("name");
+    surname = await senderSnapshot.get("surname");
+
     try {
       DocumentReference externalId = await messages.add({
         "chat": chat,
@@ -55,9 +62,10 @@ class ChatCubit extends Cubit<ChatState> {
         "timestamp": Timestamp.now()
       });
 
-      logs.add({
+      await logs.add({
         "action": "create",
-        "description": "message sent by user at ${Timestamp.now().toString()}",
+        "description":
+            "message sent by \"$name $surname\" on \"$stringDate\" at $stringTime: $message",
         "timestamp": Timestamp.now(),
         "type": "message",
         "userId": sender,

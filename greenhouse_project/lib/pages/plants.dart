@@ -201,7 +201,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                     ),
                                     title: Text(
                                       plant.type,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18),
                                     ),

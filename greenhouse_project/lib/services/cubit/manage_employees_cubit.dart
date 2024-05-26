@@ -70,9 +70,16 @@ class ManageEmployeesCubit extends ManagementCubit {
         "enabled": true,
       });
 
-      logs.add({
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+
+      await logs.add({
         "action": "create",
-        "description": "message sent by user at ${Timestamp.now().toString()}",
+        "description":
+            "$role account created by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
         "type": "message",
         "userId": userReference,
@@ -80,40 +87,76 @@ class ManageEmployeesCubit extends ManagementCubit {
       });
 
       // Use EmailJS to send email
-      String _emailMessage = "Your email  used to create an account in " +
-          "the Greenhouse Control System environment.\n\nIf you think this is a " +
-          "mistake, please ignore this email.\n\nYou can login to your account " +
-          "using the following password: ${password}";
+      String emailMessage =
+          '''Your email  used to create an account in the Greenhouse Control
+          System environment.\n\nIf you think this is a mistake, please ignore
+          this email.\n\nYou can login to your account using the following
+          password: $password''';
 
       EmailJS.init(const Options(
           publicKey: "Dzqja-Lc3erScWnmb", privateKey: "6--KQwTNaq-EKoZJg4-t6"));
 
       EmailJS.send("service_1i330zn", "template_zx9tnxd",
-          {"receiver": email, "message": _emailMessage});
+          {"receiver": email, "message": emailMessage});
     } catch (error) {
-      print(error);
       emit(ManageEmployeesError(error.toString()));
     }
   }
 
-  Future<void> disableEmployee(EmployeeData workerData) async {
+  Future<void> disableEmployee(
+      EmployeeData workerData, DocumentReference userReference) async {
     if (!_isActive) return;
     try {
       await workerData.reference.update({"enabled": false});
+      DocumentReference externalId = workerData.reference;
+
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String role = workerData.role;
+
+      await logs.add({
+        "action": "create",
+        "description":
+            "$role account disabled by \"$name $surname\" on $stringDate at $stringTime",
+        "timestamp": Timestamp.now(),
+        "type": "message",
+        "userId": userReference,
+        "externalId": externalId,
+      });
     } catch (error) {
-      print(error.toString());
       emit(ManageEmployeesError(error.toString()));
     }
     return;
   }
 
-  Future<void> enableEmployee(EmployeeData workerData) async {
+  Future<void> enableEmployee(
+      EmployeeData workerData, DocumentReference userReference) async {
     if (!_isActive) return;
 
     try {
       await workerData.reference.update({"enabled": true});
+      DocumentReference externalId = workerData.reference;
+
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String role = workerData.role;
+
+      await logs.add({
+        "action": "create",
+        "description":
+            "$role account enabled by \"$name $surname\" on $stringDate at $stringTime",
+        "timestamp": Timestamp.now(),
+        "type": "message",
+        "userId": userReference,
+        "externalId": externalId,
+      });
     } catch (error) {
-      print(error.toString());
       emit(ManageEmployeesError(error.toString()));
     }
     return;

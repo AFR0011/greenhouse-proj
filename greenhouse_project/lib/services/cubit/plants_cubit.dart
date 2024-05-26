@@ -2,8 +2,6 @@
 /// Handles plant status page state management
 library;
 
-
-
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:cloud_firestore/cloud_firestore.dart";
 import "package:flutter_bloc/flutter_bloc.dart";
@@ -12,11 +10,10 @@ import "package:flutter/foundation.dart";
 part 'plants_state.dart';
 
 class PlantStatusCubit extends Cubit<PlantStatusState> {
-  CollectionReference plants =
-    FirebaseFirestore.instance.collection("plants");
+  CollectionReference plants = FirebaseFirestore.instance.collection("plants");
 
   final CollectionReference logs =
-    FirebaseFirestore.instance.collection('logs');
+      FirebaseFirestore.instance.collection('logs');
 
   final DocumentReference userReference;
 
@@ -44,39 +41,59 @@ class PlantStatusCubit extends Cubit<PlantStatusState> {
     return super.close();
   }
 
-  Future<void> addPlant(Map<String, dynamic> data, DocumentReference userReference) async{
-    if(!_isActive) return;
-    try{
+  Future<void> addPlant(
+      Map<String, dynamic> data, DocumentReference userReference) async {
+    if (!_isActive) return;
+    try {
       DocumentReference externalId = await plants.add(data);
 
-      logs.add({
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String plantType = data["type"];
+      String plantSubtype = data["subtype"];
+
+      await logs.add({
         "action": "create",
-        "description": "Plant added by user at ${Timestamp.now().toString()}",
+        "description":
+            "\"$plantType, $plantSubtype\" plant added by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
-        "type": "Plant",
+        "type": "plant",
         "userId": userReference,
         "externalId": externalId,
       });
-    } catch (error,stack) {
+    } catch (error, stack) {
       emit(PlantsError(error.toString()));
       print(stack);
       print(error);
     }
   }
 
-  Future<void> removePlant(DocumentReference item, DocumentReference userReference) async{
+  Future<void> removePlant(
+      DocumentReference item, DocumentReference userReference) async {
     if (!_isActive) return;
     emit(PlantsLoading());
 
-    try{
+    try {
       DocumentSnapshot snapshot = await item.get();
       Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
 
       await item.delete();
+
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String plantType = data["type"];
+      String plantSubtype = data["subtype"];
+
       await logs.add({
         "action": "Delete",
         "description":
-            "Plant deleted by user at ${Timestamp.now().toString()} Plant details: ${data["type"]}",
+            "\"$plantType, $plantSubtype\" plant deleted by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
         "type": "Plant",
         "userId": userReference,

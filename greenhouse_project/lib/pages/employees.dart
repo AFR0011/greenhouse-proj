@@ -1,8 +1,7 @@
 /// Employees page - CRUD for employee accounts
 ///
 /// TODO:
-/// - Implement "deleteEmployee" function
-/// -input validation add employee
+/// - Modularize code
 ///
 library;
 
@@ -112,8 +111,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
         BlocProvider.of<ManageEmployeesCubit>(context);
     final EmployeeEditCubit employeeEditCubit =
         BlocProvider.of<EmployeeEditCubit>(context);
-    final EmployeeDropdownCubit employeeDropdownCubit =
-        context.read<EmployeeDropdownCubit>();
+
     return Scaffold(
       // Appbar (header)
       appBar: AppBar(
@@ -250,8 +248,12 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                             ),
                                             title: const Text("Are you sure"),
                                             content: Container(
-                                               constraints: const BoxConstraints(maxWidth: 400),
-                                               width: MediaQuery.of(context).size.width*.6,
+                                              constraints: const BoxConstraints(
+                                                  maxWidth: 400),
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  .6,
                                               child: Column(
                                                 mainAxisSize: MainAxisSize
                                                     .min, // Set column to minimum size
@@ -267,12 +269,13 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                                                   text:
                                                                       "Confirm",
                                                                   onPressed:
-                                                                      () {
+                                                                      () async {
                                                                     if (employee
                                                                         .enabled) {
                                                                       manageEmployeesCubit
                                                                           .disableEmployee(
-                                                                              employee)
+                                                                              employee,
+                                                                              _userReference)
                                                                           .then(
                                                                               (_) {
                                                                         Navigator.pop(
@@ -284,19 +287,17 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                                                                 Text("Account disabled successfuly!")));
                                                                       });
                                                                     } else {
-                                                                      manageEmployeesCubit
-                                                                          .enableEmployee(
-                                                                              employee)
-                                                                          .then(
-                                                                              (_) {
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                                            content:
-                                                                                Text("Account enabled successfuly!")));
-                                                                      });
+                                                                      await manageEmployeesCubit.enableEmployee(
+                                                                          employee,
+                                                                          _userReference);
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                      Navigator.pop(
+                                                                          context);
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
+                                                                          .showSnackBar(
+                                                                              const SnackBar(content: Text("Account enabled successfuly!")));
                                                                     }
                                                                   }),
                                                         ),
@@ -414,7 +415,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                         title: const Text("Add employee"),
                         content: Container(
                           constraints: const BoxConstraints(maxWidth: 400),
-                          width: MediaQuery.of(context).size.width*.6,
+                          width: MediaQuery.of(context).size.width * .6,
                           child: Column(
                             mainAxisSize:
                                 MainAxisSize.min, // Set column to minimum size
@@ -510,7 +511,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
               title: const Text("Are you sure"),
               content: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
-                width: MediaQuery.of(context).size.width*.6,
+                width: MediaQuery.of(context).size.width * .6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -524,7 +525,8 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                 onPressed: () {
                                   if (employee.enabled) {
                                     manageEmployeesCubit
-                                        .disableEmployee(employee)
+                                        .disableEmployee(
+                                            employee, _userReference)
                                         .then((_) {
                                       Navigator.pop(context);
                                       Navigator.pop(context);
@@ -535,7 +537,8 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                     });
                                   } else {
                                     manageEmployeesCubit
-                                        .enableEmployee(employee)
+                                        .enableEmployee(
+                                            employee, _userReference)
                                         .then((_) {
                                       Navigator.pop(context);
                                       Navigator.pop(context);

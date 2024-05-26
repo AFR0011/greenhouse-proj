@@ -19,10 +19,7 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
 
   _getEquipmentStatus() {
     if (!_isActive) return;
-    equipment
-        .orderBy('type', descending: true)
-        .snapshots()
-        .listen((snapshot) {
+    equipment.orderBy('type', descending: true).snapshots().listen((snapshot) {
       if (snapshot.docs.isNotEmpty) {
         final List<EquipmentStatus> status = snapshot.docs
             .map((doc) => EquipmentStatus.fromFirestore(doc))
@@ -33,18 +30,25 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
   }
 
   void toggleStatus(DocumentReference userReference,
-      DocumentReference reference, bool currentStatus) async {
+      DocumentReference equipment, bool currentStatus) async {
     if (!_isActive) return;
-    reference.update({'status': !currentStatus});
+    equipment.update({'status': !currentStatus});
 
-    logs.add({
-      "action": "create",
+    String equipmentType = (await equipment.get()).get("type");
+    DocumentSnapshot userSnapshot = await userReference.get();
+    String name = userSnapshot.get("name");
+    String surname = userSnapshot.get("surname");
+    String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+    String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+
+    await logs.add({
+      "action": "Update",
       "description":
-          "equipment toggled by user at ${Timestamp.now().toString()}",
+          "$equipmentType toggled ${!currentStatus ? "on" : "off"} by \"$name $surname\" on $stringDate at $stringTime",
       "timestamp": Timestamp.now(),
       "type": "equipment status",
       "userId": userReference,
-      "externalId": reference,
+      "externalId": equipment,
     });
   }
 

@@ -15,7 +15,6 @@ class ReadingsCubit extends GreenhouseCubit {
     readings.snapshots().listen((snapshot) {
       final List<ReadingsData> readings =
           snapshot.docs.map((doc) => ReadingsData.fromFirestore(doc)).toList();
-      print(readings[0].allReadings);
       emit(ReadingsLoaded([...readings]));
     }, onError: (error) {
       emit(ReadingsError(error.toString()));

@@ -37,9 +37,17 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     try {
       DocumentReference externalId = await programs.add(data);
 
-      logs.add({
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String title = data["title"];
+
+      await logs.add({
         "action": "create",
-        "description": "Program added by user at ${Timestamp.now().toString()}",
+        "description":
+            "program \"$title\" added by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
         "type": "Program",
         "userId": userReference,
@@ -56,15 +64,25 @@ class ProgramsCubit extends Cubit<ProgramsState> {
 
     emit(ProgramsLoading());
     try {
+      DocumentReference externalId = program;
       DocumentSnapshot docSnapshot = await program.get();
       Map<String, dynamic> data = docSnapshot.data() as Map<String, dynamic>;
-      logs.add({
+
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String title = data["title"];
+
+      await logs.add({
         "action": "delete",
         "description":
-            "Program removed by user at ${Timestamp.now().toString()} program details: ${data["title"]}",
+            "program \"$title\" deleted by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
         "type": "Program",
         "userId": userReference,
+        "externalId": externalId,
       });
 
       await program.delete();
@@ -80,14 +98,24 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     emit(ProgramsLoading());
     try {
       await program.update(data);
+
+      DocumentReference externalId = program;
+
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String title = data["title"];
+
       await logs.add({
-        "action": "Update",
+        "action": "update",
         "description":
-            "Program updated by user at ${Timestamp.now().toString()}",
+            "program \"$title\" updated by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
         "type": "Program",
         "userId": userReference,
-        "externalId": program,
+        "externalId": externalId,
       });
     } catch (error) {
       emit(ProgramsError(error.toString()));

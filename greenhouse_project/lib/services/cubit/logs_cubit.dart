@@ -15,7 +15,7 @@ class LogsCubit extends Cubit<LogsState> {
   }
 
   void _getLogs() {
-    if (_isActive) return;
+    if (!_isActive) return;
     try {
       logs
           .orderBy('timestamp', descending: true)
