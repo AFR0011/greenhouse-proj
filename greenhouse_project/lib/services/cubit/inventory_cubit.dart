@@ -34,10 +34,16 @@ class InventoryCubit extends Cubit<InventoryState> {
     try {
       DocumentReference externalId = await inventory.add(data);
 
-      logs.add({
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+
+      await logs.add({
         "action": "create",
         "description":
-            "inventory added by user at ${Timestamp.now().toString()}",
+            "${data["amount"]} ${data["name"]} added by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
         "type": "inventory",
         "userId": userReference,
@@ -52,9 +58,17 @@ class InventoryCubit extends Cubit<InventoryState> {
       DocumentReference item, DocumentReference userReference) async {
     if (!_isActive) return;
     try {
-      logs.add({
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String itemName = (await item.get()).get("name");
+
+      await logs.add({
         "action": "Delete",
-        "description": "Item deleted by user at ${Timestamp.now().toString()}",
+        "description":
+            "$itemName deleted by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
         "type": "Inventory Item",
         "userId": userReference,
@@ -71,11 +85,19 @@ class InventoryCubit extends Cubit<InventoryState> {
       Map<String, dynamic> data, DocumentReference userReference) async {
     if (!_isActive) return;
     try {
-      await item.set(data, SetOptions(merge: true));
+      await item.update(data);
 
-      logs.add({
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String itemName = (await item.get()).get("name");
+
+      await logs.add({
         "action": "Update",
-        "description": "Item updated by user at ${Timestamp.now().toString()}",
+        "description":
+            "$itemName updated by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
         "type": "Inventory Item",
         "userId": userReference,
@@ -86,19 +108,26 @@ class InventoryCubit extends Cubit<InventoryState> {
     }
   }
 
-  Future<void> approveItem(DocumentReference itemRef, userReference) async {
+  Future<void> approveItem(DocumentReference item, userReference) async {
     if (!_isActive) return;
     try {
-      await itemRef.set({"pending": false}, SetOptions(merge: true));
+      await item.update({"pending": false});
 
-      logs.add({
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String name = userSnapshot.get("name");
+      String surname = userSnapshot.get("surname");
+      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
+      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
+      String itemName = (await item.get()).get("name");
+
+      await logs.add({
         "action": "Approve",
         "description":
-            "Inventory approved by user at ${Timestamp.now().toString()}",
+            "$itemName approved by \"$name $surname\" on $stringDate at $stringTime",
         "timestamp": Timestamp.now(),
         "type": "Inventory Item",
         "userId": userReference,
-        "externalId": itemRef,
+        "externalId": item,
       });
     } catch (error) {
       emit(InventoryError(error.toString()));

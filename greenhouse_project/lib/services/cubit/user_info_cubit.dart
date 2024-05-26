@@ -13,7 +13,6 @@ class UserInfoCubit extends HomeCubit {
           .collection('users')
           .where('email', isEqualTo: email)
           .get();
-
       if (userQuery.docs.isNotEmpty) {
         DocumentSnapshot userSnapshot = userQuery.docs.first;
         Map<String, dynamic>? userData =

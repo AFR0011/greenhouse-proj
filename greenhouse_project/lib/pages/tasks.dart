@@ -161,39 +161,43 @@ class _TasksPageState extends State<_TasksPageContent> {
       // Tasks section
       body: Container(
         height: MediaQuery.of(context).size.height,
-            decoration:_userRole == "worker"? BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.lightBlueAccent.shade100.withOpacity(0.6),
-                  Colors.teal.shade100.withOpacity(0.6),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              image: DecorationImage(
-                image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.05),
-                  BlendMode.dstATop,
+        decoration: _userRole == "worker"
+            ? BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                    Colors.teal.shade100.withOpacity(0.6),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                image: DecorationImage(
+                  image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.white.withOpacity(0.05),
+                    BlendMode.dstATop,
+                  ),
+                ),
+              )
+            : BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                    Colors.teal.shade100.withOpacity(0.6),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                image: DecorationImage(
+                  image: AssetImage('lib/utils/Icons/tasks.png'),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(
+                    Colors.white.withOpacity(0.05),
+                    BlendMode.dstATop,
+                  ),
                 ),
               ),
-            ) : BoxDecoration(gradient: LinearGradient(
-                colors: [
-                  Colors.lightBlueAccent.shade100.withOpacity(0.6),
-                  Colors.teal.shade100.withOpacity(0.6),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              image: DecorationImage(
-                image: AssetImage('lib/utils/Icons/tasks.png'),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.05),
-                  BlendMode.dstATop,
-                ),
-              ),),
         child: Column(
           children: [
             SizedBox(
@@ -209,7 +213,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                 // Show tasks if tasks state is loaded
                 else if (state is TaskLoaded) {
                   List<TaskData> taskList = state.tasks; // tasks list
-        
+
                   // Display nothing if no tasks
                   if (taskList.isEmpty) {
                     return const Center(child: Text("No Tasks..."));
@@ -305,47 +309,47 @@ class _TasksPageState extends State<_TasksPageContent> {
       // Footer nav bar
       bottomNavigationBar: _userRole == "worker"
           ? PreferredSize(
-            preferredSize: Size.fromHeight(50.0),
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.green.shade700,
-                    Colors.teal.shade400,
-                    Colors.blue.shade300
-                  ],
-                  stops: [0.2, 0.5, 0.9],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: Offset(0, 3), // changes position of shadow
+              preferredSize: Size.fromHeight(50.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.green.shade700,
+                      Colors.teal.shade400,
+                      Colors.blue.shade300
+                    ],
+                    stops: [0.2, 0.5, 0.9],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 5,
+                      blurRadius: 7,
+                      offset: Offset(0, 3), // changes position of shadow
+                    ),
+                  ],
                 ),
-                child: createFooterNav(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(30.0),
+                    topRight: Radius.circular(30.0),
+                  ),
+                  child: createFooterNav(
                     _selectedIndex,
                     footerNavCubit,
                     _userRole,
                   ),
+                ),
               ),
-            ),
-          )
+            )
           : const SizedBox(),
 
-          floatingActionButton: _userRole != "worker"
-            ? GreenElevatedButton(
+      floatingActionButton: _userRole != "worker"
+          ? GreenElevatedButton(
               text: "Add Task", onPressed: () => showAddDialog())
-              : const SizedBox(),
+          : const SizedBox(),
     );
   }
 
@@ -396,7 +400,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                     title: const Text("Edit task"),
                     content: Container(
                       constraints: const BoxConstraints(maxWidth: 400),
-                      width: MediaQuery.of(context).size.width*.6,
+                      width: MediaQuery.of(context).size.width * .6,
                       child: Column(
                         mainAxisSize:
                             MainAxisSize.min, // Set column to minimum size
@@ -429,23 +433,31 @@ class _TasksPageState extends State<_TasksPageContent> {
                           SizedBox(
                             height: MediaQuery.of(context).size.height / 5,
                             child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 25),
-            child: DatePickerWidget(
-              looping: false, // default is not looping
-              firstDate: DateTime.now(),
-              lastDate: DateTime(2040, 1, 1),
-              initialDate: DateTime.now(),
-              dateFormat: "dd-MMM-yyyy",
-              locale: DatePicker.localeFromString('en'),
-              onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
-              pickerTheme: DateTimePickerTheme(
-                itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
-                dividerColor: Colors.blue,
-              ),
-            ),
-          ),
-        ),
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 25),
+                                child: DatePickerWidget(
+                                  looping: false,
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime(2040, 1, 1),
+                                  initialDate: DateTime.now(),
+                                  dateFormat: "dd-MMM-yyyy",
+                                  locale: DatePicker.localeFromString('en'),
+                                  onChange: (DateTime newDate, _) =>
+                                      taskEditCubit.updateState([
+                                    taskEditState[0],
+                                    taskEditState[1],
+                                    newDate,
+                                    taskEditState[3]
+                                  ]),
+                                  pickerTheme: DateTimePickerTheme(
+                                    itemTextStyle: TextStyle(
+                                        color: Colors.black, fontSize: 19),
+                                    dividerColor: Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                           // Submit & Cancel
                           Row(
@@ -483,13 +495,10 @@ class _TasksPageState extends State<_TasksPageContent> {
 
                                     Navigator.pop(context);
                                     Navigator.pop(context);
-                                    Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             content: Text(
                                                 "Task edited successfully")));
-                                  } else {
-                                    print("no");
                                   }
                                 },
                               ),
@@ -535,7 +544,8 @@ class _TasksPageState extends State<_TasksPageContent> {
               title: const Text("Are you sure?"),
               content: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
-                width: MediaQuery.of(context).size.width*.6, // Set maximum width
+                width:
+                    MediaQuery.of(context).size.width * .6, // Set maximum width
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -607,7 +617,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                         title: const Text("Add task"),
                         content: Container(
                           constraints: const BoxConstraints(maxWidth: 400),
-                          width: MediaQuery.of(context).size.width*.6,
+                          width: MediaQuery.of(context).size.width * .6,
                           child: Column(
                             mainAxisSize:
                                 MainAxisSize.min, // Set column to minimum size
@@ -638,27 +648,35 @@ class _TasksPageState extends State<_TasksPageContent> {
                                     .value,
                                 onChanged: taskDropdownCubit.updateDropdown,
                               ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
-                              child: Center(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 25),
-                                child: DatePickerWidget(
-                                  looping: false, // default is not looping
-                                  firstDate: DateTime.now(),
-                                  lastDate: DateTime(2040, 1, 1),
-                                  initialDate: DateTime.now(),
-                                  dateFormat: "dd-MMM-yyyy",
-                                  locale: DatePicker.localeFromString('en'),
-                                  onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
-                                  pickerTheme: DateTimePickerTheme(
-                                    itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
-                                    dividerColor: Colors.blue,
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+                                child: Center(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 25),
+                                    child: DatePickerWidget(
+                                      looping: false, // default is not looping
+                                      firstDate: DateTime.now(),
+                                      lastDate: DateTime(2040, 1, 1),
+                                      initialDate: DateTime.now(),
+                                      dateFormat: "dd-MMM-yyyy",
+                                      locale: DatePicker.localeFromString('en'),
+                                      onChange: (DateTime newDate, _) =>
+                                          taskEditCubit.updateState([
+                                        taskEditState[0],
+                                        taskEditState[1],
+                                        newDate,
+                                        taskEditState[3]
+                                      ]),
+                                      pickerTheme: DateTimePickerTheme(
+                                        itemTextStyle: TextStyle(
+                                            color: Colors.black, fontSize: 19),
+                                        dividerColor: Colors.blue,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                                                        ),
-                            ),
                               //Submit & Cancel
                               Row(
                                 children: [

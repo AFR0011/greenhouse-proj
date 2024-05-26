@@ -200,11 +200,15 @@ class EmployeeDetailsDialog extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: RedElevatedButton(
-                    text:
-                        employee.enabled ? "Disable account" : "Enable account",
-                    onPressed: () => toggleAccount(),
-                  ),
+                  child: employee.enabled
+                      ? RedElevatedButton(
+                          text: "Disable account",
+                          onPressed: () => toggleAccount(),
+                        )
+                      : GreenElevatedButton(
+                          text: "Enable account",
+                          onPressed: () => toggleAccount(),
+                        ),
                 )
               ],
             ),
@@ -375,50 +379,48 @@ class PlantDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10.0),
-          side: const BorderSide(
-              color: Colors.transparent,
-              width: 2.0), // Add border color and width
-        ),
-        title: const Text("Plant Details"),
-        content: Container(
-          constraints: const BoxConstraints(maxWidth: 400),
-          width: MediaQuery.of(context).size.width * .6, // Set maximum width
-          child: Column(
-            mainAxisSize: MainAxisSize.min, // Set column to minimum size
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildDetailRow("Type:", plant.type),
-              _buildDetailRow("Subtype:", plant.subtype),
-              _buildDetailRow("Bord No:", plant.boardNo.toString()),
-              _buildDetailRow(
-                  "Birthdate",
-                  plant.birthdate
-                      .toString()
-                      .substring(0, plant.birthdate.toString().length - 7)),
-              const SizedBox(
-                  height: 20), // Add spacing between details and buttons
-              Align(
-                alignment: Alignment.center,
-                child: Row(
-                  children: [
-                    WhiteElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Close the dialog
-                      },
-                      text: "Close",
-                    ),
-                    RedElevatedButton(
-                        onPressed: removePlant(mainContext, plant),
-                        text: "Remove Plant")
-                  ],
-                ),
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+        side: const BorderSide(
+            color: Colors.transparent,
+            width: 2.0), // Add border color and width
+      ),
+      title: const Text("Plant Details"),
+      content: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        width: MediaQuery.of(context).size.width * .6, // Set maximum width
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Set column to minimum size
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailRow("Type:", plant.type),
+            _buildDetailRow("Subtype:", plant.subtype),
+            _buildDetailRow("Bord No:", plant.boardNo.toString()),
+            _buildDetailRow(
+                "Birthdate",
+                plant.birthdate
+                    .toString()
+                    .substring(0, plant.birthdate.toString().length - 7)),
+            const SizedBox(
+                height: 20), // Add spacing between details and buttons
+            Align(
+              alignment: Alignment.center,
+              child: Row(
+                children: [
+                  WhiteElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Close the dialog
+                    },
+                    text: "Close",
+                  ),
+                  RedElevatedButton(
+                      onPressed: () => removePlant(mainContext, plant),
+                      text: "Remove Plant")
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

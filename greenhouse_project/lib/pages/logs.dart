@@ -113,8 +113,7 @@ class _LogsPageContentState extends State<_LogsPageContent> {
     // Page content
     return Scaffold(
       // Main appbar (header)
-      appBar: createMainAppBar(
-          context, widget.userCredential, _userReference, "Logs"),
+      appBar: createAltAppbar(context, "Logs"),
 
       // Call function to build notificaitons list
       body: _buildLogs(),
@@ -122,49 +121,44 @@ class _LogsPageContentState extends State<_LogsPageContent> {
   }
 
   Widget _buildLogs() {
-    return Column(
-      children: [
-        // BlocBuilder for notifications
-        BlocBuilder<LogsCubit, LogsState>(
-          builder: (context, state) {
-            // Show "loading screen" if processing notification state
-            if (state is LogsLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            // Show equipment status once notification state is loaded
-            else if (state is LogsLoaded) {
-              List<LogsData> logsList = state.logs; // notifications list
-              // Display nothing if no notifications
-              if (logsList.isEmpty) {
-                return const Center(child: Text("No Logs..."));
-              }
-              // Display notifications
-              else {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: logsList.length,
-                  itemBuilder: (context, index) {
-                    LogsData log = logsList[index]; // notification data
-                    // Notification message
-                    return ListTile(
-                      title: Text("${log.action} ${log.description} "),
-                    );
-                  },
+    return BlocBuilder<LogsCubit, LogsState>(
+      builder: (context, state) {
+        // Show "loading screen" if processing notification state
+        if (state is LogsLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        // Show equipment status once notification state is loaded
+        else if (state is LogsLoaded) {
+          List<LogsData> logsList = state.logs; // notifications list
+          // Display nothing if no notifications
+          if (logsList.isEmpty) {
+            return const Center(child: Text("No Logs..."));
+          }
+          // Display notifications
+          else {
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: logsList.length,
+              itemBuilder: (context, index) {
+                LogsData log = logsList[index]; // notification data
+                // Notification message
+                return ListTile(
+                  title: Text("${log.action} ${log.description} "),
                 );
-              }
-            }
-            // Show error message once an error occurs
-            else if (state is LogsError) {
-              return Center(child: Text('Error: ${state.error}'));
-            }
-            // If the state is not any of the predefined states;
-            // never happens; but, anything can happen
-            else {
-              return const Center(child: Text('Unexpected State'));
-            }
-          },
-        ),
-      ],
+              },
+            );
+          }
+        }
+        // Show error message once an error occurs
+        else if (state is LogsError) {
+          return Center(child: Text('Error: ${state.error}'));
+        }
+        // If the state is not any of the predefined states;
+        // never happens; but, anything can happen
+        else {
+          return const Center(child: Text('Unexpected State'));
+        }
+      },
     );
   }
 }
