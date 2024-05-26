@@ -148,7 +148,8 @@ class _PlantsPageState extends State<_PlantsPageContent> {
             Padding(
               padding: const EdgeInsets.only(top: 40),
               child: SizedBox(
-                width: MediaQuery.of(context).size.width - 20,),
+                width: MediaQuery.of(context).size.width - 20,
+              ),
             ),
             // BlocBuilder for plantStatus state
             BlocBuilder<PlantStatusCubit, PlantStatusState>(
@@ -160,7 +161,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                 // Show plants once plantStatus state is loaded
                 else if (state is PlantsLoaded) {
                   List<PlantData> plantList = state.plants; // plants list
-        
+
                   // Display nothing if no plants
                   if (plantList.isEmpty) {
                     return const Center(child: Text("No Plants..."));
@@ -172,57 +173,66 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                       child: Column(
                         children: [
                           SizedBox(
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: plantList.length,
-                                itemBuilder: (context, index) {
-                                  PlantData plant = plantList[index]; //plant data
-                              
-                                  // Display plant info
-                                  return Card(
-                                    shape: RoundedRectangleBorder(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: plantList.length,
+                              itemBuilder: (context, index) {
+                                PlantData plant = plantList[index]; //plant data
+
+                                // Display plant info
+                                return Card(
+                                  shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15.0),
-                                    ),
-                                    elevation: 4.0,
-                                    margin: EdgeInsets.only(bottom: 16.0),
-                                    child: ListTile(
-                                      leading: Container(
-                                        padding: EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.1),
-                                          shape: BoxShape.circle,
-                                        ),
+                                  ),
+                                  elevation: 4.0,
+                                  margin: EdgeInsets.only(bottom: 16.0),
+                                  child: ListTile(
+                                    leading: Container(
+                                      padding: EdgeInsets.all(8.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.1),
+                                        shape: BoxShape.circle,
+                                      ),
                                       child: Icon(
                                         Icons.grass_outlined,
                                         color: Colors.green[800]!,
                                         size: 30,
                                       ),
-                                      ),
-                                      title: Text(plant.type,
-                                      style: TextStyle(fontWeight: FontWeight.bold,
-                                      fontSize: 18),),
-                                      subtitle: Text(plant.subtype),
-                                      trailing: WhiteElevatedButton(
-                                        // Show details and sensor readings
-                                        text: 'Details',
-                                        onPressed: () {
-                                          // _showPlantDetails(plant);
-                                          BuildContext mainContext = context;
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) =>
-                                                  PlantDetailsDialog(plant: plant, removePlant: () => showDeleteForm(mainContext, plant)));
-                                        },
-                                      ),
                                     ),
-                                  );
-                                },
-                              ),
-                    )],),
+                                    title: Text(
+                                      plant.type,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18),
+                                    ),
+                                    subtitle: Text(plant.subtype),
+                                    trailing: WhiteElevatedButton(
+                                      // Show details and sensor readings
+                                      text: 'Details',
+                                      onPressed: () {
+                                        // _showPlantDetails(plant);
+                                        BuildContext mainContext = context;
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) =>
+                                                PlantDetailsDialog(
+                                                    plant: plant,
+                                                    mainContext: mainContext,
+                                                    removePlant:
+                                                        showDeleteForm));
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          )
+                        ],
+                      ),
                     );
                   }
                 }
-        
+
                 // Show error message once an error occurs
                 else if (state is PlantsError) {
                   return Center(child: Text('Error: ${state.error}'));

@@ -13,6 +13,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/pages/logs.dart';
 import 'package:greenhouse_project/pages/tasks.dart';
 import 'package:greenhouse_project/pages/employees.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
@@ -144,11 +145,13 @@ class _ManagementPageState extends State<_ManagementPageContent> {
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
     final pages = [
       {
-        'route': TasksPage(
-          userCredential: widget.userCredential,
-          userReference: _userReference,
-        ),
-        "title": "Tasks",
+        'route': _userRole == "admin"
+            ? LogsPage(userCredential: widget.userCredential)
+            : TasksPage(
+                userCredential: widget.userCredential,
+                userReference: _userReference,
+              ),
+        "title": _userRole == "admin" ? "Logs" : "Tasks",
         "icon": "lib/utils/Icons/tasks.png"
       },
       {
@@ -177,7 +180,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
             end: Alignment.bottomRight,
           ),
           image: DecorationImage(
-            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.white.withOpacity(0.05),
@@ -188,7 +191,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
         child: SingleChildScrollView(
           child: Column(children: [
             Padding(
-              padding: EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24.0),
               child: GridView.builder(
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
@@ -199,18 +202,15 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                   itemCount: 2,
                   itemBuilder: (context, index) {
                     return ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-        
-                      child: BackdropFilter(
-                        filter: ImageFilter.blur(sigmaX: 20,sigmaY: 20),
+                        borderRadius: BorderRadius.circular(20),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                           child: BoxLink(
                               text: pages[index]["title"],
                               imgPath: pages[index]["icon"],
                               context: context,
                               pageRoute: pages[index]["route"]),
-                        
-                      
-                    ));
+                        ));
                   }),
             ),
           ]),
@@ -218,36 +218,37 @@ class _ManagementPageState extends State<_ManagementPageContent> {
       ),
 
       // Footer nav bar
-      bottomNavigationBar:
-
-          PreferredSize(
-            preferredSize: Size.fromHeight(50.0),
-             child: Container(
-                     decoration: BoxDecoration(
-                       gradient: LinearGradient(
-              colors: [Colors.green.shade700, Colors.teal.shade400, Colors.blue.shade300],
-              stops: [0.2, 0.5, 0.9],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-                       ),
-                       boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
+      bottomNavigationBar: PreferredSize(
+          preferredSize: const Size.fromHeight(50.0),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.green.shade700,
+                  Colors.teal.shade400,
+                  Colors.blue.shade300
+                ],
+                stops: const [0.2, 0.5, 0.9],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-                       ],
-                     ),
-                     child: ClipRRect(
-                       borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30.0),
-              topRight: Radius.circular(30.0),
-                       ),
-            child: createFooterNav(_selectedIndex, footerNavCubit, _userRole)
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: const Offset(0, 3), // changes position of shadow
+                ),
+              ],
             ),
-            )),
-           );
-  
+            child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(30.0),
+                  topRight: Radius.circular(30.0),
+                ),
+                child:
+                    createFooterNav(_selectedIndex, footerNavCubit, _userRole)),
+          )),
+    );
   }
 }

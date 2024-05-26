@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/login.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
+import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/chart.dart';
@@ -67,8 +68,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   List<bool> _isSelected = [true, false];
   // Custom theme
   final ThemeData customTheme = theme;
-  
-   Widget _getDisplayWidget() {
+
+  Widget _getDisplayWidget() {
     if (_isSelected[0]) {
       return _buildDashbord();
     } else {
@@ -173,85 +174,81 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
               context, widget.userCredential, _userReference, "Welcome"),
         ),
 
-      // Call function to build notificaitons list
-      body: Container(
-      height: MediaQuery.of(context).size.height *0.75,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.lightBlueAccent.shade100.withOpacity(0.6),
-            Colors.teal.shade100.withOpacity(0.6),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        image: DecorationImage(
-          image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            Colors.white.withOpacity(0.05),
-            BlendMode.dstATop,
-          ),
-        ),
-      ),
-      child:Column(
-        children: [
-          Container(
-            width: double.maxFinite,
+        // Call function to build notificaitons list
+        body: Container(
+            height: MediaQuery.of(context).size.height * 0.75,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.green.shade700, Colors.teal.shade400],
+                colors: [
+                  Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                  Colors.teal.shade100.withOpacity(0.6),
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
+              ),
+              image: DecorationImage(
+                image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.05),
+                  BlendMode.dstATop,
                 ),
-                
+              ),
             ),
-            child: Center(
-              child: ToggleButtons(
-                  renderBorder: false,
-                  fillColor: Colors.teal.withOpacity(1),
-                  selectedColor: Colors.white,
-                  splashColor: Colors.tealAccent,
-                  hoverColor: Colors.tealAccent.withOpacity(0.1),
-                  isSelected: _isSelected,
-                  onPressed: _onToggle,
-                  children: <Widget>[
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width*0.5,
-                        child: const Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                              'Dashbord',
-                              style: TextStyle(fontSize: 16),
-                          ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width*0.5,
-                        child: const Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                              'Notifications',
-                              style: TextStyle(fontSize: 16),
-                          ),
-                          ),
-                        ),
-                      ),
-                  ],
-                  
+            child: Column(
+              children: [
+                Container(
+                  width: double.maxFinite,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.green.shade700, Colors.teal.shade400],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                   ),
-      
-                
-            ),
-          ),
-          _getDisplayWidget()
-        ],
-      )),
+                  child: Center(
+                    child: ToggleButtons(
+                      renderBorder: false,
+                      fillColor: Colors.teal.withOpacity(1),
+                      selectedColor: Colors.white,
+                      splashColor: Colors.tealAccent,
+                      hoverColor: Colors.tealAccent.withOpacity(0.1),
+                      isSelected: _isSelected,
+                      onPressed: _onToggle,
+                      children: <Widget>[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: const Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Dashbord',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: const Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Notifications',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                _getDisplayWidget()
+              ],
+            )),
 
         // Footer nav bar
         bottomNavigationBar: PreferredSize(
@@ -291,7 +288,9 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   Widget _buildNotifications() {
     return Column(
       children: [
-        SizedBox(height: 16,),
+        SizedBox(
+          height: 16,
+        ),
         // BlocBuilder for notifications
         BlocBuilder<NotificationsCubit, HomeState>(
           builder: (context, state) {
@@ -317,29 +316,32 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                         notificationsList[index]; // notification data
                     // Notification message
                     return Padding(
-                      padding: const EdgeInsets.fromLTRB(12,0,12,0),
+                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
                       child: Card(
-                        
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15.0)),
                         elevation: 4.0,
                         margin: const EdgeInsets.only(bottom: 16.0),
                         child: ListTile(
                           leading: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            color: Colors.cyan.withOpacity(0.1),
-                            shape: BoxShape.circle,
+                            padding: const EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              color: Colors.cyan.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.notification_important_outlined,
+                              color: Colors.orange,
+                              size: 30.0,
+                            ),
                           ),
-                          child: const Icon(
-                            Icons.notification_important_outlined,
-                            color: Colors.orange,
-                            size: 30.0,
+                          title: Text(
+                            notification.message,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.0,
+                            ),
                           ),
-                        ),
-                          title: Text(notification.message,style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18.0,
-                                ),),
                         ),
                       ),
                     );
@@ -361,7 +363,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
       ],
     );
   }
-  Widget _buildDashbord(){
+
+  Widget _buildDashbord() {
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -370,27 +373,50 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             style: headingTextStyle,
             textAlign: TextAlign.center,
           ),
-          Container(
-            height: MediaQuery.of(context).size.height*0.6,
-            width: MediaQuery.of(context).size.width*.8,
-            
-              child:  ChartClass(),
+          Align(
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.3,
+                child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemExtent: MediaQuery.of(context).size.width * 0.8,
+                    itemCount: 5,
+                    itemBuilder: (context, index) {
+                      return const Center(
+                        child: ChartClass(),
+                      );
+                    })),
           ),
           const Text(
             "Readings",
             style: headingTextStyle,
             textAlign: TextAlign.center,
           ),
-          Container(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Readings(title: 'Temperature', value: '24°C', icon: Icons.wb_sunny, color: Colors.orange),
-                  Readings(title: "Soil humidity", value: "75%", icon: Icons.grass, color: Colors.brown)
-      
-              ],
-              ),
-            )
+          BlocProvider(
+            create: (context) => ReadingsCubit(),
+            child: BlocBuilder<ReadingsCubit, GreenhouseState>(
+              builder: (context, state) {
+                if (state is ReadingsLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is ReadingsLoaded) {
+                  for (var reading in state.readings) {
+                    reading.allReadings.where((element) => element == 5);
+                  }
+                  return Container(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(""),
+                  );
+                } else if (state is ReadingsError) {
+                  print(state.error);
+                  return Text(state.error);
+                } else {
+                  return const Text("Unexpected State");
+                }
+              },
+            ),
+          )
         ],
       ),
     );
