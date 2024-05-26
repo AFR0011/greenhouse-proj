@@ -277,53 +277,55 @@ class InventoryDetailsDialog extends StatelessWidget {
             width: 2.0), // Add border color and width
       ),
       title: const Text("Inventory Details"),
-      content: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width * .6, // Set maximum width
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // Set column to minimum size
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDetailRow("Name:", inventory.name),
-            _buildDetailRow("Description:", inventory.description),
-            _buildDetailRow("Amount:", inventory.amount.toString()),
-            _buildDetailRow(
-                "Time added",
-                inventory.timeAdded
-                    .toString()
-                    .substring(0, inventory.timeAdded.toString().length - 7)),
-            const SizedBox(
-                height: 20), // Add spacing between details and buttons
-            Row(
-              children: [
-                Expanded(
-                  child: WhiteElevatedButton(
-                      text: "Edit",
-                      onPressed: () {
-                        editInventory();
-                      }),
-                ),
-                Expanded(
-                  child: RedElevatedButton(
-                      text: "Delete",
-                      onPressed: () {
-                        deleteInventory();
-                      }),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            Align(
-              alignment: Alignment.center,
-              child: WhiteElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                text: "Close",
+      content: SingleChildScrollView(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          width: MediaQuery.of(context).size.width * .6, // Set maximum width
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Set column to minimum size
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow("Name:", inventory.name),
+              _buildDetailRow("Description:", inventory.description),
+              _buildDetailRow("Amount:", inventory.amount.toString()),
+              _buildDetailRow(
+                  "Time added",
+                  inventory.timeAdded
+                      .toString()
+                      .substring(0, inventory.timeAdded.toString().length - 7)),
+              const SizedBox(
+                  height: 20), // Add spacing between details and buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: WhiteElevatedButton(
+                        text: "Edit",
+                        onPressed: () {
+                          editInventory();
+                        }),
+                  ),
+                  Expanded(
+                    child: RedElevatedButton(
+                        text: "Delete",
+                        onPressed: () {
+                          deleteInventory();
+                        }),
+                  ),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+
+              Align(
+                alignment: Alignment.center,
+                child: WhiteElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  text: "Close",
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -373,48 +375,50 @@ class PlantDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0),
-        side: const BorderSide(
-            color: Colors.transparent,
-            width: 2.0), // Add border color and width
-      ),
-      title: const Text("Plant Details"),
-      content: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width * .6, // Set maximum width
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // Set column to minimum size
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDetailRow("Type:", plant.type),
-            _buildDetailRow("Subtype:", plant.subtype),
-            _buildDetailRow("Bord No:", plant.boardNo.toString()),
-            _buildDetailRow(
-                "Birthdate",
-                plant.birthdate
-                    .toString()
-                    .substring(0, plant.birthdate.toString().length - 7)),
-            const SizedBox(
-                height: 20), // Add spacing between details and buttons
-            Align(
-              alignment: Alignment.center,
-              child: Row(
-                children: [
-                  WhiteElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                    },
-                    text: "Close",
-                  ),
-                  RedElevatedButton(
-                      onPressed: removePlant(mainContext, plant),
-                      text: "Remove Plant")
-                ],
+    return SingleChildScrollView(
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+          side: const BorderSide(
+              color: Colors.transparent,
+              width: 2.0), // Add border color and width
+        ),
+        title: const Text("Plant Details"),
+        content: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          width: MediaQuery.of(context).size.width * .6, // Set maximum width
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Set column to minimum size
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow("Type:", plant.type),
+              _buildDetailRow("Subtype:", plant.subtype),
+              _buildDetailRow("Bord No:", plant.boardNo.toString()),
+              _buildDetailRow(
+                  "Birthdate",
+                  plant.birthdate
+                      .toString()
+                      .substring(0, plant.birthdate.toString().length - 7)),
+              const SizedBox(
+                  height: 20), // Add spacing between details and buttons
+              Align(
+                alignment: Alignment.center,
+                child: Row(
+                  children: [
+                    WhiteElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      text: "Close",
+                    ),
+                    RedElevatedButton(
+                        onPressed: removePlant(mainContext, plant),
+                        text: "Remove Plant")
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

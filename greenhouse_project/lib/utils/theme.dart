@@ -1,6 +1,8 @@
 /// Theme data for the application
 library;
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 final ThemeData theme = ThemeData(
@@ -132,13 +134,7 @@ final ThemeData darkTheme = ThemeData(
   ),
 );
 
-
-
 class WavePainter extends CustomPainter {
-   final image;
-
-  WavePainter(this.image);
-
   @override
   void paint(Canvas canvas, Size size) {
     // Gradient
@@ -166,19 +162,8 @@ class WavePainter extends CustomPainter {
     // Draw gradient wave
     canvas.drawPath(path, paint);
 
-    // Image pattern
-    if (image != null) {
-      final imagePaint = Paint()
-        ..shader = ImageShader(
-          image,
-          TileMode.repeated,
-          TileMode.repeated,
-          Matrix4.identity().scaled(size.width / image.width, size.height / image.height).storage,
-        );
-
-      // Draw image pattern wave
-      canvas.drawPath(path, imagePaint);
-    }
+    // Draw image pattern wave
+    canvas.drawPath(path, paint);
   }
 
   @override

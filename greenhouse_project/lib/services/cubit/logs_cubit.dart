@@ -1,28 +1,35 @@
-import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:greenhouse_project/services/cubit/equipment_status_cubit.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/foundation.dart';
 
 part 'logs_state.dart';
 
 class LogsCubit extends Cubit<LogsState> {
-  final CollectionReference log = FirebaseFirestore.instance.collection('logs');
-
-  final DocumentReference userReference;
+  final CollectionReference logs =
+      FirebaseFirestore.instance.collection('logs');
 
   bool _isActive = true;
 
-  LogsCubit(this.userReference) : super(LogsLoading());
+  LogsCubit() : super(LogsLoading()) {
+    _getLogs();
+  }
 
-  _getLogs() async {
+  void _getLogs() {
     if (_isActive) return;
-    log.orderBy('timestamp', descending: true).snapshots().listen((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
-        final List<LogsData> logs =
-            snapshot.docs.map((doc) => LogsData.fromFirestore(doc)).toList();
-        emit(LogsLoaded([...logs]));
-      }
-    });
+    try {
+      logs
+          .orderBy('timestamp', descending: true)
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.docs.isNotEmpty) {
+          final List<LogsData> logs =
+              snapshot.docs.map((doc) => LogsData.fromFirestore(doc)).toList();
+          emit(LogsLoaded([...logs]));
+        }
+      });
+    } catch (error) {
+      emit(LogsError(error.toString()));
+    }
   }
 
   @override

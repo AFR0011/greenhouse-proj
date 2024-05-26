@@ -6,6 +6,8 @@
 /// - Review cubit usage; builder and listener usage might be unnecessary
 library;
 
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -21,8 +23,7 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage>
-    with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage> {
   // Text controllers
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -60,8 +61,16 @@ class _LoginPageState extends State<LoginPage>
           right: 0,
           child: CustomPaint(
             painter: WavePainter1(),
-            child: Container(
-              height: MediaQuery.of(context).size.height*0.7,
+            child: Transform(
+              transform: Matrix4.rotationZ(3),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.7,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                      fit: BoxFit.cover),
+                ),
+              ),
             ),
           ),
         ),
@@ -70,9 +79,9 @@ class _LoginPageState extends State<LoginPage>
           left: 0,
           right: 0,
           child: CustomPaint(
-            painter: WavePainter(Image.asset('lib/utils/Icons/leaf_pat.jpg')),
+            painter: WavePainter(),
             child: Container(
-              height: MediaQuery.of(context).size.height*0.7,
+              height: MediaQuery.of(context).size.height * 0.7,
             ),
           ),
         ),
@@ -87,7 +96,7 @@ class _LoginPageState extends State<LoginPage>
             return Padding(
               padding: const EdgeInsets.all(25.0),
               child: SafeArea(
-                child: Container(
+                child: SizedBox(
                   width: double.maxFinite,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -102,12 +111,13 @@ class _LoginPageState extends State<LoginPage>
                       ),
                       Container(
                         constraints: const BoxConstraints(maxWidth: 400),
-                        width: MediaQuery.of(context).size.width*.6,
+                        width: MediaQuery.of(context).size.width * .6,
                         child: TextField(
                           controller: emailController,
                           decoration: InputDecoration(
                             filled: true,
-                            fillColor: theme.colorScheme.secondary.withOpacity(0.5),
+                            fillColor:
+                                theme.colorScheme.secondary.withOpacity(0.5),
                             labelText: 'Email',
                             border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20)),
@@ -117,7 +127,7 @@ class _LoginPageState extends State<LoginPage>
                       const SizedBox(height: 20.0),
                       Container(
                         constraints: const BoxConstraints(maxWidth: 400),
-                  width: MediaQuery.of(context).size.width*.6,
+                        width: MediaQuery.of(context).size.width * .6,
                         child: TextField(
                           controller: passwordController,
                           obscureText: _isSecurePassword,
