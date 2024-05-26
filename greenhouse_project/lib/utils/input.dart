@@ -144,11 +144,18 @@ class ToggleButtonContainer extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(8)),
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
           color: equipment.status
               ? theme.colorScheme.secondary.withOpacity(0.75)
               : theme.colorScheme.primary.withOpacity(0.75),
-          border: Border.all(width: 2, color: Colors.white30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              offset: Offset(0,4),
+              blurRadius: 8,
+            )
+          ]
+          //border: Border.all(width: 2, color: Colors.white30),
         ),
 
         margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
@@ -156,6 +163,7 @@ class ToggleButtonContainer extends StatelessWidget {
         width: MediaQuery.of(context).size.width * 0.5,
         height: MediaQuery.of(context).size.width * 0.5,
         child: Container(
+          padding: EdgeInsets.all(8),
           height: 200,
           width: 200,
           decoration: BoxDecoration(
@@ -164,44 +172,44 @@ class ToggleButtonContainer extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [Colors.white60, Colors.white10],
             ),
-            borderRadius: BorderRadius.circular(25),
-            border: Border.all(width: 2, color: Colors.white10),
+            //borderRadius: BorderRadius.circular(25),
+            border: Border.all(width: 2, color: Colors.white30),
+            borderRadius: BorderRadius.circular(15),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(children: [
-                Expanded(
-                    child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          margin: EdgeInsets.fromLTRB(2, 10, 2, 2),
-                          child: ClipOval(
-                            child: Image.asset(imgPath,
-                                width: 100, height: 100, fit: BoxFit.cover),
-                          ),
-                        ))),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Switch(
-                        value: equipment.status,
-                        onChanged: (value) {
-                          context.read<EquipmentStatusCubit>().toggleStatus(
-                              userReference,
-                              equipment.reference,
-                              equipment.status);
-                        }),
-                  ),
-                )
-              ]),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Text(
                   equipment.type,
-                  style: subheadingTextStyle,
+                  style: headingTextStyle,
                 ),
-              )
+              ),
+              ClipOval(
+                child: Image.asset(
+                  imgPath,
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover),
+              ),
+              //Spacer(),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Switch(
+                  value: equipment.status,
+                  onChanged: (value) {
+                    context.read<EquipmentStatusCubit>().toggleStatus(
+                        userReference,
+                        equipment.reference,
+                        equipment.status);
+                  },
+                  activeColor: theme.colorScheme.secondary,
+                  inactiveThumbColor: theme.colorScheme.primary,
+                  inactiveTrackColor: Colors.grey,
+                ),
+              ),
             ],
           ),
         ),
