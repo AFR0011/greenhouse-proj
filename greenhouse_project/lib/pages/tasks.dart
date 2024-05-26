@@ -225,7 +225,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                         child: Column(
                           children: [
                             SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.5,
+                              height: MediaQuery.of(context).size.height * 0.6,
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: taskList.length,
