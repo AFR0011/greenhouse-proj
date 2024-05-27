@@ -260,59 +260,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
           : null,
     );
   }
-
-  // Function to show sensor readings
-  Widget _showReadings(PlantData plant) {
-    final ReadingsCubit readingsCubit = BlocProvider.of<ReadingsCubit>(context);
-
-    // BlocBuilder for readings state
-    return BlocBuilder<ReadingsCubit, GreenhouseState>(
-      bloc: readingsCubit,
-      builder: (context, state) {
-        // Show "loading screen" if processing readings state
-        if (state is ReadingsLoading ||
-            [EquipmentLoaded, EquipmentLoading].contains(state.runtimeType)) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (state is ReadingsLoaded) {
-          final readings = state.readings; // list of all readings
-
-          Set<Map<String, dynamic>> latestAllReadings =
-              readings.last.allReadings; // latest readings
-
-          Map<String, dynamic>? latestReading =
-              latestAllReadings.elementAtOrNull(plant.boardNo - 1)?[
-                  plant.boardNo.toString()]; // readings associated with plant
-
-          // Display nothing if no readings
-          if (latestReading!.isEmpty) {
-            return const Text("No readings available");
-          } else {
-            return Column(
-              children: [
-                Text("Gas: ${latestReading['gas']}%"),
-                Text("Humidity: ${latestReading['humidity']}%"),
-                Text("Light Intensity: ${latestReading['lightIntensity']}%"),
-                Text("Temperature: ${latestReading['temperature']} C"),
-                Text("Soil Moisture: ${latestReading['soilMoisture']}%"),
-              ],
-            );
-          }
-        }
-        // Show error message once an error occurs
-        else if (state is ReadingsError) {
-          return Text(state.error);
-        }
-        // If the state is not any of the predefined states;
-        // never happens; but, anything can happen
-        else {
-          return const Text("Something went wrong...");
-        }
-      },
-    );
-  }
-
+  
   // Item addition form function
   void showAdditionForm(BuildContext context) {
     // Get instance of inventory cubit from main context

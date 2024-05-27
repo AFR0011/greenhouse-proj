@@ -13,10 +13,13 @@ import "package:flutter/material.dart";
 // }
 
 class ChartClass extends StatelessWidget {
-  const ChartClass({super.key});
+  final double miny, maxy;
+  final List values;
+  const ChartClass({super.key, required this.maxy, required this.miny, required this.values});
 
   @override
   Widget build(BuildContext context) {
+    print("Values $values");
     return SizedBox(
       height: MediaQuery.of(context).size.height*.5,
       width: MediaQuery.of(context).size.width * 0.9,
@@ -26,8 +29,8 @@ class ChartClass extends StatelessWidget {
           LineChartData(
             minX: 0,
             maxX: 24,
-            minY: 10,
-            maxY: 50,
+            minY: miny,
+            maxY: maxy,
             titlesData: const FlTitlesData(
               show: true,
               bottomTitles: AxisTitles(
@@ -62,18 +65,12 @@ class ChartClass extends StatelessWidget {
               }
             ) ,
             lineBarsData: [LineChartBarData(
-              spots: [
-                const FlSpot(0, 23),
-                const FlSpot(2, 19),
-                const FlSpot(7, 25),
-                const FlSpot(12, 35),
-                const FlSpot(15, 40),
-                const FlSpot(18, 28),
-                const FlSpot(22, 25),
-              ],
+              dotData: const FlDotData(show: false),
+              spots: values.map((value) => createSpot(values.indexOf(value), value)).toList(),
               isCurved: true,
               gradient: const LinearGradient(colors: [Colors.red,Colors.blue]),
               belowBarData: BarAreaData(
+                
                 show: true,
                 gradient: LinearGradient(colors: [Colors.red.withOpacity(.1),Colors.blue.withOpacity(0.1)]),
               )
@@ -85,4 +82,8 @@ class ChartClass extends StatelessWidget {
     );
 
   }
+}
+
+FlSpot createSpot(index, value) {
+   return FlSpot(index*4.roundToDouble(), value.roundToDouble());
 }
