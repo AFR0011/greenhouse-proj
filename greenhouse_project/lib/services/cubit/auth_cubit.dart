@@ -17,9 +17,9 @@ class AuthCubit extends Cubit<AuthState> {
         email: email,
         password: password,
       );
-      return emit(AuthSuccess(userCredential));
+      emit(AuthSuccess(userCredential));
     } on FirebaseAuthException catch (e) {
-      return emit(AuthFailure(e.message));
+      emit(AuthFailure(e.message));
     }
   }
 
@@ -28,9 +28,9 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       emit(AuthLoading());
       await FirebaseAuth.instance.signOut();
-      return emit(AuthInitial());
+      emit(AuthInitial());
     } catch (e) {
-      return emit(AuthFailure("Logout Failed"));
+      emit(AuthFailure("Logout Failed"));
     }
   }
 

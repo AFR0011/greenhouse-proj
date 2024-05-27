@@ -27,7 +27,7 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   void _getTasks() async {
-    if (!_isActive || _isProcessing) return;
+    if (!_isActive) return;
     DocumentSnapshot userSnapshot = await userReference.get();
     Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
     String userRole = userData['role'];
@@ -41,9 +41,9 @@ class TaskCubit extends Cubit<TaskState> {
           .listen((snapshot) {
         final List<TaskData> tasks =
             snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
-        if (!_isProcessing && _isActive) emit(TaskLoaded([...tasks]));
+        if (_isActive && !_isProcessing) emit(TaskLoaded([...tasks]));
       }, onError: (error) {
-        if (!_isProcessing && _isActive) emit(TaskError(error.toString()));
+        if (_isActive && !_isProcessing) emit(TaskError(error.toString()));
       });
     } else if (userRole == "worker") {
       tasks
@@ -53,9 +53,9 @@ class TaskCubit extends Cubit<TaskState> {
           .listen((snapshot) {
         final List<TaskData> tasks =
             snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
-        if (!_isProcessing && _isActive) emit(TaskLoaded([...tasks]));
+        if (_isActive && !_isProcessing) emit(TaskLoaded([...tasks]));
       }, onError: (error) {
-        if (!_isProcessing && _isActive) emit(TaskError(error.toString()));
+        if (_isActive && !_isProcessing) emit(TaskError(error.toString()));
       });
     }
   }

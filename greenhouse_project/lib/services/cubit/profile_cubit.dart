@@ -13,6 +13,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   DocumentReference userReference;
 
   bool _isActive = true;
+  bool _isProcessing = false;
 
   ProfileCubit(this.userReference) : super(ProfileLoading()) {
     _getUserProfile(storage);
@@ -20,6 +21,7 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   void _getUserProfile(FirebaseStorage storage) async {
     if (!_isActive) return;
+
     try {
       DocumentSnapshot userSnapshot = await userReference.get();
       final userSnapshotData = userSnapshot.data();
@@ -27,14 +29,15 @@ class ProfileCubit extends Cubit<ProfileState> {
 
       UserData? userData =
           await UserData.fromFirestore(firestoreData, userReference, storage);
-      emit(ProfileLoaded(userData));
+      if (_isActive && !_isProcessing) emit(ProfileLoaded(userData));
     } catch (error) {
-      emit(ProfileError(error.toString()));
+      if (_isActive && !_isProcessing) emit(ProfileError(error.toString()));
     }
   }
 
   Future selectImage() async {
     if (!_isActive) return;
+    _isProcessing = true;
     final ImagePicker imagePicker = ImagePicker();
     XFile? file = await imagePicker.pickImage(source: ImageSource.gallery);
     if (file != null) {
@@ -66,6 +69,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     } else {
       print('Image selection Failed');
     }
+    _isProcessing = false;
   }
 
   @override
@@ -81,6 +85,7 @@ class UserData {
   final String name;
   final String surname;
   final String role;
+  final bool enabled;
   final Uint8List picture;
   final DocumentReference reference;
 
@@ -91,6 +96,7 @@ class UserData {
     required this.surname,
     required this.role,
     required this.picture,
+    required this.enabled,
     required this.reference,
   });
 
@@ -105,6 +111,7 @@ class UserData {
       name: data['name'],
       surname: data['surname'],
       role: data['role'],
+      enabled: data["enabled"],
       picture: picture as Uint8List,
       reference: userReference,
     );

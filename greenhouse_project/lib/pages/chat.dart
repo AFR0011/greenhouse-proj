@@ -303,11 +303,11 @@ class _ChatPageState extends State<_ChatPageContent> {
 
 // Function to send a message
   void _sendMessage(ChatsData? chat) {
-    double scrollOffset =
-        (_scrollController.hasClients ? _scrollController.offset : 0) + 1;
-    double addOffset = 0;
+    // double scrollOffset =
+    //     (_scrollController.hasClients ? _scrollController.offset : 0) + 1;
+    // double addOffset = 0;
     if (_textEditingController.text.isNotEmpty) {
-      addOffset = (_textEditingController.text.length / 25).ceil() * 25;
+      // addOffset = (_textEditingController.text.length / 25).ceil() * 25;
       context.read<ChatCubit>().sendMessage(
             _textEditingController.text,
             chat?.receiverData?['reference'],
@@ -318,14 +318,16 @@ class _ChatPageState extends State<_ChatPageContent> {
     }
   }
 
-
-Widget sendButton(chat){
-      
-      return IconButton(onPressed: () {
-        _sendMessage(chat);
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      },
-      icon: Icon(Icons.send_outlined),
-      color: Colors.grey ); 
-}
+  Widget sendButton(chat) {
+    return IconButton(
+        onPressed: () {
+          _sendMessage(chat);
+          if (_scrollController.hasClients) {
+            _scrollController
+                .jumpTo(_scrollController.position.maxScrollExtent);
+          }
+        },
+        icon: const Icon(Icons.send_outlined),
+        color: Colors.grey);
+  }
 }

@@ -2,6 +2,7 @@ part of 'home_cubit.dart';
 
 class UserInfoCubit extends HomeCubit {
   bool _isActive = true;
+  bool _isProcessing = false;
 
   UserInfoCubit() : super(UserInfoLoading());
 
@@ -23,18 +24,20 @@ class UserInfoCubit extends HomeCubit {
         final DocumentReference userReference = userSnapshot.reference;
         final bool enabled = userData?['enabled'];
 
-        emit(UserInfoLoaded(userRole, userName, userReference, enabled));
+        if (_isActive && !_isProcessing)
+          emit(UserInfoLoaded(userRole, userName, userReference, enabled));
       } else {
-        emit(UserInfoError("User not found"));
+        if (_isActive && !_isProcessing) emit(UserInfoError("User not found"));
       }
     } catch (error) {
-      emit(UserInfoError(error.toString()));
+      if (_isActive && !_isProcessing) emit(UserInfoError(error.toString()));
     }
   }
 
   Future<void> setUserInfo(DocumentReference userReference, String name,
       String email, String password) async {
     if (!_isActive) return;
+    _isProcessing = true;
     emit(UserInfoLoading());
     try {
       userReference.update({
@@ -50,17 +53,20 @@ class UserInfoCubit extends HomeCubit {
       print(error.toString());
       emit(UserInfoError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   void deleteUserAccount(
       UserCredential userCredential, DocumentReference userReference) async {
     if (!_isActive) return;
+    _isProcessing = true;
     try {
       await userCredential.user?.delete();
       await userReference.delete();
     } catch (e) {
       emit(UserInfoError(e.toString()));
     }
+    _isProcessing = false;
   }
 
   @override

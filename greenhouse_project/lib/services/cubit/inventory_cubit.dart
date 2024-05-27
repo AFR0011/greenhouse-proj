@@ -12,6 +12,7 @@ class InventoryCubit extends Cubit<InventoryState> {
       FirebaseFirestore.instance.collection('logs');
 
   bool _isActive = true;
+  bool _isProcessing = false;
 
   InventoryCubit() : super(InventoryLoading()) {
     _getInventory();
@@ -22,15 +23,16 @@ class InventoryCubit extends Cubit<InventoryState> {
     inventory.snapshots().listen((snapshot) {
       final List<InventoryData> inventory =
           snapshot.docs.map((doc) => InventoryData.fromFirestore(doc)).toList();
-      emit(InventoryLoaded([...inventory]));
+      if (_isActive && !_isProcessing) emit(InventoryLoaded([...inventory]));
     }, onError: (error) {
-      emit(InventoryError(error.toString()));
+      if (_isActive && !_isProcessing) emit(InventoryError(error.toString()));
     });
   }
 
   Future<void> addInventory(
       Map<String, dynamic> data, DocumentReference userReference) async {
     if (!_isActive) return;
+    _isProcessing = true;
     try {
       DocumentReference externalId = await inventory.add(data);
 
@@ -52,11 +54,13 @@ class InventoryCubit extends Cubit<InventoryState> {
     } catch (error) {
       emit(InventoryError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   Future<void> removeInventory(
       DocumentReference item, DocumentReference userReference) async {
     if (!_isActive) return;
+    _isProcessing = true;
     try {
       DocumentSnapshot userSnapshot = await userReference.get();
       String name = userSnapshot.get("name");
@@ -79,11 +83,14 @@ class InventoryCubit extends Cubit<InventoryState> {
     } catch (error) {
       emit(InventoryError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   Future<void> updateInventory(DocumentReference item,
       Map<String, dynamic> data, DocumentReference userReference) async {
     if (!_isActive) return;
+    _isProcessing = true;
+
     try {
       await item.update(data);
 
@@ -106,10 +113,13 @@ class InventoryCubit extends Cubit<InventoryState> {
     } catch (error) {
       emit(InventoryError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   Future<void> approveItem(DocumentReference item, userReference) async {
     if (!_isActive) return;
+    _isProcessing = true;
+
     try {
       await item.update({"pending": false});
 
@@ -132,6 +142,7 @@ class InventoryCubit extends Cubit<InventoryState> {
     } catch (error) {
       emit(InventoryError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   @override

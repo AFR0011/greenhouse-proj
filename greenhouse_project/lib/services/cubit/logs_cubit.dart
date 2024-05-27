@@ -24,11 +24,11 @@ class LogsCubit extends Cubit<LogsState> {
         if (snapshot.docs.isNotEmpty) {
           final List<LogsData> logs =
               snapshot.docs.map((doc) => LogsData.fromFirestore(doc)).toList();
-          emit(LogsLoaded([...logs]));
+          if (_isActive) emit(LogsLoaded([...logs]));
         }
       });
     } catch (error) {
-      emit(LogsError(error.toString()));
+      if (_isActive) emit(LogsError(error.toString()));
     }
   }
 

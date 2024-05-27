@@ -11,12 +11,12 @@ class ChatUsersCubit extends Cubit<ChatUsersState> {
   CollectionReference users = FirebaseFirestore.instance.collection("users");
 
   bool _isActive = true;
-
+  bool _isProcessing = false;
 
   ChatUsersCubit(this.user) : super(ChatUsersInitial()) {
     _getUsers();
   }
-    void _getUsers() {
+  void _getUsers() {
     if (!_isActive) return;
     emit(ChatUsersLoading());
     List<UserData> usersData = [];
@@ -26,15 +26,12 @@ class ChatUsersCubit extends Cubit<ChatUsersState> {
       final List<Future<UserData>> userDataFutures =
           snapshot.docs.map((doc) => UserData.fromFirestore(doc)).toList();
       usersData = await Future.wait(userDataFutures);
-      emit(ChatUsersLoaded(usersData));
-    }, onError: (error,stack) {
-      print(error);
-      print(stack);
-      if (_isActive) emit(ChatUsersError(error.toString()));
+      if (_isActive && !_isProcessing) emit(ChatUsersLoaded(usersData));
+    }, onError: (error, stack) {
+      if (_isActive && !_isProcessing) emit(ChatUsersError(error.toString()));
     });
   }
 }
-
 
 class UserData {
   final String email;

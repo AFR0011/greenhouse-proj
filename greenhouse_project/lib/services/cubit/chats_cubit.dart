@@ -19,14 +19,15 @@ class ChatsCubit extends Cubit<ChatsState> {
   final UserCredential? user;
 
   bool _isActive = true;
+  bool _isProcessing = false;
 
   ChatsCubit(this.user) : super(ChatsLoading()) {
     if (user != null) {
-      _subscribeToChats();
+      _getChats();
     }
   }
 
-  void _subscribeToChats() async {
+  void _getChats() async {
     if (!_isActive) return;
     // Get user reference
     QuerySnapshot userQuery = await FirebaseFirestore.instance
@@ -43,9 +44,9 @@ class ChatsCubit extends Cubit<ChatsState> {
           .toList();
 
       final userChats = await Future.wait(userChatsFutures);
-      if (_isActive) emit(ChatsLoaded([...userChats]));
+      if (_isActive && !_isProcessing) emit(ChatsLoaded([...userChats]));
     }, onError: (error) {
-      if (_isActive) emit(ChatsError(error.toString()));
+      if (_isActive && !_isProcessing) emit(ChatsError(error.toString()));
     });
   }
 
@@ -58,6 +59,7 @@ class ChatsCubit extends Cubit<ChatsState> {
   Future<void> createChat(
       BuildContext context, DocumentReference receiverReference) async {
     try {
+      _isProcessing = true;
       //get user ref
       QuerySnapshot userQuery =
           await users.where('email', isEqualTo: user?.user?.email).get();
@@ -76,6 +78,7 @@ class ChatsCubit extends Cubit<ChatsState> {
           // navigate to existing chat
           DocumentReference existChatReference = doc.reference;
           _navigateToChat(context, existChatReference);
+          _isProcessing = false;
           return;
         }
       }
@@ -91,6 +94,7 @@ class ChatsCubit extends Cubit<ChatsState> {
     } catch (error) {
       emit(ChatsError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   void _navigateToChat(BuildContext context, DocumentReference chatReference) {

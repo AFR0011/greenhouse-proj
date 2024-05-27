@@ -15,22 +15,21 @@ class ManageEmployeesCubit extends ManagementCubit {
   // final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
-
   final CollectionReference logs =
       FirebaseFirestore.instance.collection('logs');
-
   final UserCredential? user;
-
   final FirebaseStorage storage = FirebaseStorage.instance;
+
   bool _isActive = true;
+  bool _isProcessing = false;
 
   ManageEmployeesCubit(this.user) : super(ManageEmployeesLoading()) {
     if (user != null) {
-      fetchEmployees();
+      _fetchEmployees();
     }
   }
 
-  void fetchEmployees() {
+  void _fetchEmployees() {
     if (!_isActive) return;
     List<EmployeeData> employees;
     users
@@ -41,9 +40,10 @@ class ManageEmployeesCubit extends ManagementCubit {
       employees =
           snapshot.docs.map((doc) => EmployeeData.fromFirestore(doc)).toList();
 
-      if (_isActive) emit(ManageEmployeesLoaded([...employees]));
+      if (_isActive && !_isProcessing)
+        emit(ManageEmployeesLoaded([...employees]));
     }, onError: (error) {
-      emit(ManageEmployeesError(error));
+      if (_isActive && !_isProcessing) emit(ManageEmployeesError(error));
     });
   }
 
@@ -51,8 +51,9 @@ class ManageEmployeesCubit extends ManagementCubit {
   Future<void> createEmployee(
       String email, String role, DocumentReference userReference) async {
     if (!_isActive) return;
-
+    _isProcessing = true;
     emit(ManageEmployeesLoading());
+
     // Get url of uploaded image
     String imageUrl = await storage.ref().child("Default.jpg").getDownloadURL();
     try {
@@ -103,14 +104,15 @@ class ManageEmployeesCubit extends ManagementCubit {
     } catch (error) {
       emit(ManageEmployeesError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   Future<void> disableEmployee(
       EmployeeData workerData, DocumentReference userReference) async {
     if (!_isActive) return;
+    _isProcessing = true;
+    emit(ManageEmployeesLoading());
     try {
-      emit(ManageEmployeesLoading());
-
       await workerData.reference.update({"enabled": false});
       DocumentReference externalId = workerData.reference;
 
@@ -133,15 +135,15 @@ class ManageEmployeesCubit extends ManagementCubit {
     } catch (error) {
       emit(ManageEmployeesError(error.toString()));
     }
-    return;
+    _isProcessing = false;
   }
 
   Future<void> enableEmployee(
       EmployeeData workerData, DocumentReference userReference) async {
     if (!_isActive) return;
-
+    _isProcessing = true;
+    emit(ManageEmployeesLoading());
     try {
-      emit(ManageEmployeesLoading());
       await workerData.reference.update({"enabled": true});
       DocumentReference externalId = workerData.reference;
 
@@ -164,7 +166,7 @@ class ManageEmployeesCubit extends ManagementCubit {
     } catch (error) {
       emit(ManageEmployeesError(error.toString()));
     }
-    return;
+    _isProcessing = false;
   }
 
   @override

@@ -10,6 +10,7 @@ class NotificationsCubit extends HomeCubit {
   final UserCredential? user;
 
   bool _isActive = true;
+  bool _isProcessing = false;
 
   NotificationsCubit(this.user) : super(NotificationsLoading()) {
     if (user != null) {
@@ -31,7 +32,6 @@ class NotificationsCubit extends HomeCubit {
         .get();
     DocumentReference userReference = userQuery.docs.first.reference;
 
-    //Get user notifications
     // Get user notifications
     notifications
         .where('user', isEqualTo: userReference)
@@ -41,14 +41,19 @@ class NotificationsCubit extends HomeCubit {
       final List<NotificationData> notifications = snapshot.docs
           .map((doc) => NotificationData.fromFirestore(doc))
           .toList();
-      emit(NotificationsLoaded([...notifications]));
+      if (_isActive && !_isProcessing)
+        emit(NotificationsLoaded([...notifications]));
     }, onError: (error) {
-      emit(NotificationsError(error.toString()));
+      if (_isActive && !_isProcessing)
+        emit(NotificationsError(error.toString()));
     });
   }
 
   void handleNotification(RemoteMessage? message) {
     if (!_isActive || message == null) return;
+    _isProcessing = true;
+    // HANDLE NOTIFICATION WITHIN APP
+    _isProcessing = false;
   }
 
 // // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
