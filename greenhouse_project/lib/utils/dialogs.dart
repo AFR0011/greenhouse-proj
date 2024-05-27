@@ -12,6 +12,7 @@ import 'package:greenhouse_project/utils/theme.dart';
 
 class TaskDetailsDialog extends StatelessWidget {
   final TaskData task;
+  final BuildContext mainContext;
   final String userRole;
   final DocumentReference? managerReference;
   final Function editOrComplete;
@@ -20,6 +21,7 @@ class TaskDetailsDialog extends StatelessWidget {
   const TaskDetailsDialog(
       {super.key,
       required this.task,
+      required this.mainContext,
       required this.userRole,
       required this.managerReference,
       required this.editOrComplete,
@@ -57,16 +59,17 @@ class TaskDetailsDialog extends StatelessWidget {
                     children: [
                       Expanded(
                         child: WhiteElevatedButton(
-                            text: "Contact Manager", onPressed: () {}),
+                          text: "Contact Manager",
+                          onPressed: () =>
+                              deleteOrContact(mainContext, managerReference),
+                        ),
                       ),
                       Expanded(
                         child: WhiteElevatedButton(
-                            text: "Mark as Complete",
-                            onPressed: () {
-                              context
-                                  .read<TaskCubit>()
-                                  .completeTask(task.taskReference);
-                            }),
+                          text: "Mark as Complete",
+                          onPressed: () =>
+                              editOrComplete(mainContext, task.taskReference),
+                        ),
                       )
                     ],
                   )
@@ -76,7 +79,7 @@ class TaskDetailsDialog extends StatelessWidget {
                           text: userRole == "worker"
                               ? "Mark as Complete"
                               : "Edit",
-                          onPressed: () => editOrComplete(task)),
+                          onPressed: () => editOrComplete(mainContext, task)),
                     ),
                     Expanded(
                       child: RedElevatedButton(
@@ -89,7 +92,9 @@ class TaskDetailsDialog extends StatelessWidget {
                     task.status == "waiting"
                         ? Expanded(
                             child: GreenElevatedButton(
-                                text: "Approve", onPressed: () {}),
+                                text: "Approve",
+                                onPressed: () => editOrComplete(
+                                    mainContext, task.taskReference)),
                           )
                         : const SizedBox(),
                   ]),
@@ -203,11 +208,11 @@ class EmployeeDetailsDialog extends StatelessWidget {
                   child: employee.enabled
                       ? RedElevatedButton(
                           text: "Disable account",
-                          onPressed: () => toggleAccount(),
+                          onPressed: () => toggleAccount(employee),
                         )
                       : GreenElevatedButton(
                           text: "Enable account",
-                          onPressed: () => toggleAccount(),
+                          onPressed: () => toggleAccount(employee),
                         ),
                 )
               ],
