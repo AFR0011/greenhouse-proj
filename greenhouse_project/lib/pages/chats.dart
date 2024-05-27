@@ -220,8 +220,9 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                                     width: 2.0), // Add border color and width
                               ),
                               content: Container(
-                                constraints: const BoxConstraints(maxWidth: 400),
-                                width: MediaQuery.of(context).size.width*.6,
+                                constraints:
+                                    const BoxConstraints(maxWidth: 400),
+                                width: MediaQuery.of(context).size.width * .6,
                                 child: ListView.builder(
                                   padding: const EdgeInsets.all(16.0),
                                   shrinkWrap: true,
@@ -248,6 +249,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                                           " ${employee.name + employee.surname}",
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
+                                              overflow: TextOverflow.ellipsis,
                                               fontSize: 12)),
                                       subtitle: Text(employee.role,
                                           style: const TextStyle(
@@ -338,31 +340,36 @@ class _ChatsPageState extends State<_ChatsPageContent> {
           },
           child: Container(
             decoration: const BoxDecoration(border: Border.symmetric()),
-            child: Row(
-              children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 5, bottom: 5),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: ClipOval(
-                        child: Image.memory(
-                      chat!.receiverPicture,
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    )),
-                  ),
-                ),
-                Container(
-                    margin: const EdgeInsets.only(left: 5),
+            child: SizedBox(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Row(
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 5, bottom: 5),
                     child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          overflow: TextOverflow.ellipsis,
-                          "${receiverData?['name']} ${receiverData?['surname']}",
-                          style: bodyTextStyle,
-                        ))),
-              ],
+                      alignment: Alignment.centerLeft,
+                      child: ClipOval(
+                          child: Image.memory(
+                        chat!.receiverPicture,
+                        width: 50,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      )),
+                    ),
+                  ),
+                  Expanded(
+                    child: Container(
+                        margin: const EdgeInsets.only(left: 5),
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              overflow: TextOverflow.ellipsis,
+                              "${receiverData?['name']} ${receiverData?['surname']}",
+                              style: bodyTextStyle,
+                            ))),
+                  ),
+                ],
+              ),
             ),
           ),
         ));

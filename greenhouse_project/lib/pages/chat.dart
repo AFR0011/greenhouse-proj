@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/pages/profile.dart';
 import 'package:greenhouse_project/services/cubit/chat_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -158,32 +159,42 @@ class _ChatPageState extends State<_ChatPageContent> {
             Navigator.pop(context);
           },
         ),
-        title: Container(
-          //margin: const BoxDecoration(border: Border(bottom: BorderSide())),
+        title: GestureDetector(
+          onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProfilePage(
+                      userCredential: widget.userCredential,
+                      userReference: chat.receiverData?["reference"]))),
           child: Row(
             children: [
-              Container(
-                margin: const EdgeInsets.only(top: 5, bottom: 5),
-                child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: ClipOval(
-                      child: Image.memory(
-                        chat.receiverPicture,
-                        width: 50,
-                        height: 50,
-                        fit: BoxFit.cover,
+              Padding(
+                padding: const EdgeInsets.only(right: 12),
+                child: Container(
+                  margin: const EdgeInsets.only(top: 5, bottom: 5),
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: ClipOval(
+                        child: Image.memory(
+                          chat.receiverPicture,
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                      )),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                    margin: const EdgeInsets.only(left: 5),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "${chat.receiverData?['name']} ${chat.receiverData?['surname']}",
+                        style: bodyTextStyle,
                       ),
                     )),
-              ),
-              Container(
-                  margin: const EdgeInsets.only(left: 5),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      "${chat.receiverData?['name']} ${chat.receiverData?['surname']}",
-                      style: bodyTextStyle,
-                    ),
-                  ))
+              )
             ],
           ),
         ),
