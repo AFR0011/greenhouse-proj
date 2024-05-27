@@ -29,23 +29,24 @@ class ReadingsCubit extends GreenhouseCubit {
 }
 
 class ReadingsData {
-  final Set<Map<String, dynamic>> allReadings;
+  final Map<String, dynamic> allReadings;
 
   ReadingsData({required this.allReadings});
 
   factory ReadingsData.fromFirestore(DocumentSnapshot doc) {
+    
     LinkedHashMap<String, dynamic> databaseReadings =
         doc.data() as LinkedHashMap<String, dynamic>;
-
+    print("databasereadings $databaseReadings");
     // Converting LinkedHashMap to a list of maps preserving keys
-    Set<Map<String, dynamic>> readingsList = databaseReadings.entries
+    Map<String, dynamic> readingsList = databaseReadings.entries
         .map(
           (boardReading) => {
             boardReading.key: boardReading.value,
           },
         )
-        .toSet();
-
+        .toSet().first;
+        print("READINGSLIST $readingsList");
     return ReadingsData(allReadings: readingsList);
   }
 }

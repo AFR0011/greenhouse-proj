@@ -5,11 +5,11 @@
 ///
 library;
 
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/login.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
@@ -20,7 +20,6 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/chart.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
-import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -62,10 +61,11 @@ class _EquipmentPageContent extends StatefulWidget {
 class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // User info local variables
   late String _userRole = "";
-  late String _userName = "";
   late DocumentReference _userReference;
   late bool _enabled;
   List<bool> _isSelected = [true, false];
+  static List<ReadingsData> readings = [];
+
   // Custom theme
   final ThemeData customTheme = theme;
 
@@ -82,14 +82,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
       for (int i = 0; i < _isSelected.length; i++) {
         _isSelected[i] = i == index;
       }
-    });
-  }
-
-  int _selectedIndexWidget = 2;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndexWidget = index;
     });
   }
 
@@ -131,7 +123,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           else if (state is UserInfoLoaded) {
             // Assign user info to local variables
             _userRole = state.userRole;
-            _userName = state.userName;
             _userReference = state.userReference;
             _enabled = state.enabled;
 
@@ -379,15 +370,79 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             alignment: Alignment.topCenter,
             child: SizedBox(
                 height: MediaQuery.of(context).size.height * 0.5,
-                child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemExtent: MediaQuery.of(context).size.width * 0.8,
-                    itemCount: 5,
-                    itemBuilder: (context, index) {
+                child: BlocProvider(
+                  create: (context) => ReadingsCubit(),
+                  child: BlocBuilder<ReadingsCubit, GreenhouseState>(
+                      builder: (context, state) {
+                    if (state is ReadingsLoading) {
                       return const Center(
-                        child: ChartClass(),
+                        child: CircularProgressIndicator(),
                       );
-                    })),
+                    } else if (state is ReadingsLoaded) {
+                      List<ReadingsData> allReadings = state.readings;
+
+                      List temperatures = [];
+                      List gases = [];
+                      List soilMoistures = [];
+                      List lightIntensities = [];
+                      List humidities = [];
+  
+                      for (int i = 0; i < min(allReadings.length, 24 * 120); i++) {
+                        Map<String, dynamic> boardReadings = allReadings[i].allReadings; // {"1" : {}, "2" : {}, ...}
+                        for (int j = 0; j < boardReadings.length; j++) {
+                          Map<String, dynamic> singleBoardReadings =
+                              boardReadings.entries.elementAt(j).value as Map<String, dynamic>;
+    
+                          temperatures.add(singleBoardReadings["temperature"]);
+                          humidities.add(singleBoardReadings["humidity"]);
+                          soilMoistures.add(singleBoardReadings["soilMoisture"]);
+                          lightIntensities
+                              .add(singleBoardReadings["lightIntensity"]);
+                          gases.add(singleBoardReadings["gas"]);
+                        }
+                      }
+                      return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemExtent: MediaQuery.of(context).size.width * 0.8,
+                        itemCount: 5,
+                        itemBuilder: (context, index) {
+                          switch (index) {
+                            case 0:
+                              return Center(
+                                child: ChartClass(
+                                    miny: 10, maxy: 50, values: temperatures),
+                              );
+                            case 1:
+                              return Center(
+                                child: ChartClass(
+                                    miny: 00, maxy: 100, values: humidities),
+                              );
+                            case 2:
+                              return Center(
+                                child: ChartClass(
+                                    miny: 00, maxy: 100, values: soilMoistures),
+                              );
+                            case 3:
+                              return Center(
+                                child: ChartClass(
+                                    miny: 00,
+                                    maxy: 100,
+                                    values: lightIntensities),
+                              );
+                            case 4:
+                              return Center(
+                                child: ChartClass(
+                                    miny: 00, maxy: 100, values: gases),
+                              );
+                          }
+                          return null;
+                        },
+                      );
+                    } else {
+                      return const Text("Unexpected State");
+                    }
+                  }),
+                )),
           ),
           const Text(
             "Readings",
@@ -404,7 +459,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   );
                 } else if (state is ReadingsLoaded) {
                   for (var reading in state.readings) {
-                    reading.allReadings.where((element) => element == 5);
+                    // reading.allReadings.where((element) => element == 5);
                   }
                   return Container(
                     padding: const EdgeInsets.all(16.0),
