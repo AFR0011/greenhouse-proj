@@ -169,11 +169,13 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
         }),
       ),
       //floating button
-      floatingActionButton: GreenElevatedButton(
-          text: "Create program",
-          onPressed: () {
-            _showAdditionForm();
-          }),
+      floatingActionButton: _userRole == "manager"
+          ? GreenElevatedButton(
+              text: "Create program",
+              onPressed: () {
+                _showAdditionForm();
+              })
+          : null,
     );
   }
 

@@ -14,6 +14,7 @@ const TextStyle subheadingTextStyle = TextStyle(
 );
 
 const TextStyle bodyTextStyle = TextStyle(
+  overflow: TextOverflow.ellipsis,
   fontSize: 16,
 );
 
@@ -28,4 +29,3 @@ const TextStyle lightButtonTextStyle = TextStyle(
   fontWeight: FontWeight.bold,
   color: Colors.black,
 );
-

@@ -62,6 +62,8 @@ class _PlantsPageContent extends StatefulWidget {
 class _PlantsPageState extends State<_PlantsPageContent> {
   // User info local variables
   late DocumentReference _userReference;
+  late String _userRole;
+
   // Custom theme
   final ThemeData customTheme = theme;
 
@@ -99,6 +101,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
         else if (state is UserInfoLoaded) {
           // Call function to create plants page
           _userReference = state.userReference;
+          _userRole = state.userRole;
 
           return Theme(data: customTheme, child: _createPlantsPage());
         }
@@ -248,8 +251,10 @@ class _PlantsPageState extends State<_PlantsPageContent> {
         ),
       ),
 
-      floatingActionButton: GreenElevatedButton(
-          text: "Add Plant", onPressed: () => showAdditionForm(context)),
+      floatingActionButton: _userRole == "manager"
+          ? GreenElevatedButton(
+              text: "Add Plant", onPressed: () => showAdditionForm(context))
+          : null,
     );
   }
 
