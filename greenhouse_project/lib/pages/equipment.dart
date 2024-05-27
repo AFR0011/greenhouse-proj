@@ -5,8 +5,12 @@
 ///
 library;
 
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -148,27 +152,33 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                     // Display equipment
                     else {
                       final imgpath = [
-                      {'path': "lib/utils/Icons/pump.png"},
-                      {'path': "lib/utils/Icons/idea.png"},
-                      {'path': "lib/utils/Icons/fan.png"},
-                    ] as List<Map<String, dynamic>>;
-                      return GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2),
-                        shrinkWrap: true,
-                        itemCount: equipmentList.length,
-                        itemBuilder: (context, index) {
-                          EquipmentStatus equipment =
-                              equipmentList[index]; //equipment data
-                          // Display equipment info
-                          return ToggleButtonContainer(
-                            context: context,
-                            equipment: equipment,
-                            userReference: _userReference,
-                            imgPath: imgpath[index]['path'],
-                          );
-                        },
+                        {'path': "lib/utils/Icons/pump.png"},
+                        {'path': "lib/utils/Icons/idea.png"},
+                        {'path': "lib/utils/Icons/fan.png"},
+                      ] as List<Map<String, dynamic>>;
+                      return Container(
+                        height: MediaQuery.of(context).size.height,
+                        child: GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount:
+                                      (MediaQuery.of(context).size.width < 800)
+                                          ? 2
+                                          : 4),
+                          shrinkWrap: true,
+                          itemCount: equipmentList.length,
+                          itemBuilder: (context, index) {
+                            EquipmentStatus equipment =
+                                equipmentList[index]; //equipment data
+                            // Display equipment info
+                            return ToggleButtonContainer(
+                              context: context,
+                              equipment: equipment,
+                              userReference: _userReference,
+                              imgPath: imgpath[index]['path'],
+                            );
+                          },
+                        ),
                       );
                     }
                   }

@@ -58,6 +58,7 @@ class ProgramsCubit extends Cubit<ProgramsState> {
       emit(ProgramsError(error.toString()));
     }
     _isProcessing = false;
+    _getPrograms();
   }
 
   void removeProgram(
@@ -92,6 +93,7 @@ class ProgramsCubit extends Cubit<ProgramsState> {
       emit(ProgramsError(error.toString()));
     }
     _isProcessing = false;
+    _getPrograms();
   }
 
   void updatePrograms(DocumentReference program, Map<String, dynamic> data,

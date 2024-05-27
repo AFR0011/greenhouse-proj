@@ -70,6 +70,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       print('Image selection Failed');
     }
     _isProcessing = false;
+    _getUserProfile(storage);
   }
 
   @override
