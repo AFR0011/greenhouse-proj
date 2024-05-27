@@ -150,13 +150,15 @@ class EmployeeDetailsDialog extends StatelessWidget {
   final Function tasksFunction;
   final Function toggleAccount;
   final Function profileFunction;
+  final String userRole;
 
   const EmployeeDetailsDialog(
       {super.key,
       required this.employee,
       required this.tasksFunction,
       required this.profileFunction,
-      required this.toggleAccount});
+      required this.toggleAccount,
+      required this.userRole});
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +184,9 @@ class EmployeeDetailsDialog extends StatelessWidget {
             _buildDetailRow(
                 "Start Date:",
                 employee.creationDate.toString().substring(
-                    0, employee.creationDate.toString().length - 12)),
+                    0,
+                    employee.creationDate.toString().length -
+                        12)), // Remove time
             _buildDetailRow(
                 "Status:", employee.enabled ? "Enabled" : "Disabled"),
             const SizedBox(
@@ -202,17 +206,19 @@ class EmployeeDetailsDialog extends StatelessWidget {
                     onPressed: () => profileFunction(employee),
                   ),
                 ),
-                Expanded(
-                  child: employee.enabled
-                      ? RedElevatedButton(
-                          text: "Disable account",
-                          onPressed: () => toggleAccount(employee),
-                        )
-                      : GreenElevatedButton(
-                          text: "Enable account",
-                          onPressed: () => toggleAccount(employee),
-                        ),
-                )
+                userRole == "admin"
+                    ? Expanded(
+                        child: employee.enabled
+                            ? RedElevatedButton(
+                                text: "Disable account",
+                                onPressed: () => toggleAccount(employee),
+                              )
+                            : GreenElevatedButton(
+                                text: "Enable account",
+                                onPressed: () => toggleAccount(employee),
+                              ),
+                      )
+                    : const SizedBox(),
               ],
             ),
             const SizedBox(height: 20),
