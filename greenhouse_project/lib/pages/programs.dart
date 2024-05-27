@@ -122,9 +122,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
       // Appbar (header)
       appBar: createAltAppbar(context, "Programs"),
       // Blocbuilder for programs state
-      body:
-          Container(
-            decoration: BoxDecoration(
+      body: Container(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
               Colors.lightBlueAccent.shade100.withOpacity(0.6),
@@ -142,32 +141,33 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
             ),
           ),
         ),
-            child: BlocBuilder<ProgramsCubit, ProgramsState>(builder: (context, state) {
-                    // Show "loading screen" if processing programs state
-                    if (state is ProgramsLoading) {
+        child: BlocBuilder<ProgramsCubit, ProgramsState>(
+            builder: (context, state) {
+          // Show "loading screen" if processing programs state
+          if (state is ProgramsLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
-                    }
-                    // Show programs once programs state is loaded
-                    else if (state is ProgramsLoaded) {
+          }
+          // Show programs once programs state is loaded
+          else if (state is ProgramsLoaded) {
             List<ProgramData> programsList = state.programs; // programs list
             // Function call to create programs list
             return _createProgramsList(programsList);
-                    } // Show error if there is an issues with user info
-                    else if (state is ProgramsError) {
+          } // Show error if there is an issues with user info
+          else if (state is ProgramsError) {
             print(state.error);
             return Center(child: Text('Error: ${state.error}'));
-                    }
-                    // If somehow state doesn't match predefined states;
-                    // never happens; but, anything can happen
-                    else {
+          }
+          // If somehow state doesn't match predefined states;
+          // never happens; but, anything can happen
+          else {
             return const Center(
               child: Text('Unexpected state'),
             );
-                    }
-                  }),
-          ),
+          }
+        }),
+      ),
       //floating button
       floatingActionButton: GreenElevatedButton(
           text: "Create program",
@@ -266,7 +266,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
             title: const Text("Create program"),
             content: Container(
               constraints: const BoxConstraints(maxWidth: 400),
-              width: MediaQuery.of(context).size.width*.6,
+              width: MediaQuery.of(context).size.width * .6,
               child: Column(
                 mainAxisSize: MainAxisSize.min, // Set column to minimum size
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,7 +327,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                 programEditCubit
                                     .checkValidationAndUpdate(values);
                               },
-                              currentSliderValue: inputValues[2]),
+                              currentSliderValue:
+                                  inputValues[2].roundToDouble()),
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Center(
@@ -484,7 +485,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
               title: const Text("Edit program"),
               content: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
-                width: MediaQuery.of(context).size.width*.6,
+                width: MediaQuery.of(context).size.width * .6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -687,7 +688,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
               title: const Text("Are you sure?"),
               content: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
-                width: MediaQuery.of(context).size.width*.6,
+                width: MediaQuery.of(context).size.width * .6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,

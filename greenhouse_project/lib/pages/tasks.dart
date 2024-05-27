@@ -637,7 +637,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                     newDate,
                                     taskEditState[3]
                                   ]),
-                                  pickerTheme: DateTimePickerTheme(
+                                  pickerTheme: const DateTimePickerTheme(
                                     itemTextStyle: TextStyle(
                                         color: Colors.black, fontSize: 19),
                                     dividerColor: Colors.blue,

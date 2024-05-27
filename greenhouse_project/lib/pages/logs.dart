@@ -5,7 +5,6 @@
 ///
 library;
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -54,9 +53,6 @@ class _LogsPageContent extends StatefulWidget {
 
 // Main page content goes here
 class _LogsPageContentState extends State<_LogsPageContent> {
-  // User info local variables
-  late DocumentReference _userReference;
-
   // Custom theme
   final ThemeData customTheme = theme;
 
@@ -90,7 +86,6 @@ class _LogsPageContentState extends State<_LogsPageContent> {
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
           // Assign user info to local variables
-          _userReference = state.userReference;
 
           // Function call to build page
           return Theme(data: customTheme, child: _createLogsPage());
