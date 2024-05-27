@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/plants_cubit.dart';
@@ -35,80 +36,79 @@ class TaskDetailsDialog extends StatelessWidget {
             width: 2.0), // Add border color and width
       ),
       title: const Text("Task Details"),
-      content: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width * .6, // Set maximum width
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // Set column to minimum size
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDetailRow("Title:", task.title),
-            _buildDetailRow("Description:", task.description),
-            _buildDetailRow(
-                "Due Date:",
-                task.dueDate
-                    .toString()
-                    .substring(0, task.dueDate.toString().length - 7)),
-            _buildDetailRow("Status:", task.status),
-            const SizedBox(
-                height: 20), // Add spacing between details and buttons
-            userRole == "worker"
-                ? Row(
-                    children: [
+      content: SingleChildScrollView(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          width: MediaQuery.of(context).size.width * .6, // Set maximum width
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Set column to minimum size
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow("Title:", task.title),
+              _buildDetailRow("Description:", task.description),
+              _buildDetailRow(
+                  "Due Date:",
+                  task.dueDate
+                      .toString()
+                      .substring(0, task.dueDate.toString().length - 7)),
+              _buildDetailRow("Status:", task.status),
+              const SizedBox(
+                  height: 20), // Add spacing between details and buttons
+              userRole == "worker"
+                  ? Row(
+                      children: [
+                        Expanded(
+                          child: WhiteElevatedButton(
+                              text: "Contact Manager", onPressed: () {}),
+                        ),
+                        Expanded(
+                          child: WhiteElevatedButton(
+                              text: "Mark as Complete",
+                              onPressed: () {
+                                context
+                                    .read<TaskCubit>()
+                                    .completeTask(task.taskReference);
+                              }),
+                        )
+                      ],
+                    )
+                  : Row(children: [
                       Expanded(
                         child: WhiteElevatedButton(
-                          text: "Contact Manager",
-                          onPressed: () =>
-                              deleteOrContact(mainContext, managerReference),
-                        ),
+                            text: userRole == "worker"
+                                ? "Mark as Complete"
+                                : "Edit",
+                            onPressed: () => editOrComplete(task)),
                       ),
                       Expanded(
-                        child: WhiteElevatedButton(
-                          text: "Mark as Complete",
-                          onPressed: () =>
-                              editOrComplete(mainContext, task.taskReference),
-                        ),
-                      )
-                    ],
-                  )
-                : Row(children: [
-                    Expanded(
-                      child: WhiteElevatedButton(
-                          text: userRole == "worker"
-                              ? "Mark as Complete"
-                              : "Edit",
-                          onPressed: () => editOrComplete(mainContext, task)),
-                    ),
-                    Expanded(
-                      child: RedElevatedButton(
-                          text: userRole == "worker"
-                              ? "Contact Manager"
-                              : "Delete",
-                          onPressed: () => deleteOrContact(
-                              userRole == "worker" ? managerReference : task)),
-                    ),
-                    task.status == "waiting"
-                        ? Expanded(
-                            child: GreenElevatedButton(
-                                text: "Approve",
-                                onPressed: () => editOrComplete(
-                                    mainContext, task.taskReference)),
-                          )
-                        : const SizedBox(),
-                  ]),
-
-            const SizedBox(height: 20),
-
-            Align(
-              alignment: Alignment.center,
-              child: WhiteElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                text: "Close",
+                        child: RedElevatedButton(
+                            text: userRole == "worker"
+                                ? "Contact Manager"
+                                : "Delete",
+                            onPressed: () => deleteOrContact(
+                                userRole == "worker" ? managerReference : task)),
+                      ),
+                      task.status == "waiting"
+                          ? Expanded(
+                              child: GreenElevatedButton(
+                                  text: "Approve", onPressed: () {}),
+                            )
+                          : const SizedBox(),
+                    ]),
+        
+              const SizedBox(height: 20),
+        
+              Align(
+                alignment: Alignment.center,
+                child: WhiteElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  text: "Close",
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -170,69 +170,63 @@ class EmployeeDetailsDialog extends StatelessWidget {
             width: 2.0), // Add border color and width
       ),
       title: const Text("Employee Details"),
-      content: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width * .6, // Set maximum width
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // Set column to minimum size
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDetailRow("Name:", employee.name),
-            _buildDetailRow("Surname:", employee.surname),
-            _buildDetailRow("Email:", employee.email),
-            _buildDetailRow("Role:", employee.role),
-            _buildDetailRow(
-                "Start Date:",
-                employee.creationDate.toString().substring(
-                    0,
-                    employee.creationDate.toString().length -
-                        12)), // Remove time
-            _buildDetailRow(
-                "Status:", employee.enabled ? "Enabled" : "Disabled"),
-            const SizedBox(
-                height: 20), // Add spacing between details and buttons
-
-            Row(
-              children: [
-                Expanded(
-                  child: WhiteElevatedButton(
-                    text: "Tasks",
-                    onPressed: () => tasksFunction(employee),
+      content: SingleChildScrollView(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          width: MediaQuery.of(context).size.width * .6, // Set maximum width
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Set column to minimum size
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow("Name:", employee.name),
+              _buildDetailRow("Surname:", employee.surname),
+              _buildDetailRow("Email:", employee.email),
+              _buildDetailRow("Role:", employee.role),
+              _buildDetailRow(
+                  "Start Date:",
+                  employee.creationDate.toString().substring(
+                      0, employee.creationDate.toString().length - 12)),
+              _buildDetailRow(
+                  "Status:", employee.enabled ? "Enabled" : "Disabled"),
+              const SizedBox(
+                  height: 20), // Add spacing between details and buttons
+        
+              Row(
+                children: [
+                  Expanded(
+                    child: WhiteElevatedButton(
+                      text: "Tasks",
+                      onPressed: () => tasksFunction(employee),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: WhiteElevatedButton(
-                    text: "Show profile",
-                    onPressed: () => profileFunction(employee),
+                  Expanded(
+                    child: WhiteElevatedButton(
+                      text: "Show profile",
+                      onPressed: () => profileFunction(employee),
+                    ),
                   ),
-                ),
-                userRole == "admin"
-                    ? Expanded(
-                        child: employee.enabled
-                            ? RedElevatedButton(
-                                text: "Disable account",
-                                onPressed: () => toggleAccount(employee),
-                              )
-                            : GreenElevatedButton(
-                                text: "Enable account",
-                                onPressed: () => toggleAccount(employee),
-                              ),
-                      )
-                    : const SizedBox(),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            Align(
-              alignment: Alignment.center,
-              child: WhiteElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                text: "Close",
+                  Expanded(
+                    child: RedElevatedButton(
+                      text:
+                          employee.enabled ? "Disable account" : "Enable account",
+                      onPressed: () => toggleAccount(),
+                    ),
+                  )
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+        
+              Align(
+                alignment: Alignment.center,
+                child: WhiteElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  text: "Close",
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -327,7 +321,7 @@ class InventoryDetailsDialog extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 20),
-
+        
               Align(
                 alignment: Alignment.center,
                 child: WhiteElevatedButton(
@@ -417,15 +411,20 @@ class PlantDetailsDialog extends StatelessWidget {
               alignment: Alignment.center,
               child: Row(
                 children: [
-                  WhiteElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pop(); // Close the dialog
-                    },
-                    text: "Close",
+                  Expanded(
+                    child: RedElevatedButton(
+                        onPressed: () => removePlant(mainContext, plant),
+                        text: "Remove Plant"),
                   ),
-                  RedElevatedButton(
-                      onPressed: () => removePlant(mainContext, plant),
-                      text: "Remove Plant")
+                  Expanded(
+                    child: WhiteElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      text: "Close",
+                    ),
+                  ),
+                  
                 ],
               ),
             ),
@@ -487,51 +486,53 @@ class ProgramDetailsDialog extends StatelessWidget {
             width: 2.0), // Add border color and width
       ),
       title: const Text("Program Details"),
-      content: Container(
-        constraints: const BoxConstraints(maxWidth: 400),
-        width: MediaQuery.of(context).size.width * .6, // Set maximum width
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // Set column to minimum size
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDetailRow("Equipment:", program.equipment),
-            _buildDetailRow("Title", program.title),
-            _buildDetailRow(
-                "Creation date:",
-                program.creationDate
-                    .toString()
-                    .substring(0, program.creationDate.toString().length - 7)),
-            const SizedBox(
-                height: 20), // Add spacing between details and buttons
-            Row(
-              children: [
-                Expanded(
-                  child: WhiteElevatedButton(
-                      text: "Edit",
-                      onPressed: () {
-                        editProgram();
-                      }),
-                ),
-                Expanded(
-                  child: RedElevatedButton(
-                      text: "Delete",
-                      onPressed: () {
-                        deleteProgram();
-                      }),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Align(
-              alignment: Alignment.center,
-              child: WhiteElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop(); // Close the dialog
-                },
-                text: "Close",
+      content: SingleChildScrollView(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 400),
+          width: MediaQuery.of(context).size.width * .6, // Set maximum width
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Set column to minimum size
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildDetailRow("Equipment:", program.equipment),
+              _buildDetailRow("Title", program.title),
+              _buildDetailRow(
+                  "Creation date:",
+                  program.creationDate
+                      .toString()
+                      .substring(0, program.creationDate.toString().length - 7)),
+              const SizedBox(
+                  height: 20), // Add spacing between details and buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: WhiteElevatedButton(
+                        text: "Edit",
+                        onPressed: () {
+                          editProgram();
+                        }),
+                  ),
+                  Expanded(
+                    child: RedElevatedButton(
+                        text: "Delete",
+                        onPressed: () {
+                          deleteProgram();
+                        }),
+                  ),
+                ],
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.center,
+                child: WhiteElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Close the dialog
+                  },
+                  text: "Close",
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

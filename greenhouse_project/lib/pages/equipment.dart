@@ -156,7 +156,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                         {'path': "lib/utils/Icons/idea.png"},
                         {'path': "lib/utils/Icons/fan.png"},
                       ] as List<Map<String, dynamic>>;
-                      return Container(
+                      return SizedBox(
                         height: MediaQuery.of(context).size.height,
                         child: GridView.builder(
                           gridDelegate:
