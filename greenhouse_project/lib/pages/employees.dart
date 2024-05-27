@@ -61,6 +61,8 @@ class _EmployeesPageContent extends StatefulWidget {
 // Main page content
 class _EmployeesPageState extends State<_EmployeesPageContent> {
   late DocumentReference _userReference;
+  late String _userRole;
+
   // Custom theme
   final ThemeData customTheme = theme;
 
@@ -96,6 +98,8 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
         else if (state is UserInfoLoaded) {
           // Function call to create employees page
           _userReference = state.userReference;
+          _userRole = state.userRole;
+
           return Theme(data: customTheme, child: _createEmployeesPage());
         } else {
           return const Center(
@@ -258,6 +262,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                           context: context,
                                           builder: (context) {
                                             return EmployeeDetailsDialog(
+                                              userRole: _userRole,
                                               employee: employee,
                                               tasksFunction: tasksFunction,
                                               toggleAccount: toggleAccount,
@@ -291,92 +296,98 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
           ],
         ),
       ),
-      floatingActionButton: GreenElevatedButton(
-          text: 'Add Employee',
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return BlocBuilder<EmployeeEditCubit, List<dynamic>>(
-                    bloc: employeeEditCubit,
-                    builder: (context, state) {
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          side: const BorderSide(
-                              color: Colors.transparent,
-                              width: 2.0), // Add border color and width
-                        ),
-                        title: const Text("Add employee"),
-                        content: Container(
-                          constraints: const BoxConstraints(maxWidth: 400),
-                          width: MediaQuery.of(context).size.width * .6,
-                          child: Column(
-                            mainAxisSize:
-                                MainAxisSize.min, // Set column to minimum size
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            //Textfields
-                            children: [
-                              InputTextField(
-                                  controller: _emailController,
-                                  errorText: state[0]
-                                      ? null
-                                      : "Email cannot be empty!",
-                                  labelText: "email"),
-                              SizedBox(
-                                  width: double.maxFinite,
-                                  child: InputDropdown(
-                                    items: const {
-                                      "worker": "worker",
-                                      "manager": "manager"
-                                    },
-                                    value: state[1] != '' ? state[1] : "worker",
-                                    onChanged: employeeEditCubit.updateState,
-                                  )),
-                              //Submit or Cancel
-                              Row(
+      floatingActionButton: _userRole == "admin"
+          ? GreenElevatedButton(
+              text: 'Add Employee',
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return BlocBuilder<EmployeeEditCubit, List<dynamic>>(
+                        bloc: employeeEditCubit,
+                        builder: (context, state) {
+                          return AlertDialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                              side: const BorderSide(
+                                  color: Colors.transparent,
+                                  width: 2.0), // Add border color and width
+                            ),
+                            title: const Text("Add employee"),
+                            content: Container(
+                              constraints: const BoxConstraints(maxWidth: 400),
+                              width: MediaQuery.of(context).size.width * .6,
+                              child: Column(
+                                mainAxisSize: MainAxisSize
+                                    .min, // Set column to minimum size
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                //Textfields
                                 children: [
-                                  Expanded(
-                                    child: GreenElevatedButton(
-                                        text: 'Submit',
-                                        onPressed: () async {
-                                          if (!_emailController.text
-                                              .contains(RegExp(r'.+@.+\..+'))) {
-                                            employeeEditCubit
-                                                .updateState([false, state[1]]);
-                                            return;
-                                          }
-                                          await manageEmployeesCubit
-                                              .createEmployee(
-                                                  _emailController.text,
-                                                  state[1],
-                                                  _userReference);
-                                          Navigator.pop(context);
-                                          _emailController.clear();
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                                  content: Text(
-                                                      "User account created successfully! Instructions have been sent via email.")));
-                                        }),
-                                  ),
-                                  Expanded(
-                                    child: WhiteElevatedButton(
-                                        text: 'Cancel',
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          _emailController.clear();
-                                        }),
+                                  InputTextField(
+                                      controller: _emailController,
+                                      errorText: state[0]
+                                          ? null
+                                          : "Email cannot be empty!",
+                                      labelText: "email"),
+                                  SizedBox(
+                                      width: double.maxFinite,
+                                      child: InputDropdown(
+                                        items: const {
+                                          "worker": "worker",
+                                          "manager": "manager"
+                                        },
+                                        value: state[1] != ''
+                                            ? state[1]
+                                            : "worker",
+                                        onChanged:
+                                            employeeEditCubit.updateState,
+                                      )),
+                                  //Submit or Cancel
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: GreenElevatedButton(
+                                            text: 'Submit',
+                                            onPressed: () async {
+                                              if (!_emailController.text
+                                                  .contains(
+                                                      RegExp(r'.+@.+\..+'))) {
+                                                employeeEditCubit.updateState(
+                                                    [false, state[1]]);
+                                                return;
+                                              }
+                                              await manageEmployeesCubit
+                                                  .createEmployee(
+                                                      _emailController.text,
+                                                      state[1],
+                                                      _userReference);
+                                              Navigator.pop(context);
+                                              _emailController.clear();
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(const SnackBar(
+                                                      content: Text(
+                                                          "User account created successfully! Instructions have been sent via email.")));
+                                            }),
+                                      ),
+                                      Expanded(
+                                        child: WhiteElevatedButton(
+                                            text: 'Cancel',
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                              _emailController.clear();
+                                            }),
+                                      )
+                                    ],
                                   )
                                 ],
-                              )
-                            ],
-                          ),
-                        ),
+                              ),
+                            ),
+                          );
+                        },
                       );
-                    },
-                  );
-                });
-          }),
+                    });
+              })
+          : null,
     );
   }
 

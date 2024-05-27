@@ -7,10 +7,8 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -171,7 +169,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             end: Alignment.bottomRight,
           ),
           image: DecorationImage(
-            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.white.withOpacity(0.05),
@@ -221,7 +219,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
 
       // Footer nav bar
       bottomNavigationBar: PreferredSize(
-        preferredSize: Size.fromHeight(50.0),
+        preferredSize: const Size.fromHeight(50.0),
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -230,7 +228,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                 Colors.teal.shade400,
                 Colors.blue.shade300
               ],
-              stops: [0.2, 0.5, 0.9],
+              stops: const [0.2, 0.5, 0.9],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -239,7 +237,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                 color: Colors.black.withOpacity(0.2),
                 spreadRadius: 5,
                 blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
+                offset: const Offset(0, 3), // changes position of shadow
               ),
             ],
           ),
@@ -283,10 +281,10 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                         borderRadius: BorderRadius.circular(15.0),
                       ),
                       elevation: 4.0,
-                      margin: EdgeInsets.only(bottom: 16.0),
+                      margin: const EdgeInsets.only(bottom: 16.0),
                       child: ListTile(
                         leading: Container(
-                          padding: EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(8.0),
                           decoration: BoxDecoration(
                             color: Colors.green.withOpacity(0.1),
                             shape: BoxShape.circle,
@@ -300,7 +298,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
 
                         title: Text(
                           inventory.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                         subtitle: Text(inventory.timeAdded.toString()),
@@ -329,7 +327,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
 
           // Pending inventory item updates
           Container(
-            margin: EdgeInsets.only(top: 10, bottom: 10),
+            margin: const EdgeInsets.only(top: 10, bottom: 10),
             child: const Text("Pending updates", style: subheadingTextStyle),
           ),
           SizedBox(
@@ -345,10 +343,10 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                             borderRadius: BorderRadius.circular(15.0),
                           ),
                           elevation: 4.0,
-                          margin: EdgeInsets.only(bottom: 16.0),
+                          margin: const EdgeInsets.only(bottom: 16.0),
                           child: ListTile(
                             leading: Container(
-                              padding: EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.all(8.0),
                               decoration: BoxDecoration(
                                 color: Colors.green.withOpacity(0.1),
                                 shape: BoxShape.circle,
@@ -361,7 +359,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                             ),
                             title: Text(
                               inventory.name,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 18),
                             ),
                             subtitle: Text(inventory.timeAdded.toString()),
@@ -419,7 +417,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
-              side: BorderSide(
+              side: const BorderSide(
                   color: Colors.transparent,
                   width: 2.0), // Add border color and width
             ),
@@ -552,11 +550,11 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           return AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
-              side: BorderSide(
+              side: const BorderSide(
                   color: Colors.transparent,
                   width: 2.0), // Add border color and width
             ),
-            title: Text("Edit inventory"),
+            title: const Text("Edit inventory"),
             content: BlocBuilder<InventoryEditCubit, List<bool>>(
               bloc: inventoryEditCubit,
               builder: (context, state) {
@@ -575,26 +573,12 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                               ? ""
                               : "Name should be longer than 1 characters.",
                           labelText: "Name"),
-                      // TextField(
-                      //   controller: _equipmentController,
-                      //   decoration: InputDecoration(
-                      //       errorText: state[0]
-                      //           ? ""
-                      //           : "Name should be longer than 1 characters."),
-                      // ),
                       InputTextField(
                           controller: _descController,
                           errorText: state[1]
                               ? ""
                               : "Description should be longer than 2 characters.",
                           labelText: "Description"),
-                      // TextField(
-                      //   controller: _descController,
-                      //   decoration: InputDecoration(
-                      //       errorText: state[1]
-                      //           ? ""
-                      //           : "Description should be longer than 2 characters."),
-                      // ),
                       TextFormField(
                           controller: _amountController,
                           keyboardType: TextInputType.number,
@@ -610,16 +594,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
                             ),
-                          )
-                          // controller: _amountController,
-                          // keyboardType: TextInputType.number,
-                          // inputFormatters: <TextInputFormatter>[
-                          //   FilteringTextInputFormatter.digitsOnly
-                          // ],
-                          // decoration: InputDecoration(
-                          //     errorText:
-                          //         state[2] ? "" : "Amount should be more than 0."),
-                          ),
+                          )),
                       // Submit and Cancel buttons
                       Row(
                         children: [
@@ -628,7 +603,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                 text: "Submit",
                                 onPressed: () async {
                                   List<bool> validation = [true, true, true];
-                                  if (_equipmentController.text.length < 1) {
+                                  if (_equipmentController.text.isEmpty) {
                                     validation[0] = !validation[0];
                                   }
                                   if (_descController.text.length < 2) {
@@ -700,11 +675,11 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           return AlertDialog(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                side: BorderSide(
+                side: const BorderSide(
                     color: Colors.transparent,
                     width: 2.0), // Add border color and width
               ),
-              title: Text("Are you sure?"),
+              title: const Text("Are you sure?"),
               content: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
                 width:
