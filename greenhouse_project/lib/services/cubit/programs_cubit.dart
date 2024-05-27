@@ -124,6 +124,7 @@ class ProgramsCubit extends Cubit<ProgramsState> {
       emit(ProgramsError(error.toString()));
     }
     _isProcessing = false;
+    _getPrograms();
   }
 
   @override
@@ -158,7 +159,7 @@ class ProgramData {
     return ProgramData(
         action: data['action'],
         condition: data['condition'],
-        limit: data['limit'],
+        limit: data['limit'].roundToDouble(),
         equipment: data['equipment'],
         title: data['title'],
         description: data['description'],
