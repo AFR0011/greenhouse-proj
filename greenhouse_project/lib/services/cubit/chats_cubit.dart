@@ -79,7 +79,7 @@ class ChatsCubit extends Cubit<ChatsState> {
           DocumentReference existChatReference = doc.reference;
           _navigateToChat(context, existChatReference);
           _isProcessing = false;
-          return;
+          return _getChats();
         }
       }
 
@@ -95,6 +95,7 @@ class ChatsCubit extends Cubit<ChatsState> {
       emit(ChatsError(error.toString()));
     }
     _isProcessing = false;
+    _getChats();
   }
 
   void _navigateToChat(BuildContext context, DocumentReference chatReference) {

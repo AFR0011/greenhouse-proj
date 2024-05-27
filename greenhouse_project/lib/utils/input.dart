@@ -144,26 +144,26 @@ class ToggleButtonContainer extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(15)),
-          color: equipment.status
-              ? theme.colorScheme.secondary.withOpacity(0.75)
-              : theme.colorScheme.primary.withOpacity(0.75),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              offset: Offset(0,4),
-              blurRadius: 8,
-            )
-          ]
-          //border: Border.all(width: 2, color: Colors.white30),
-        ),
+            borderRadius: const BorderRadius.all(Radius.circular(15)),
+            color: equipment.status
+                ? theme.colorScheme.secondary.withOpacity(0.75)
+                : theme.colorScheme.primary.withOpacity(0.75),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                offset: Offset(0, 4),
+                blurRadius: 8,
+              )
+            ]
+            //border: Border.all(width: 2, color: Colors.white30),
+            ),
 
         margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
         // color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary,
         width: MediaQuery.of(context).size.width * 0.5,
         height: MediaQuery.of(context).size.width * 0.5,
         child: Container(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           height: 200,
           width: 200,
           decoration: BoxDecoration(
@@ -176,41 +176,38 @@ class ToggleButtonContainer extends StatelessWidget {
             border: Border.all(width: 2, color: Colors.white30),
             borderRadius: BorderRadius.circular(15),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: Text(
-                  equipment.type,
-                  style: headingTextStyle,
+          child: SizedBox(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    equipment.type,
+                    style: headingTextStyle,
+                  ),
                 ),
-              ),
-              ClipOval(
-                child: Image.asset(
-                  imgPath,
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover),
-              ),
-              //Spacer(),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Switch(
-                  value: equipment.status,
-                  onChanged: (value) {
-                    context.read<EquipmentStatusCubit>().toggleStatus(
-                        userReference,
-                        equipment.reference,
-                        equipment.status);
-                  },
-                  activeColor: theme.colorScheme.secondary,
-                  inactiveThumbColor: theme.colorScheme.primary,
-                  inactiveTrackColor: Colors.grey,
+                ClipOval(
+                  child: Image.asset(imgPath,
+                      width: 100, height: 100, fit: BoxFit.cover),
                 ),
-              ),
-            ],
+                //Spacer(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Switch(
+                    value: equipment.status,
+                    onChanged: (value) {
+                      context.read<EquipmentStatusCubit>().toggleStatus(
+                          userReference, equipment.reference, equipment.status);
+                    },
+                    activeColor: theme.colorScheme.secondary,
+                    inactiveThumbColor: theme.colorScheme.primary,
+                    inactiveTrackColor: Colors.grey,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -61,6 +61,7 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
     });
 
     _isProcessing = false;
+    _getEquipmentStatus();
   }
 
   @override

@@ -55,6 +55,7 @@ class InventoryCubit extends Cubit<InventoryState> {
       emit(InventoryError(error.toString()));
     }
     _isProcessing = false;
+    _getInventory();
   }
 
   Future<void> removeInventory(
@@ -84,6 +85,7 @@ class InventoryCubit extends Cubit<InventoryState> {
       emit(InventoryError(error.toString()));
     }
     _isProcessing = false;
+    _getInventory();
   }
 
   Future<void> updateInventory(DocumentReference item,
@@ -114,6 +116,7 @@ class InventoryCubit extends Cubit<InventoryState> {
       emit(InventoryError(error.toString()));
     }
     _isProcessing = false;
+    _getInventory();
   }
 
   Future<void> approveItem(DocumentReference item, userReference) async {
@@ -143,6 +146,7 @@ class InventoryCubit extends Cubit<InventoryState> {
       emit(InventoryError(error.toString()));
     }
     _isProcessing = false;
+    _getInventory();
   }
 
   @override

@@ -25,11 +25,11 @@ class ManageEmployeesCubit extends ManagementCubit {
 
   ManageEmployeesCubit(this.user) : super(ManageEmployeesLoading()) {
     if (user != null) {
-      _fetchEmployees();
+      _getEmployees();
     }
   }
 
-  void _fetchEmployees() {
+  void _getEmployees() {
     if (!_isActive) return;
     List<EmployeeData> employees;
     users
@@ -105,6 +105,7 @@ class ManageEmployeesCubit extends ManagementCubit {
       emit(ManageEmployeesError(error.toString()));
     }
     _isProcessing = false;
+    _getEmployees();
   }
 
   Future<void> disableEmployee(
@@ -136,6 +137,7 @@ class ManageEmployeesCubit extends ManagementCubit {
       emit(ManageEmployeesError(error.toString()));
     }
     _isProcessing = false;
+    _getEmployees();
   }
 
   Future<void> enableEmployee(
@@ -167,6 +169,7 @@ class ManageEmployeesCubit extends ManagementCubit {
       emit(ManageEmployeesError(error.toString()));
     }
     _isProcessing = false;
+    _getEmployees();
   }
 
   @override
