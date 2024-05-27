@@ -8,12 +8,10 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
-import 'package:flutter_holo_date_picker/widget/date_picker_widget.dart';
+import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
@@ -24,6 +22,7 @@ import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
+import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
 class TasksPage extends StatelessWidget {
@@ -54,6 +53,7 @@ class TasksPage extends StatelessWidget {
         BlocProvider(create: (context) => TaskEditCubit()),
         BlocProvider(create: (context) => TaskDropdownCubit(context)),
         BlocProvider(create: (context) => ManageEmployeesCubit(userCredential)),
+        BlocProvider(create: (context) => ChatsCubit(userCredential)),
       ],
       child: _TasksPageContent(
         userCredential: userCredential,
@@ -152,6 +152,7 @@ class _TasksPageState extends State<_TasksPageContent> {
     // Get instance of footer nav cubit from main context
     final FooterNavCubit footerNavCubit =
         BlocProvider.of<FooterNavCubit>(context);
+
     return Scaffold(
       // Appbar (header)
       appBar: _userRole == "worker"
@@ -172,7 +173,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                   end: Alignment.bottomRight,
                 ),
                 image: DecorationImage(
-                  image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                  image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
                     Colors.white.withOpacity(0.05),
@@ -190,7 +191,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                   end: Alignment.bottomRight,
                 ),
                 image: DecorationImage(
-                  image: AssetImage('lib/utils/Icons/tasks.png'),
+                  image: const AssetImage('lib/utils/Icons/tasks.png'),
                   fit: BoxFit.cover,
                   colorFilter: ColorFilter.mode(
                     Colors.white.withOpacity(0.05),
@@ -200,9 +201,6 @@ class _TasksPageState extends State<_TasksPageContent> {
               ),
         child: Column(
           children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width - 20,
-            ),
             // BlocBuilder for tasks
             BlocBuilder<TaskCubit, TaskState>(
               builder: (context, state) {
@@ -220,75 +218,264 @@ class _TasksPageState extends State<_TasksPageContent> {
                   }
                   // Display tasks
                   else {
-                    return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.6,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: taskList.length,
-                                itemBuilder: (context, index) {
-                                  TaskData task = taskList[index]; // task info
-                                  return Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                    ),
-                                    elevation: 4.0,
-                                    margin: EdgeInsets.only(bottom: 16.0),
-                                    child: ListTile(
-                                      leading: Container(
-                                        padding: EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.green.withOpacity(0.1),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(
-                                          Icons.task_outlined,
-                                          color: Colors.grey[600]!,
-                                          size: 30,
-                                        ),
-                                      ),
-                                      title: Text(
-                                        task.title,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18),
-                                      ),
-                                      subtitle: Text(task.dueDate.toString()),
-                                      trailing: WhiteElevatedButton(
-                                        text: 'Details',
-                                        onPressed: () {
-                                          showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return TaskDetailsDialog(
-                                                  task: task,
-                                                  userRole: _userRole,
-                                                  managerReference:
-                                                      _userRole == "worker"
-                                                          ? task.manager
-                                                          : null,
-                                                  editOrComplete:
-                                                      _userRole == "worker"
-                                                          ? completeTask
-                                                          : showEditForm,
-                                                  deleteOrContact:
-                                                      _userRole == "worker"
-                                                          ? contactManager
-                                                          : showDeleteForm);
+                    List<TaskData> waitingTasks = taskList
+                        .where((task) => task.status == "waiting")
+                        .toList();
+                    List<TaskData> incompleteTasks = taskList
+                        .where((task) => task.status == "incomplete")
+                        .toList();
+                    return SingleChildScrollView(
+                      child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16.0, right: 16.0, top: 8.0),
+                          child: Column(
+                            children: [
+                              const Align(
+                                  alignment: Alignment.topLeft,
+                                  child: Text("Tasks",
+                                      style: subheadingTextStyle)),
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.30,
+                                child: _userRole == "manager"
+                                    ? taskList.isEmpty
+                                        ? const Center(
+                                            child: Text("No tasks..."),
+                                          )
+                                        : ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: taskList.length,
+                                            itemBuilder: (context, index) {
+                                              TaskData task =
+                                                  taskList[index]; // task info
+                                              return Card(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15.0),
+                                                ),
+                                                elevation: 4.0,
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 16.0),
+                                                child: ListTile(
+                                                  leading: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.green
+                                                          .withOpacity(0.1),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.task_outlined,
+                                                      color: Colors.grey[600]!,
+                                                      size: 30,
+                                                    ),
+                                                  ),
+                                                  title: Text(
+                                                    task.title,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 18),
+                                                  ),
+                                                  subtitle: Text(
+                                                      task.dueDate.toString()),
+                                                  trailing: WhiteElevatedButton(
+                                                    text: 'Details',
+                                                    onPressed: () {
+                                                      BuildContext mainContext =
+                                                          context;
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return TaskDetailsDialog(
+                                                              task: task,
+                                                              mainContext:
+                                                                  mainContext,
+                                                              userRole:
+                                                                  _userRole,
+                                                              managerReference:
+                                                                  _userRole ==
+                                                                          "worker"
+                                                                      ? task
+                                                                          .manager
+                                                                      : null,
+                                                              editOrComplete: _userRole ==
+                                                                          "worker" ||
+                                                                      (_userRole ==
+                                                                              "manager" &&
+                                                                          task.status ==
+                                                                              "waiting")
+                                                                  ? completeTask
+                                                                  : showEditForm,
+                                                              deleteOrContact:
+                                                                  _userRole ==
+                                                                          "worker"
+                                                                      ? contactManager
+                                                                      : showDeleteForm);
+                                                        },
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              );
                                             },
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
+                                          )
+                                    : incompleteTasks.isEmpty
+                                        ? const Center(
+                                            child: Text("No tasks..."),
+                                          )
+                                        : ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: incompleteTasks.length,
+                                            itemBuilder: (context, index) {
+                                              TaskData task = incompleteTasks[
+                                                  index]; // task info
+                                              return Card(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15.0),
+                                                ),
+                                                elevation: 4.0,
+                                                margin: const EdgeInsets.only(
+                                                    bottom: 16.0),
+                                                child: ListTile(
+                                                  leading: Container(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.green
+                                                          .withOpacity(0.1),
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Icon(
+                                                      Icons.task_outlined,
+                                                      color: Colors.grey[600]!,
+                                                      size: 30,
+                                                    ),
+                                                  ),
+                                                  title: Text(
+                                                    task.title,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 18),
+                                                  ),
+                                                  subtitle: Text(
+                                                      task.dueDate.toString()),
+                                                  trailing: WhiteElevatedButton(
+                                                    text: 'Details',
+                                                    onPressed: () {
+                                                      BuildContext mainContext =
+                                                          context;
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return TaskDetailsDialog(
+                                                              task: task,
+                                                              mainContext:
+                                                                  mainContext,
+                                                              userRole:
+                                                                  _userRole,
+                                                              managerReference:
+                                                                  _userRole ==
+                                                                          "worker"
+                                                                      ? task
+                                                                          .manager
+                                                                      : null,
+                                                              editOrComplete: _userRole ==
+                                                                          "worker" ||
+                                                                      (_userRole ==
+                                                                              "manager" &&
+                                                                          task.status ==
+                                                                              "waiting")
+                                                                  ? completeTask
+                                                                  : showEditForm,
+                                                              deleteOrContact:
+                                                                  _userRole ==
+                                                                          "worker"
+                                                                      ? contactManager
+                                                                      : showDeleteForm);
+                                                        },
+                                                      );
+                                                    },
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
                               ),
-                            ),
-                          ],
-                        ));
+                              _userRole == "manager"
+                                  ? const SizedBox()
+                                  : const Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Text("Waiting for Approval",
+                                          style: subheadingTextStyle)),
+                              _userRole == "manager"
+                                  ? const SizedBox()
+                                  : SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.35,
+                                      child: waitingTasks.isEmpty
+                                          ? const Center(
+                                              child:
+                                                  Text("No pending tasks..."),
+                                            )
+                                          : ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount: waitingTasks.length,
+                                              itemBuilder: (context, index) {
+                                                TaskData task = waitingTasks[
+                                                    index]; // task info
+                                                return Card(
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.0),
+                                                  ),
+                                                  elevation: 4.0,
+                                                  margin: const EdgeInsets.only(
+                                                      bottom: 16.0),
+                                                  child: ListTile(
+                                                    leading: Container(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8.0),
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.green
+                                                            .withOpacity(0.1),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      child: Icon(
+                                                        Icons.task_outlined,
+                                                        color:
+                                                            Colors.grey[600]!,
+                                                        size: 30,
+                                                      ),
+                                                    ),
+                                                    title: Text(
+                                                      task.title,
+                                                      style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 18),
+                                                    ),
+                                                    subtitle: Text(task.dueDate
+                                                        .toString()
+                                                        .substring(0, 16)),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                    ),
+                            ],
+                          )),
+                    );
                   }
                 }
                 // Show error message once an error occurs
@@ -309,7 +496,7 @@ class _TasksPageState extends State<_TasksPageContent> {
       // Footer nav bar
       bottomNavigationBar: _userRole == "worker"
           ? PreferredSize(
-              preferredSize: Size.fromHeight(50.0),
+              preferredSize: const Size.fromHeight(50.0),
               child: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -318,7 +505,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                       Colors.teal.shade400,
                       Colors.blue.shade300
                     ],
-                    stops: [0.2, 0.5, 0.9],
+                    stops: const [0.2, 0.5, 0.9],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -327,12 +514,12 @@ class _TasksPageState extends State<_TasksPageContent> {
                       color: Colors.black.withOpacity(0.2),
                       spreadRadius: 5,
                       blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
+                      offset: const Offset(0, 3), // changes position of shadow
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(30.0),
                     topRight: Radius.circular(30.0),
                   ),
@@ -346,7 +533,7 @@ class _TasksPageState extends State<_TasksPageContent> {
             )
           : const SizedBox(),
 
-      floatingActionButton: _userRole != "worker"
+      floatingActionButton: _userRole == "manager"
           ? GreenElevatedButton(
               text: "Add Task", onPressed: () => showAddDialog())
           : const SizedBox(),
@@ -649,7 +836,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                 onChanged: taskDropdownCubit.updateDropdown,
                               ),
                               Padding(
-                                padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
                                 child: Center(
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
@@ -668,7 +855,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                         newDate,
                                         taskEditState[3]
                                       ]),
-                                      pickerTheme: DateTimePickerTheme(
+                                      pickerTheme: const DateTimePickerTheme(
                                         itemTextStyle: TextStyle(
                                             color: Colors.black, fontSize: 19),
                                         dividerColor: Colors.blue,
@@ -739,7 +926,17 @@ class _TasksPageState extends State<_TasksPageContent> {
         });
   }
 
-  completeTask() {}
+  completeTask(BuildContext context, DocumentReference taskReference) {
+    context.read<TaskCubit>().completeTask(taskReference);
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: _userRole == "manager"
+            ? const Text("Task completion approved!")
+            : const Text(
+                "Task completion request sent, wait for manager approval.")));
+  }
 
-  contactManager() {}
+  contactManager(BuildContext context, DocumentReference managerReference) {
+    context.read<ChatsCubit>().createChat(context, managerReference);
+  }
 }

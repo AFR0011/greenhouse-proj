@@ -15,6 +15,7 @@ import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/employee_edit_cubit.dart';
+import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/input.dart';
@@ -114,55 +115,56 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
 
     return Scaffold(
       // Appbar (header)
-      appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.green.shade700, Colors.teal.shade400],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            image: DecorationImage(
-              image: AssetImage(
-                  'lib/utils/Icons/leaf_pat.jpg'), // your background image
-              fit: BoxFit.cover,
-              colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(0.1), BlendMode.dstATop),
-            ),
-          ),
-        ),
-        automaticallyImplyLeading: false,
-        toolbarHeight: 75,
-        centerTitle: true,
-        title: const Text(
-          "Employees",
-          style: TextStyle(
-            fontFamily: 'Pacifico', // use a custom font
-            fontSize: 28.0,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            shadows: [
-              Shadow(
-                blurRadius: 10.0,
-                color: Colors.black54,
-                offset: Offset(2.0, 2.0),
-              ),
-            ],
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(30.0),
-          ),
-        ),
-        elevation: 10.0,
-      ),
+      // appBar: AppBar(
+      //   flexibleSpace: Container(
+      //     decoration: BoxDecoration(
+      //       gradient: LinearGradient(
+      //         colors: [Colors.green.shade700, Colors.teal.shade400],
+      //         begin: Alignment.topLeft,
+      //         end: Alignment.bottomRight,
+      //       ),
+      //       image: DecorationImage(
+      //         image: const AssetImage(
+      //             'lib/utils/Icons/leaf_pat.jpg'), // your background image
+      //         fit: BoxFit.cover,
+      //         colorFilter: ColorFilter.mode(
+      //             Colors.black.withOpacity(0.1), BlendMode.dstATop),
+      //       ),
+      //     ),
+      //   ),
+      //   automaticallyImplyLeading: false,
+      //   toolbarHeight: 75,
+      //   centerTitle: true,
+      //   title: const Text(
+      //     "Employees",
+      //     style: TextStyle(
+      //       fontFamily: 'Pacifico', // use a custom font
+      //       fontSize: 28.0,
+      //       fontWeight: FontWeight.bold,
+      //       color: Colors.white,
+      //       shadows: [
+      //         Shadow(
+      //           blurRadius: 10.0,
+      //           color: Colors.black54,
+      //           offset: Offset(2.0, 2.0),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      //   leading: IconButton(
+      //     icon: const Icon(Icons.arrow_back),
+      //     onPressed: () {
+      //       Navigator.pop(context);
+      //     },
+      //   ),
+      //   shape: const RoundedRectangleBorder(
+      //     borderRadius: BorderRadius.vertical(
+      //       bottom: Radius.circular(30.0),
+      //     ),
+      //   ),
+      //   elevation: 10.0,
+      // ),
+      appBar: createAltAppbar(context, "Employees"),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -174,7 +176,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
             end: Alignment.bottomRight,
           ),
           image: DecorationImage(
-            image: AssetImage('lib/utils/Icons/worker.png'),
+            image: const AssetImage('lib/utils/Icons/worker.png'),
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
               Colors.white.withOpacity(0.05),
@@ -221,122 +223,15 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                               itemBuilder: (context, index) {
                                 EmployeeData employee =
                                     employeeList[index]; // employee info
-                                void tasksFunction() {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => TasksPage(
-                                                userCredential:
-                                                    widget.userCredential,
-                                                userReference:
-                                                    employee.reference,
-                                              )));
-                                }
-
-                                void toggleAccount() {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10.0),
-                                              side: const BorderSide(
-                                                  color: Colors.transparent,
-                                                  width:
-                                                      2.0), // Add border color and width
-                                            ),
-                                            title: const Text("Are you sure"),
-                                            content: Container(
-                                              constraints: const BoxConstraints(
-                                                  maxWidth: 400),
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  .6,
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize
-                                                    .min, // Set column to minimum size
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Center(
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                          child:
-                                                              GreenElevatedButton(
-                                                                  text:
-                                                                      "Confirm",
-                                                                  onPressed:
-                                                                      () async {
-                                                                    if (employee
-                                                                        .enabled) {
-                                                                      manageEmployeesCubit
-                                                                          .disableEmployee(
-                                                                              employee,
-                                                                              _userReference)
-                                                                          .then(
-                                                                              (_) {
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                                                                            content:
-                                                                                Text("Account disabled successfuly!")));
-                                                                      });
-                                                                    } else {
-                                                                      await manageEmployeesCubit.enableEmployee(
-                                                                          employee,
-                                                                          _userReference);
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                      ScaffoldMessenger.of(
-                                                                              context)
-                                                                          .showSnackBar(
-                                                                              const SnackBar(content: Text("Account enabled successfuly!")));
-                                                                    }
-                                                                  }),
-                                                        ),
-                                                        Expanded(
-                                                          child: WhiteElevatedButton(
-                                                              text: "Go Back",
-                                                              onPressed: () =>
-                                                                  Navigator.pop(
-                                                                      context)),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ));
-                                      });
-                                }
-
-                                void profileFunction() {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => ProfilePage(
-                                              userCredential:
-                                                  widget.userCredential,
-                                              userReference:
-                                                  employee.reference)));
-                                }
-
                                 return Card(
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(15.0),
                                   ),
                                   elevation: 4.0,
-                                  margin: EdgeInsets.only(bottom: 16.0),
+                                  margin: const EdgeInsets.only(bottom: 16.0),
                                   child: ListTile(
                                     leading: Container(
-                                      padding: EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(8.0),
                                       decoration: BoxDecoration(
                                         color: Colors.green.withOpacity(0.1),
                                         shape: BoxShape.circle,
@@ -349,7 +244,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                     ),
                                     title: Text(
                                       employee.name,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18),
                                     ),

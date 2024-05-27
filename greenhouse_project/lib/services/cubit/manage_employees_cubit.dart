@@ -31,7 +31,7 @@ class ManageEmployeesCubit extends ManagementCubit {
   }
 
   void fetchEmployees() {
-    if (!_isActive) return null;
+    if (!_isActive) return;
     List<EmployeeData> employees;
     users
         .where(Filter.or(Filter("role", isEqualTo: "worker"),
@@ -41,7 +41,7 @@ class ManageEmployeesCubit extends ManagementCubit {
       employees =
           snapshot.docs.map((doc) => EmployeeData.fromFirestore(doc)).toList();
 
-      emit(ManageEmployeesLoaded([...employees]));
+      if (_isActive) emit(ManageEmployeesLoaded([...employees]));
     }, onError: (error) {
       emit(ManageEmployeesError(error));
     });
@@ -51,6 +51,8 @@ class ManageEmployeesCubit extends ManagementCubit {
   Future<void> createEmployee(
       String email, String role, DocumentReference userReference) async {
     if (!_isActive) return;
+
+    emit(ManageEmployeesLoading());
     // Get url of uploaded image
     String imageUrl = await storage.ref().child("Default.jpg").getDownloadURL();
     try {
@@ -107,6 +109,8 @@ class ManageEmployeesCubit extends ManagementCubit {
       EmployeeData workerData, DocumentReference userReference) async {
     if (!_isActive) return;
     try {
+      emit(ManageEmployeesLoading());
+
       await workerData.reference.update({"enabled": false});
       DocumentReference externalId = workerData.reference;
 
@@ -137,6 +141,7 @@ class ManageEmployeesCubit extends ManagementCubit {
     if (!_isActive) return;
 
     try {
+      emit(ManageEmployeesLoading());
       await workerData.reference.update({"enabled": true});
       DocumentReference externalId = workerData.reference;
 

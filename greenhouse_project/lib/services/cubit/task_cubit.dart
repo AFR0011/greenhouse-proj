@@ -20,13 +20,14 @@ class TaskCubit extends Cubit<TaskState> {
   final DocumentReference userReference;
 
   bool _isActive = true;
+  bool _isProcessing = false;
 
   TaskCubit(this.userReference) : super(TaskLoading()) {
     _getTasks();
   }
 
   void _getTasks() async {
-    if (!_isActive) return;
+    if (!_isActive || _isProcessing) return;
     DocumentSnapshot userSnapshot = await userReference.get();
     Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
     String userRole = userData['role'];
@@ -40,9 +41,9 @@ class TaskCubit extends Cubit<TaskState> {
           .listen((snapshot) {
         final List<TaskData> tasks =
             snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
-        emit(TaskLoaded([...tasks]));
+        if (!_isProcessing && _isActive) emit(TaskLoaded([...tasks]));
       }, onError: (error) {
-        emit(TaskError(error.toString()));
+        if (!_isProcessing && _isActive) emit(TaskError(error.toString()));
       });
     } else if (userRole == "worker") {
       tasks
@@ -52,21 +53,31 @@ class TaskCubit extends Cubit<TaskState> {
           .listen((snapshot) {
         final List<TaskData> tasks =
             snapshot.docs.map((doc) => TaskData.fromFirestore(doc)).toList();
-        emit(TaskLoaded([...tasks]));
+        if (!_isProcessing && _isActive) emit(TaskLoaded([...tasks]));
       }, onError: (error) {
-        emit(TaskError(error.toString()));
+        if (!_isProcessing && _isActive) emit(TaskError(error.toString()));
       });
     }
   }
 
   void completeTask(DocumentReference taskReference) async {
+    _isProcessing = true;
     if (!_isActive) return;
-    taskReference.update({'status': 'waiting'});
+    DocumentSnapshot taskSnapshot = await taskReference.get();
+    String status = taskSnapshot.get("status");
+    if (status == "waiting") {
+      taskReference.update({'status': 'completed'});
+    } else {
+      taskReference.update({'status': 'waiting'});
+    }
+    _isProcessing = false;
+    _getTasks();
   }
 
   void addTask(String title, String desc, DateTime dueDate,
       DocumentReference worker) async {
     if (!_isActive) return;
+    _isProcessing = true;
     try {
       DocumentReference externalId = await tasks.add({
         "title": title,
@@ -96,11 +107,14 @@ class TaskCubit extends Cubit<TaskState> {
     } catch (error) {
       emit(TaskError(error.toString()));
     }
+    _isProcessing = false;
+    _getTasks();
   }
 
   void removeTask(
       DocumentReference item, DocumentReference userReference) async {
     if (!_isActive) return;
+    _isProcessing = true;
     emit(TaskLoading());
     try {
       DocumentReference externalId = item;
@@ -128,11 +142,14 @@ class TaskCubit extends Cubit<TaskState> {
     } catch (error, stack) {
       emit(TaskError(stack.toString()));
     }
+    _isProcessing = false;
+    _getTasks();
   }
 
   Future<void> updateTask(DocumentReference item, Map<String, dynamic> data,
       DocumentReference userReference) async {
     if (!_isActive) return;
+    _isProcessing = true;
     emit(TaskLoading());
     try {
       DocumentReference externalId = item;
@@ -158,6 +175,8 @@ class TaskCubit extends Cubit<TaskState> {
     } catch (error) {
       emit(TaskError(error.toString()));
     }
+    _isProcessing = false;
+    _getTasks();
   }
 
   @override
