@@ -127,6 +127,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
       appBar: createAltAppbar(context, "Plants"),
       // Plants section
       body: Container(
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -145,109 +146,111 @@ class _PlantsPageState extends State<_PlantsPageContent> {
             ),
           ),
         ),
-        child: Column(
-          children: [
-            // Plants subheading
-            Padding(
-              padding: const EdgeInsets.only(top: 40),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width - 20,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // Plants subheading
+              Padding(
+                padding: const EdgeInsets.only(top: 40),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 20,
+                ),
               ),
-            ),
-            // BlocBuilder for plantStatus state
-            BlocBuilder<PlantStatusCubit, PlantStatusState>(
-              builder: (context, state) {
-                // show "loading screen" if processing plantStatus state
-                if (state is PlantsLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                // Show plants once plantStatus state is loaded
-                else if (state is PlantsLoaded) {
-                  List<PlantData> plantList = state.plants; // plants list
-
-                  // Display nothing if no plants
-                  if (plantList.isEmpty) {
-                    return const Center(child: Text("No Plants..."));
+              // BlocBuilder for plantStatus state
+              BlocBuilder<PlantStatusCubit, PlantStatusState>(
+                builder: (context, state) {
+                  // show "loading screen" if processing plantStatus state
+                  if (state is PlantsLoading) {
+                    return const Center(child: CircularProgressIndicator());
                   }
-                  // Display plants
+                  // Show plants once plantStatus state is loaded
+                  else if (state is PlantsLoaded) {
+                    List<PlantData> plantList = state.plants; // plants list
+          
+                    // Display nothing if no plants
+                    if (plantList.isEmpty) {
+                      return const Center(child: Text("No Plants..."));
+                    }
+                    // Display plants
+                    else {
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: plantList.length,
+                                itemBuilder: (context, index) {
+                                  PlantData plant = plantList[index]; //plant data
+          
+                                  // Display plant info
+                                  return Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    elevation: 4.0,
+                                    margin: EdgeInsets.only(bottom: 16.0),
+                                    child: ListTile(
+                                      leading: Container(
+                                        padding: EdgeInsets.all(8.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.grass_outlined,
+                                          color: Colors.green[800]!,
+                                          size: 30,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        plant.type,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18),
+                                      ),
+                                      subtitle: Text(plant.subtype),
+                                      trailing: WhiteElevatedButton(
+                                        // Show details and sensor readings
+                                        text: 'Details',
+                                        onPressed: () {
+                                          // _showPlantDetails(plant);
+                                          BuildContext mainContext = context;
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) =>
+                                                  PlantDetailsDialog(
+                                                      plant: plant,
+                                                      mainContext: mainContext,
+                                                      removePlant:
+                                                          showDeleteForm));
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    }
+                  }
+          
+                  // Show error message once an error occurs
+                  else if (state is PlantsError) {
+                    return Center(child: Text('Error: ${state.error}'));
+                  }
+                  // If the state is not any of the predefined states;
+                  // never happens; but, anything can happen
                   else {
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: plantList.length,
-                              itemBuilder: (context, index) {
-                                PlantData plant = plantList[index]; //plant data
-
-                                // Display plant info
-                                return Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  elevation: 4.0,
-                                  margin: EdgeInsets.only(bottom: 16.0),
-                                  child: ListTile(
-                                    leading: Container(
-                                      padding: EdgeInsets.all(8.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.1),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.grass_outlined,
-                                        color: Colors.green[800]!,
-                                        size: 30,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      plant.type,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                    subtitle: Text(plant.subtype),
-                                    trailing: WhiteElevatedButton(
-                                      // Show details and sensor readings
-                                      text: 'Details',
-                                      onPressed: () {
-                                        // _showPlantDetails(plant);
-                                        BuildContext mainContext = context;
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) =>
-                                                PlantDetailsDialog(
-                                                    plant: plant,
-                                                    mainContext: mainContext,
-                                                    removePlant:
-                                                        showDeleteForm));
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          )
-                        ],
-                      ),
-                    );
+                    return const Center(child: Text('Unexpected State'));
                   }
-                }
-
-                // Show error message once an error occurs
-                else if (state is PlantsError) {
-                  return Center(child: Text('Error: ${state.error}'));
-                }
-                // If the state is not any of the predefined states;
-                // never happens; but, anything can happen
-                else {
-                  return const Center(child: Text('Unexpected State'));
-                }
-              },
-            ),
-          ],
+                },
+              ),
+            ],
+          ),
         ),
       ),
 
@@ -329,106 +332,102 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                   width: 2.0), // Add border color and width
             ),
             title: const Text("Add Plant"),
-            content: Container(
-              constraints: const BoxConstraints(maxWidth: 400),
-              width: MediaQuery.of(context).size.width * .6,
-              child: BlocBuilder<PlantsEditCubit, List<bool>>(
-                bloc: plantsEditCubit,
-                builder: (context, state) {
-                  return Column(
-                    mainAxisSize:
-                        MainAxisSize.min, // Set column to minimum size
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InputTextField(
-                          controller: _typeController,
-                          errorText: state[0]
-                              ? ""
-                              : "Type should be longer than 1 characters.",
-                          labelText: "Type"),
-                      // TextField(
-                      //   controller: _equipmentController,
-                      //   decoration: InputDecoration(
-                      //       errorText: state[0]
-                      //           ? ""
-                      //           : "Name should be longer than 1 characters."),
-                      // ),
-                      InputTextField(
-                          controller: _textController,
-                          errorText: state[1]
-                              ? ""
-                              : "Subtype should be longer than 2 characters.",
-                          labelText: "Subtype"),
-                      //insert dropdown HERE!!
-                      DropdownButtonFormField<String>(
-                        value: dropdownValue,
-                        decoration: const InputDecoration(
-                          labelText: "Board No",
-                        ),
-                        items: <String>["1"]
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        onChanged: null,
-                        onTap: () {},
-                        disabledHint: Text(dropdownValue),
-                      ),
-                      // Submit and cancel buttons
-                      Row(
-                        children: [
-                          Expanded(
-                            child: GreenElevatedButton(
-                                text: "Submit",
-                                onPressed: () async {
-                                  List<bool> validation = [true, true];
-                                  if (_typeController.text.isEmpty) {
-                                    validation[0] = !validation[0];
-                                  }
-                                  if (_textController.text.isEmpty) {
-                                    validation[1] = !validation[1];
-                                  }
-
-                                  bool isValid =
-                                      plantsEditCubit.updateState(validation);
-                                  if (!isValid) {
-                                  } else {
-                                    Map<String, dynamic> data = {
-                                      "birthdate": DateTime.now(),
-                                      "boardNo": 1,
-                                      "subtype": _textController.text,
-                                      "type": _typeController.text,
-                                    };
-                                    await plantStatusCubit
-                                        .addPlant(data, _userReference)
-                                        .then((value) {
-                                      Navigator.pop(context);
-                                      _textController.clear();
-                                      _typeController.clear();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text(
-                                                  "Plant added succesfully!")));
-                                    });
-                                  }
-                                }),
+            content: SingleChildScrollView(
+              child: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                width: MediaQuery.of(context).size.width * .6,
+                child: BlocBuilder<PlantsEditCubit, List<bool>>(
+                  bloc: plantsEditCubit,
+                  builder: (context, state) {
+                    return Column(
+                      mainAxisSize:
+                          MainAxisSize.min, // Set column to minimum size
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        InputTextField(
+                            controller: _typeController,
+                            errorText: state[0]
+                                ? ""
+                                : "Type should be longer than 1 characters.",
+                            labelText: "Type"),
+                        InputTextField(
+                            controller: _textController,
+                            errorText: state[1]
+                                ? ""
+                                : "Subtype should be longer than 2 characters.",
+                            labelText: "Subtype"),
+                        //insert dropdown HERE!!
+                        DropdownButtonFormField<String>(
+                          value: dropdownValue,
+                          decoration: const InputDecoration(
+                            labelText: "Board No",
                           ),
-                          Expanded(
-                            child: WhiteElevatedButton(
-                                text: "Cancel",
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  _textController.clear();
-                                  _typeController.clear();
-                                }),
-                          )
-                        ],
-                      )
-                    ],
-                  );
-                },
+                          items: <String>["1"]
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                          onChanged: null,
+                          onTap: () {},
+                          disabledHint: Text(dropdownValue),
+                        ),
+                        SizedBox(height: 10,),
+                        // Submit and cancel buttons
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GreenElevatedButton(
+                                  text: "Submit",
+                                  onPressed: () async {
+                                    List<bool> validation = [true, true];
+                                    if (_typeController.text.isEmpty) {
+                                      validation[0] = !validation[0];
+                                    }
+                                    if (_textController.text.isEmpty) {
+                                      validation[1] = !validation[1];
+                                    }
+              
+                                    bool isValid =
+                                        plantsEditCubit.updateState(validation);
+                                    if (!isValid) {
+                                    } else {
+                                      Map<String, dynamic> data = {
+                                        "birthdate": DateTime.now(),
+                                        "boardNo": 1,
+                                        "subtype": _textController.text,
+                                        "type": _typeController.text,
+                                      };
+                                      await plantStatusCubit
+                                          .addPlant(data, _userReference)
+                                          .then((value) {
+                                        Navigator.pop(context);
+                                        _textController.clear();
+                                        _typeController.clear();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                                content: Text(
+                                                    "Plant added succesfully!")));
+                                      });
+                                    }
+                                  }),
+                            ),
+                            Expanded(
+                              child: WhiteElevatedButton(
+                                  text: "Cancel",
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    _textController.clear();
+                                    _typeController.clear();
+                                  }),
+                            )
+                          ],
+                        )
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
           );
@@ -450,43 +449,45 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                     width: 2.0), // Add border color and width
               ),
               title: Text("Are you sure?"),
-              content: Container(
-                constraints: const BoxConstraints(maxWidth: 400),
-                width:
-                    MediaQuery.of(context).size.width * .6, // Set maximum width
-                child: Column(
-                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RedElevatedButton(
-                              text: "Yes",
-                              onPressed: () async {
-                                plantStatusCubit
-                                    .removePlant(
-                                        plant.plantReference, _userReference)
-                                    .then((value) {
+              content: SingleChildScrollView(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  width:
+                      MediaQuery.of(context).size.width * .6, // Set maximum width
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: RedElevatedButton(
+                                text: "Yes",
+                                onPressed: () async {
+                                  plantStatusCubit
+                                      .removePlant(
+                                          plant.plantReference, _userReference)
+                                      .then((value) {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                "Item deleted succesfully!")));
+                                  });
+                                }),
+                          ),
+                          Expanded(
+                            child: WhiteElevatedButton(
+                                text: "No",
+                                onPressed: () {
                                   Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "Item deleted succesfully!")));
-                                });
-                              }),
-                        ),
-                        Expanded(
-                          child: WhiteElevatedButton(
-                              text: "No",
-                              onPressed: () {
-                                Navigator.pop(context);
-                              }),
-                        )
-                      ],
-                    )
-                  ],
+                                }),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ));
         });

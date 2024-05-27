@@ -160,12 +160,12 @@ class ToggleButtonContainer extends StatelessWidget {
 
         margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
         // color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary,
-        width: MediaQuery.of(context).size.width * 0.5,
-        height: MediaQuery.of(context).size.width * 0.5,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
         child: Container(
           padding: const EdgeInsets.all(8),
-          height: 200,
-          width: 200,
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               begin: Alignment.topLeft,

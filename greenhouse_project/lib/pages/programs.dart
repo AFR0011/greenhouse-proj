@@ -123,6 +123,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
       appBar: createAltAppbar(context, "Programs"),
       // Blocbuilder for programs state
       body: Container(
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -141,32 +142,34 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
             ),
           ),
         ),
-        child: BlocBuilder<ProgramsCubit, ProgramsState>(
-            builder: (context, state) {
-          // Show "loading screen" if processing programs state
-          if (state is ProgramsLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          // Show programs once programs state is loaded
-          else if (state is ProgramsLoaded) {
-            List<ProgramData> programsList = state.programs; // programs list
-            // Function call to create programs list
-            return _createProgramsList(programsList);
-          } // Show error if there is an issues with user info
-          else if (state is ProgramsError) {
-            print(state.error);
-            return Center(child: Text('Error: ${state.error}'));
-          }
-          // If somehow state doesn't match predefined states;
-          // never happens; but, anything can happen
-          else {
-            return const Center(
-              child: Text('Unexpected state'),
-            );
-          }
-        }),
+        child: SingleChildScrollView(
+          child: BlocBuilder<ProgramsCubit, ProgramsState>(
+              builder: (context, state) {
+            // Show "loading screen" if processing programs state
+            if (state is ProgramsLoading) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            // Show programs once programs state is loaded
+            else if (state is ProgramsLoaded) {
+              List<ProgramData> programsList = state.programs; // programs list
+              // Function call to create programs list
+              return _createProgramsList(programsList);
+            } // Show error if there is an issues with user info
+            else if (state is ProgramsError) {
+              print(state.error);
+              return Center(child: Text('Error: ${state.error}'));
+            }
+            // If somehow state doesn't match predefined states;
+            // never happens; but, anything can happen
+            else {
+              return const Center(
+                child: Text('Unexpected state'),
+              );
+            }
+          }),
+        ),
       ),
       //floating button
       floatingActionButton: _userRole == "manager"
@@ -266,248 +269,31 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                   width: 2.0), // Add border color and width
             ),
             title: const Text("Create program"),
-            content: Container(
-              constraints: const BoxConstraints(maxWidth: 400),
-              width: MediaQuery.of(context).size.width * .6,
-              child: Column(
-                mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BlocBuilder<ProgramEditCubit, List<dynamic>>(
-                    bloc: programEditCubit,
-                    builder: (context, state) {
-                      return Column(
-                        children: [
-                          InputTextField(
-                              controller: _titleController,
-                              errorText: validation[0]
-                                  ? null
-                                  : "Title cannot be be empty!",
-                              labelText: "Title"),
-                          InputTextField(
-                              controller: _descriptionController,
-                              errorText: validation[1]
-                                  ? null
-                                  : "Description cannot be be empty!",
-                              labelText: "Description"),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Center(
-                              child: DropdownButtonFormField(
-                                  isExpanded: true,
-                                  value: inputValues[5] != ""
-                                      ? inputValues[5]
-                                      : null,
-                                  elevation: 16,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Condition',
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20))),
-                                  ),
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'lt',
-                                      child: Text('less than'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'gt',
-                                      child: Text('greater than'),
-                                    ),
-                                  ],
-                                  onChanged: (selection) {
-                                    inputValues[5] = selection;
-                                    programEditCubit
-                                        .checkValidationAndUpdate(inputValues);
-                                  }),
-                            ),
-                          ),
-                          CustomSlider(
-                              updateSlider: (double value) {
-                                List<dynamic> values = inputValues;
-                                values[2] = value;
-                                programEditCubit
-                                    .checkValidationAndUpdate(values);
-                              },
-                              currentSliderValue:
-                                  inputValues[2].roundToDouble()),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Center(
-                              child: DropdownButtonFormField(
-                                  isExpanded: true,
-                                  value: inputValues[3] != ""
-                                      ? inputValues[3]
-                                      : null,
-                                  elevation: 16,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Equipment',
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20))),
-                                  ),
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'fan',
-                                      child: Text('fan'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'pump',
-                                      child: Text('pump'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'light',
-                                      child: Text('light'),
-                                    ),
-                                  ],
-                                  onChanged: (selection) {
-                                    inputValues[3] = selection;
-                                    programEditCubit
-                                        .checkValidationAndUpdate(inputValues);
-                                  }),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Center(
-                              child: DropdownButtonFormField(
-                                  isExpanded: true,
-                                  value: inputValues[4] != ""
-                                      ? inputValues[4]
-                                      : null,
-                                  elevation: 16,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Action',
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(20))),
-                                  ),
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'off',
-                                      child: Text('off'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'on',
-                                      child: Text('on'),
-                                    ),
-                                  ],
-                                  onChanged: (selection) {
-                                    inputValues[4] = selection;
-                                    programEditCubit
-                                        .checkValidationAndUpdate(inputValues);
-                                  }),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GreenElevatedButton(
-                            text: "Submit",
-                            onPressed: () {
-                              inputValues[0] = _titleController.text;
-                              inputValues[1] = _descriptionController.text;
-                              validation = programEditCubit
-                                  .checkValidationAndUpdate(inputValues);
-                              if (validation.contains(null) ||
-                                  validation.contains(false)) {
-                                return;
-                              } else {
-                                Map<String, dynamic> data = {
-                                  "title": _titleController.text,
-                                  "description": _descriptionController.text,
-                                  "limit": inputValues[2],
-                                  "equipment": inputValues[3],
-                                  "action": inputValues[4],
-                                  "condition": inputValues[5],
-                                  "creationDate": DateTime.now(),
-                                  "pending":
-                                      _userRole != 'worker' ? false : true,
-                                };
-                                programsCubit.addProgram(data, _userReference);
-                                _titleController.clear();
-                                _descriptionController.clear();
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content:
-                                            Text("Item added succesfully!")));
-                              }
-                            }),
-                      ),
-                      Expanded(
-                        child: WhiteElevatedButton(
-                            text: "Cancel",
-                            onPressed: () {
-                              _titleController.clear();
-                              _descriptionController.clear();
-                              //_amountController.clear();
-                              Navigator.pop(context);
-                            }),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-          );
-        });
-  }
-
-  void _showEditForm(ProgramData program) {
-    // Get instance of programs cubit from main context
-    ProgramsCubit programsCubit = BlocProvider.of<ProgramsCubit>(context);
-    ProgramEditCubit programEditCubit =
-        BlocProvider.of<ProgramEditCubit>(context);
-    List<bool> validation = [true, true, true, true, true, true];
-    showDialog(
-        context: context,
-        builder: (context) {
-          _titleController.text = program.title;
-          _descriptionController.text = program.description;
-          List<dynamic> inputValues = [
-            _titleController.text,
-            _descriptionController.text,
-            program.limit,
-            program.equipment,
-            program.action,
-            program.condition
-          ];
-          return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                side: const BorderSide(
-                    color: Colors.transparent,
-                    width: 2.0), // Add border color and width
-              ),
-              title: const Text("Edit program"),
-              content: Container(
+            content: SingleChildScrollView(
+              child: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
-                width: MediaQuery.of(context).size.width * .6,
+                width: MediaQuery.of(context).size.width*.6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    InputTextField(
-                        controller: _titleController,
-                        errorText:
-                            validation[0] ? null : "Title cannot be be empty!",
-                        labelText: "Title"),
-                    InputTextField(
-                        controller: _descriptionController,
-                        errorText: validation[1]
-                            ? null
-                            : "Description cannot be be empty!",
-                        labelText: "Description"),
                     BlocBuilder<ProgramEditCubit, List<dynamic>>(
                       bloc: programEditCubit,
                       builder: (context, state) {
                         return Column(
                           children: [
+                            InputTextField(
+                                controller: _titleController,
+                                errorText: validation[0]
+                                    ? null
+                                    : "Title cannot be be empty!",
+                                labelText: "Title"),
+                            InputTextField(
+                                controller: _descriptionController,
+                                errorText: validation[1]
+                                    ? null
+                                    : "Description cannot be be empty!",
+                                labelText: "Description"),
                             Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Center(
@@ -535,8 +321,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     ],
                                     onChanged: (selection) {
                                       inputValues[5] = selection;
-                                      programEditCubit.checkValidationAndUpdate(
-                                          inputValues);
+                                      programEditCubit
+                                          .checkValidationAndUpdate(inputValues);
                                     }),
                               ),
                             ),
@@ -579,8 +365,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     ],
                                     onChanged: (selection) {
                                       inputValues[3] = selection;
-                                      programEditCubit.checkValidationAndUpdate(
-                                          inputValues);
+                                      programEditCubit
+                                          .checkValidationAndUpdate(inputValues);
                                     }),
                               ),
                             ),
@@ -611,8 +397,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     ],
                                     onChanged: (selection) {
                                       inputValues[4] = selection;
-                                      programEditCubit.checkValidationAndUpdate(
-                                          inputValues);
+                                      programEditCubit
+                                          .checkValidationAndUpdate(inputValues);
                                     }),
                               ),
                             ),
@@ -645,16 +431,14 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     "pending":
                                         _userRole != 'worker' ? false : true,
                                   };
-                                  programsCubit.updatePrograms(
-                                      program.reference, data, _userReference);
+                                  programsCubit.addProgram(data, _userReference);
                                   _titleController.clear();
                                   _descriptionController.clear();
                                   Navigator.pop(context);
-                                  Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content: Text(
-                                              "Program edited succesfully!")));
+                                          content:
+                                              Text("Item added succesfully!")));
                                 }
                               }),
                         ),
@@ -664,12 +448,234 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                               onPressed: () {
                                 _titleController.clear();
                                 _descriptionController.clear();
+                                //_amountController.clear();
                                 Navigator.pop(context);
                               }),
                         )
                       ],
                     )
                   ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  void _showEditForm(ProgramData program) {
+    // Get instance of programs cubit from main context
+    ProgramsCubit programsCubit = BlocProvider.of<ProgramsCubit>(context);
+    ProgramEditCubit programEditCubit =
+        BlocProvider.of<ProgramEditCubit>(context);
+    List<bool> validation = [true, true, true, true, true, true];
+    showDialog(
+        context: context,
+        builder: (context) {
+          _titleController.text = program.title;
+          _descriptionController.text = program.description;
+          List<dynamic> inputValues = [
+            _titleController.text,
+            _descriptionController.text,
+            program.limit,
+            program.equipment,
+            program.action,
+            program.condition
+          ];
+          return AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                side: const BorderSide(
+                    color: Colors.transparent,
+                    width: 2.0), // Add border color and width
+              ),
+              title: const Text("Edit program"),
+              content: SingleChildScrollView(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  width: MediaQuery.of(context).size.width*.6,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      InputTextField(
+                          controller: _titleController,
+                          errorText:
+                              validation[0] ? null : "Title cannot be be empty!",
+                          labelText: "Title"),
+                      InputTextField(
+                          controller: _descriptionController,
+                          errorText: validation[1]
+                              ? null
+                              : "Description cannot be be empty!",
+                          labelText: "Description"),
+                      BlocBuilder<ProgramEditCubit, List<dynamic>>(
+                        bloc: programEditCubit,
+                        builder: (context, state) {
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Center(
+                                  child: DropdownButtonFormField(
+                                      isExpanded: true,
+                                      value: inputValues[5] != ""
+                                          ? inputValues[5]
+                                          : null,
+                                      elevation: 16,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Condition',
+                                        border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(20))),
+                                      ),
+                                      items: const [
+                                        DropdownMenuItem(
+                                          value: 'lt',
+                                          child: Text('less than'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'gt',
+                                          child: Text('greater than'),
+                                        ),
+                                      ],
+                                      onChanged: (selection) {
+                                        inputValues[5] = selection;
+                                        programEditCubit.checkValidationAndUpdate(
+                                            inputValues);
+                                      }),
+                                ),
+                              ),
+                              CustomSlider(
+                                  updateSlider: (double value) {
+                                    List<dynamic> values = inputValues;
+                                    values[2] = value;
+                                    programEditCubit
+                                        .checkValidationAndUpdate(values);
+                                  },
+                                  currentSliderValue: inputValues[2]),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Center(
+                                  child: DropdownButtonFormField(
+                                      isExpanded: true,
+                                      value: inputValues[3] != ""
+                                          ? inputValues[3]
+                                          : null,
+                                      elevation: 16,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Equipment',
+                                        border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(20))),
+                                      ),
+                                      items: const [
+                                        DropdownMenuItem(
+                                          value: 'fan',
+                                          child: Text('fan'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'pump',
+                                          child: Text('pump'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'light',
+                                          child: Text('light'),
+                                        ),
+                                      ],
+                                      onChanged: (selection) {
+                                        inputValues[3] = selection;
+                                        programEditCubit.checkValidationAndUpdate(
+                                            inputValues);
+                                      }),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Center(
+                                  child: DropdownButtonFormField(
+                                      isExpanded: true,
+                                      value: inputValues[4] != ""
+                                          ? inputValues[4]
+                                          : null,
+                                      elevation: 16,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Action',
+                                        border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(20))),
+                                      ),
+                                      items: const [
+                                        DropdownMenuItem(
+                                          value: 'off',
+                                          child: Text('off'),
+                                        ),
+                                        DropdownMenuItem(
+                                          value: 'on',
+                                          child: Text('on'),
+                                        ),
+                                      ],
+                                      onChanged: (selection) {
+                                        inputValues[4] = selection;
+                                        programEditCubit.checkValidationAndUpdate(
+                                            inputValues);
+                                      }),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GreenElevatedButton(
+                                text: "Submit",
+                                onPressed: () {
+                                  inputValues[0] = _titleController.text;
+                                  inputValues[1] = _descriptionController.text;
+                                  validation = programEditCubit
+                                      .checkValidationAndUpdate(inputValues);
+                                  if (validation.contains(null) ||
+                                      validation.contains(false)) {
+                                    return;
+                                  } else {
+                                    Map<String, dynamic> data = {
+                                      "title": _titleController.text,
+                                      "description": _descriptionController.text,
+                                      "limit": inputValues[2],
+                                      "equipment": inputValues[3],
+                                      "action": inputValues[4],
+                                      "condition": inputValues[5],
+                                      "creationDate": DateTime.now(),
+                                      "pending":
+                                          _userRole != 'worker' ? false : true,
+                                    };
+                                    programsCubit.updatePrograms(
+                                        program.reference, data, _userReference);
+                                    _titleController.clear();
+                                    _descriptionController.clear();
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content: Text(
+                                                "Program edited succesfully!")));
+                                  }
+                                }),
+                          ),
+                          Expanded(
+                            child: WhiteElevatedButton(
+                                text: "Cancel",
+                                onPressed: () {
+                                  _titleController.clear();
+                                  _descriptionController.clear();
+                                  Navigator.pop(context);
+                                }),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ));
         });
@@ -688,39 +694,41 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                     width: 2.0), // Add border color and width
               ),
               title: const Text("Are you sure?"),
-              content: Container(
-                constraints: const BoxConstraints(maxWidth: 400),
-                width: MediaQuery.of(context).size.width * .6,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: GreenElevatedButton(
-                              text: "Submit",
-                              onPressed: () {
-                                programsCubit.removeProgram(
-                                    program.reference, _userReference);
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            "Program deleted succesfully!")));
-                              }),
-                        ),
-                        Expanded(
-                          child: WhiteElevatedButton(
-                              text: "Cancel",
-                              onPressed: () {
-                                Navigator.pop(context);
-                              }),
-                        )
-                      ],
-                    )
-                  ],
+              content: SingleChildScrollView(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  width: MediaQuery.of(context).size.width*.6,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GreenElevatedButton(
+                                text: "Submit",
+                                onPressed: () {
+                                  programsCubit.removeProgram(
+                                      program.reference, _userReference);
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              "Program deleted succesfully!")));
+                                }),
+                          ),
+                          Expanded(
+                            child: WhiteElevatedButton(
+                                text: "Cancel",
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                }),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ));
         });

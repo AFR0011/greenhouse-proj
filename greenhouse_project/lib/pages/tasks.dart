@@ -160,10 +160,10 @@ class _TasksPageState extends State<_TasksPageContent> {
               context, widget.userCredential, _userReference, "Tasks")
           : createAltAppbar(context, "Tasks"),
       // Tasks section
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: _userRole == "worker"
-            ? BoxDecoration(
+      body: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+              decoration:_userRole == "worker"? BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
                     Colors.lightBlueAccent.shade100.withOpacity(0.6),
@@ -180,9 +180,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                     BlendMode.dstATop,
                   ),
                 ),
-              )
-            : BoxDecoration(
-                gradient: LinearGradient(
+              ) : BoxDecoration(gradient: LinearGradient(
                   colors: [
                     Colors.lightBlueAccent.shade100.withOpacity(0.6),
                     Colors.teal.shade100.withOpacity(0.6),
@@ -197,299 +195,116 @@ class _TasksPageState extends State<_TasksPageContent> {
                     Colors.white.withOpacity(0.05),
                     BlendMode.dstATop,
                   ),
-                ),
+                ),),
+          child: Column(
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width - 20,
               ),
-        child: Column(
-          children: [
-            // BlocBuilder for tasks
-            BlocBuilder<TaskCubit, TaskState>(
-              builder: (context, state) {
-                // Show "loading screen" if processing tasks state
-                if (state is TaskLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                // Show tasks if tasks state is loaded
-                else if (state is TaskLoaded) {
-                  List<TaskData> taskList = state.tasks; // tasks list
-
-                  // Display nothing if no tasks
-                  if (taskList.isEmpty) {
-                    return const Center(child: Text("No Tasks..."));
+              // BlocBuilder for tasks
+              BlocBuilder<TaskCubit, TaskState>(
+                builder: (context, state) {
+                  // Show "loading screen" if processing tasks state
+                  if (state is TaskLoading) {
+                    return const Center(child: CircularProgressIndicator());
                   }
-                  // Display tasks
-                  else {
-                    List<TaskData> waitingTasks = taskList
-                        .where((task) => task.status == "waiting")
-                        .toList();
-                    List<TaskData> incompleteTasks = taskList
-                        .where((task) => task.status == "incomplete")
-                        .toList();
-                    return SingleChildScrollView(
-                      child: Padding(
-                          padding: const EdgeInsets.only(
-                              left: 16.0, right: 16.0, top: 8.0),
+                  // Show tasks if tasks state is loaded
+                  else if (state is TaskLoaded) {
+                    List<TaskData> taskList = state.tasks; // tasks list
+          
+                    // Display nothing if no tasks
+                    if (taskList.isEmpty) {
+                      return const Center(child: Text("No Tasks..."));
+                    }
+                    // Display tasks
+                    else {
+                      return Padding(
+                          padding: const EdgeInsets.all(16.0),
                           child: Column(
                             children: [
-                              const Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text("Tasks",
-                                      style: subheadingTextStyle)),
                               SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.30,
-                                child: _userRole == "manager"
-                                    ? taskList.isEmpty
-                                        ? const Center(
-                                            child: Text("No tasks..."),
-                                          )
-                                        : ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: taskList.length,
-                                            itemBuilder: (context, index) {
-                                              TaskData task =
-                                                  taskList[index]; // task info
-                                              return Card(
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15.0),
-                                                ),
-                                                elevation: 4.0,
-                                                margin: const EdgeInsets.only(
-                                                    bottom: 16.0),
-                                                child: ListTile(
-                                                  leading: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.green
-                                                          .withOpacity(0.1),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.task_outlined,
-                                                      color: Colors.grey[600]!,
-                                                      size: 30,
-                                                    ),
-                                                  ),
-                                                  title: Text(
-                                                    task.title,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 18),
-                                                  ),
-                                                  subtitle: Text(
-                                                      task.dueDate.toString()),
-                                                  trailing: WhiteElevatedButton(
-                                                    text: 'Details',
-                                                    onPressed: () {
-                                                      BuildContext mainContext =
-                                                          context;
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return TaskDetailsDialog(
-                                                              task: task,
-                                                              mainContext:
-                                                                  mainContext,
-                                                              userRole:
-                                                                  _userRole,
-                                                              managerReference:
-                                                                  _userRole ==
-                                                                          "worker"
-                                                                      ? task
-                                                                          .manager
-                                                                      : null,
-                                                              editOrComplete: _userRole ==
-                                                                          "worker" ||
-                                                                      (_userRole ==
-                                                                              "manager" &&
-                                                                          task.status ==
-                                                                              "waiting")
-                                                                  ? completeTask
-                                                                  : showEditForm,
-                                                              deleteOrContact:
-                                                                  _userRole ==
-                                                                          "worker"
-                                                                      ? contactManager
-                                                                      : showDeleteForm);
-                                                        },
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          )
-                                    : incompleteTasks.isEmpty
-                                        ? const Center(
-                                            child: Text("No tasks..."),
-                                          )
-                                        : ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: incompleteTasks.length,
-                                            itemBuilder: (context, index) {
-                                              TaskData task = incompleteTasks[
-                                                  index]; // task info
-                                              return Card(
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          15.0),
-                                                ),
-                                                elevation: 4.0,
-                                                margin: const EdgeInsets.only(
-                                                    bottom: 16.0),
-                                                child: ListTile(
-                                                  leading: Container(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.green
-                                                          .withOpacity(0.1),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    child: Icon(
-                                                      Icons.task_outlined,
-                                                      color: Colors.grey[600]!,
-                                                      size: 30,
-                                                    ),
-                                                  ),
-                                                  title: Text(
-                                                    task.title,
-                                                    style: const TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 18),
-                                                  ),
-                                                  subtitle: Text(
-                                                      task.dueDate.toString()),
-                                                  trailing: WhiteElevatedButton(
-                                                    text: 'Details',
-                                                    onPressed: () {
-                                                      BuildContext mainContext =
-                                                          context;
-                                                      showDialog(
-                                                        context: context,
-                                                        builder: (context) {
-                                                          return TaskDetailsDialog(
-                                                              task: task,
-                                                              mainContext:
-                                                                  mainContext,
-                                                              userRole:
-                                                                  _userRole,
-                                                              managerReference:
-                                                                  _userRole ==
-                                                                          "worker"
-                                                                      ? task
-                                                                          .manager
-                                                                      : null,
-                                                              editOrComplete: _userRole ==
-                                                                          "worker" ||
-                                                                      (_userRole ==
-                                                                              "manager" &&
-                                                                          task.status ==
-                                                                              "waiting")
-                                                                  ? completeTask
-                                                                  : showEditForm,
-                                                              deleteOrContact:
-                                                                  _userRole ==
-                                                                          "worker"
-                                                                      ? contactManager
-                                                                      : showDeleteForm);
-                                                        },
-                                                      );
-                                                    },
-                                                  ),
-                                                ),
-                                              );
-                                            },
+                                height: MediaQuery.of(context).size.height * 0.5,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: taskList.length,
+                                  itemBuilder: (context, index) {
+                                    TaskData task = taskList[index]; // task info
+                                    return Card(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15.0),
+                                      ),
+                                      elevation: 4.0,
+                                      margin: const EdgeInsets.only(bottom: 16.0),
+                                      child: ListTile(
+                                        leading: Container(
+                                          padding: const EdgeInsets.all(8.0),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green.withOpacity(0.1),
+                                            shape: BoxShape.circle,
                                           ),
-                              ),
-                              _userRole == "manager"
-                                  ? const SizedBox()
-                                  : const Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Text("Waiting for Approval",
-                                          style: subheadingTextStyle)),
-                              _userRole == "manager"
-                                  ? const SizedBox()
-                                  : SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.35,
-                                      child: waitingTasks.isEmpty
-                                          ? const Center(
-                                              child:
-                                                  Text("No pending tasks..."),
-                                            )
-                                          : ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount: waitingTasks.length,
-                                              itemBuilder: (context, index) {
-                                                TaskData task = waitingTasks[
-                                                    index]; // task info
-                                                return Card(
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15.0),
-                                                  ),
-                                                  elevation: 4.0,
-                                                  margin: const EdgeInsets.only(
-                                                      bottom: 16.0),
-                                                  child: ListTile(
-                                                    leading: Container(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              8.0),
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.green
-                                                            .withOpacity(0.1),
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      child: Icon(
-                                                        Icons.task_outlined,
-                                                        color:
-                                                            Colors.grey[600]!,
-                                                        size: 30,
-                                                      ),
-                                                    ),
-                                                    title: Text(
-                                                      task.title,
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 18),
-                                                    ),
-                                                    subtitle: Text(task.dueDate
-                                                        .toString()
-                                                        .substring(0, 16)),
-                                                  ),
-                                                );
+                                          child: Icon(
+                                            Icons.task_outlined,
+                                            color: Colors.grey[600]!,
+                                            size: 30,
+                                          ),
+                                        ),
+                                        title: Text(
+                                          task.title,
+                                          style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 18),
+                                        ),
+                                        subtitle: Text(task.dueDate.toString()),
+                                        trailing: WhiteElevatedButton(
+                                          text: 'Details',
+                                          onPressed: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return TaskDetailsDialog(
+                                                    task: task,
+                                                    userRole: _userRole,
+                                                    managerReference:
+                                                        _userRole == "worker"
+                                                            ? task.manager
+                                                            : null,
+                                                    editOrComplete:
+                                                        _userRole == "worker"
+                                                            ? completeTask
+                                                            : showEditForm,
+                                                    deleteOrContact:
+                                                        _userRole == "worker"
+                                                            ? contactManager
+                                                            : showDeleteForm,
+                                                            
+                                                    mainContext: context,);
+                                                    
                                               },
-                                            ),
-                                    ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
                             ],
-                          )),
-                    );
+                          ));
+                    }
                   }
-                }
-                // Show error message once an error occurs
-                else if (state is TaskError) {
-                  return Center(child: Text(state.error.toString()));
-                }
-                // If the state is not any of the predefined states;
-                // never happens; but, anything can happen
-                else {
-                  return const Center(child: Text('Unexpected State'));
-                }
-              },
-            ),
-          ],
+                  // Show error message once an error occurs
+                  else if (state is TaskError) {
+                    return Center(child: Text(state.error.toString()));
+                  }
+                  // If the state is not any of the predefined states;
+                  // never happens; but, anything can happen
+                  else {
+                    return const Center(child: Text('Unexpected State'));
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
 
@@ -585,123 +400,126 @@ class _TasksPageState extends State<_TasksPageContent> {
                       ),
                     ),
                     title: const Text("Edit task"),
-                    content: Container(
-                      constraints: const BoxConstraints(maxWidth: 400),
-                      width: MediaQuery.of(context).size.width * .6,
-                      child: Column(
-                        mainAxisSize:
-                            MainAxisSize.min, // Set column to minimum size
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          InputTextField(
-                            controller: _titleController,
-                            errorText: taskEditState[0]
-                                ? ""
-                                : "Title should not be empty",
-                            labelText: "Title",
-                          ),
-                          InputTextField(
-                            controller: _descController,
-                            errorText: taskEditState[1]
-                                ? ""
-                                : "Description should not be empty",
-                            labelText: "Description",
-                          ),
-                          InputDropdown(
-                            items: dropdownItems,
-                            value: dropdownItems.entries
-                                .firstWhere(
-                                    (element) =>
-                                        element.value == widget.userReference,
-                                    orElse: () => dropdownItems.entries.first)
-                                .value,
-                            onChanged: taskDropdownCubit.updateDropdown,
-                          ),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height / 5,
-                            child: Center(
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 25),
-                                child: DatePickerWidget(
-                                  looping: false,
-                                  firstDate: DateTime.now(),
-                                  lastDate: DateTime(2040, 1, 1),
-                                  initialDate: DateTime.now(),
-                                  dateFormat: "dd-MMM-yyyy",
-                                  locale: DatePicker.localeFromString('en'),
-                                  onChange: (DateTime newDate, _) =>
-                                      taskEditCubit.updateState([
-                                    taskEditState[0],
-                                    taskEditState[1],
-                                    newDate,
-                                    taskEditState[3]
-                                  ]),
-                                  pickerTheme: const DateTimePickerTheme(
-                                    itemTextStyle: TextStyle(
-                                        color: Colors.black, fontSize: 19),
-                                    dividerColor: Colors.blue,
+                    content: SingleChildScrollView(
+                      child: Container(
+                        constraints: const BoxConstraints(maxWidth: 400),
+                        width: MediaQuery.of(context).size.width*.6,
+                        child: Column(
+                          mainAxisSize:
+                              MainAxisSize.min, // Set column to minimum size
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InputTextField(
+                              controller: _titleController,
+                              errorText: taskEditState[0]
+                                  ? ""
+                                  : "Title should not be empty",
+                              labelText: "Title",
+                            ),
+                            InputTextField(
+                              controller: _descController,
+                              errorText: taskEditState[1]
+                                  ? ""
+                                  : "Description should not be empty",
+                              labelText: "Description",
+                            ),
+                            InputDropdown(
+                              items: dropdownItems,
+                              value: dropdownItems.entries
+                                  .firstWhere(
+                                      (element) =>
+                                          element.value == widget.userReference,
+                                      orElse: () => dropdownItems.entries.first)
+                                  .value,
+                              onChanged: taskDropdownCubit.updateDropdown,
+                            ),
+                            Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
+                                child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                                  child: DatePickerWidget(
+                                    looping: false, // default is not looping
+                                    firstDate: DateTime.now(),
+                                    lastDate: DateTime(2040, 1, 1),
+                                    initialDate: DateTime.now(),
+                                    dateFormat: "dd-MMM-yyyy",
+                                    locale: DatePicker.localeFromString('en'),
+                                    onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
+                                    pickerTheme: const DateTimePickerTheme(
+                                      itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
+                                      dividerColor: Colors.blue,
+                                      backgroundColor: Colors.transparent,
+                                    ),
                                   ),
                                 ),
+                                                          ),
                               ),
+                            const SizedBox(height: 10),
+                            // Submit & Cancel
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: GreenElevatedButton(
+                                    text: 'Submit',
+                                    onPressed: () {
+                                      List<dynamic> validation = [
+                                        true,
+                                        true,
+                                        taskEditState[2],
+                                        taskEditState[3],
+                                      ];
+                                      if (_titleController.text.isEmpty) {
+                                        validation[0] = false;
+                                      }
+                                      if (_descController.text.isEmpty) {
+                                        validation[1] = false;
+                                      }
+                                      bool isValid =
+                                          taskEditCubit.updateState(validation);
+                                      if (isValid) {
+                                        taskCubit.updateTask(
+                                            task.taskReference,
+                                            {
+                                              "title": _titleController.text,
+                                              "description": _descController.text,
+                                              "worker": taskEditState[3],
+                                              "dueDate": Timestamp
+                                                  .fromMillisecondsSinceEpoch(
+                                                      taskEditState[2]
+                                                          .millisecondsSinceEpoch)
+                                            },
+                                            _userReference);
+                                                        
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                                content: Text(
+                                                    "Task edited successfully")));
+                                      } else {
+                                        print("no");
+                                      }
+                                    },
+                                  ),
+                                ),
+                                Expanded(
+                                  child: WhiteElevatedButton(
+                                    text: 'Cancel',
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      Navigator.pop(context);
+                                      _titleController.clear();
+                                      _descController.clear();
+                                      _duedateController.clear();
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          // Submit & Cancel
-                          Row(
-                            children: [
-                              GreenElevatedButton(
-                                text: 'Submit',
-                                onPressed: () {
-                                  List<dynamic> validation = [
-                                    true,
-                                    true,
-                                    taskEditState[2],
-                                    taskEditState[3],
-                                  ];
-                                  if (_titleController.text.isEmpty) {
-                                    validation[0] = false;
-                                  }
-                                  if (_descController.text.isEmpty) {
-                                    validation[1] = false;
-                                  }
-                                  bool isValid =
-                                      taskEditCubit.updateState(validation);
-                                  if (isValid) {
-                                    taskCubit.updateTask(
-                                        task.taskReference,
-                                        {
-                                          "title": _titleController.text,
-                                          "description": _descController.text,
-                                          "worker": taskEditState[3],
-                                          "dueDate": Timestamp
-                                              .fromMillisecondsSinceEpoch(
-                                                  taskEditState[2]
-                                                      .millisecondsSinceEpoch)
-                                        },
-                                        _userReference);
-
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                "Task edited successfully")));
-                                  }
-                                },
-                              ),
-                              WhiteElevatedButton(
-                                text: 'Cancel',
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  _titleController.clear();
-                                  _descController.clear();
-                                  _duedateController.clear();
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -729,40 +547,41 @@ class _TasksPageState extends State<_TasksPageContent> {
                     width: 2.0), // Add border color and width
               ),
               title: const Text("Are you sure?"),
-              content: Container(
-                constraints: const BoxConstraints(maxWidth: 400),
-                width:
-                    MediaQuery.of(context).size.width * .6, // Set maximum width
-                child: Column(
-                  mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RedElevatedButton(
-                              text: "Yes",
-                              onPressed: () {
-                                taskCubit.removeTask(
-                                    task.taskReference, _userReference);
-                                Navigator.pop(context);
-                                Navigator.pop(context);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content:
-                                            Text("Task deleted succesfully!")));
-                              }),
-                        ),
-                        Expanded(
-                          child: WhiteElevatedButton(
-                              text: "No",
-                              onPressed: () {
-                                Navigator.pop(context);
-                              }),
-                        )
-                      ],
-                    )
-                  ],
+              content: SingleChildScrollView(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  width: MediaQuery.of(context).size.width*.6, // Set maximum width
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: RedElevatedButton(
+                                text: "Yes",
+                                onPressed: () {
+                                  taskCubit.removeTask(
+                                      task.taskReference, _userReference);
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text("Task deleted succesfully!")));
+                                }),
+                          ),
+                          Expanded(
+                            child: WhiteElevatedButton(
+                                text: "No",
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                }),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ));
         });
@@ -802,118 +621,118 @@ class _TasksPageState extends State<_TasksPageContent> {
                           ),
                         ),
                         title: const Text("Add task"),
-                        content: Container(
-                          constraints: const BoxConstraints(maxWidth: 400),
-                          width: MediaQuery.of(context).size.width * .6,
-                          child: Column(
-                            mainAxisSize:
-                                MainAxisSize.min, // Set column to minimum size
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              InputTextField(
-                                controller: _titleController,
-                                errorText: taskEditState[0]
-                                    ? ""
-                                    : "Title should not be empty",
-                                labelText: "Title",
-                              ),
-                              InputTextField(
-                                controller: _descController,
-                                errorText: taskEditState[1]
-                                    ? ""
-                                    : "Description should not be empty",
-                                labelText: "Description",
-                              ),
-                              InputDropdown(
-                                items: dropdownItems,
-                                value: dropdownItems.entries
-                                    .firstWhere(
-                                      (element) =>
-                                          element.value == widget.userReference,
-                                      orElse: () => dropdownItems.entries.first,
-                                    )
-                                    .value,
-                                onChanged: taskDropdownCubit.updateDropdown,
-                              ),
+                        content: SingleChildScrollView(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            width: MediaQuery.of(context).size.width*.6,
+                            child: Column(
+                              mainAxisSize:
+                                  MainAxisSize.min, // Set column to minimum size
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                InputTextField(
+                                  controller: _titleController,
+                                  errorText: taskEditState[0]
+                                      ? ""
+                                      : "Title should not be empty",
+                                  labelText: "Title",
+                                ),
+                                InputTextField(
+                                  controller: _descController,
+                                  errorText: taskEditState[1]
+                                      ? ""
+                                      : "Description should not be empty",
+                                  labelText: "Description",
+                                ),
+                                InputDropdown(
+                                  items: dropdownItems,
+                                  value: dropdownItems.entries
+                                      .firstWhere(
+                                        (element) =>
+                                            element.value == widget.userReference,
+                                        orElse: () => dropdownItems.entries.first,
+                                      )
+                                      .value,
+                                  onChanged: taskDropdownCubit.updateDropdown,
+                                ),
                               Padding(
                                 padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
                                 child: Center(
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 25),
-                                    child: DatePickerWidget(
-                                      looping: false, // default is not looping
-                                      firstDate: DateTime.now(),
-                                      lastDate: DateTime(2040, 1, 1),
-                                      initialDate: DateTime.now(),
-                                      dateFormat: "dd-MMM-yyyy",
-                                      locale: DatePicker.localeFromString('en'),
-                                      onChange: (DateTime newDate, _) =>
-                                          taskEditCubit.updateState([
-                                        taskEditState[0],
-                                        taskEditState[1],
-                                        newDate,
-                                        taskEditState[3]
-                                      ]),
-                                      pickerTheme: const DateTimePickerTheme(
-                                        itemTextStyle: TextStyle(
-                                            color: Colors.black, fontSize: 19),
-                                        dividerColor: Colors.blue,
-                                      ),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                                  child: DatePickerWidget(
+                                    looping: false, // default is not looping
+                                    firstDate: DateTime.now(),
+                                    lastDate: DateTime(2040, 1, 1),
+                                    initialDate: DateTime.now(),
+                                    dateFormat: "dd-MMM-yyyy",
+                                    locale: DatePicker.localeFromString('en'),
+                                    onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
+                                    pickerTheme: const DateTimePickerTheme(
+                                      itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
+                                      dividerColor: Colors.blue,
+                                      backgroundColor: Colors.transparent,
                                     ),
                                   ),
                                 ),
+                                                          ),
                               ),
-                              //Submit & Cancel
-                              Row(
-                                children: [
-                                  GreenElevatedButton(
-                                    text: 'Submit',
-                                    onPressed: () {
-                                      List<dynamic> validation = [
-                                        true,
-                                        true,
-                                        taskEditState[2],
-                                        taskEditState[3],
-                                      ];
-                                      if (_titleController.text.isEmpty) {
-                                        validation[0] = false;
-                                      }
-                                      if (_descController.text.isEmpty) {
-                                        validation[1] = false;
-                                      }
-                                      bool isValid =
-                                          taskEditCubit.updateState(validation);
-                                      if (isValid) {
-                                        taskCubit.addTask(
-                                          _titleController.text,
-                                          _descController.text,
-                                          taskEditState[2],
-                                          taskEditState[3],
-                                        );
-                                        Navigator.pop(context);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content:
-                                                Text("Task has been created!"),
-                                          ),
-                                        );
-                                      }
-                                    },
-                                  ),
-                                  WhiteElevatedButton(
-                                    text: 'Cancel',
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      _titleController.clear();
-                                      _descController.clear();
-                                      _duedateController.clear();
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
+                              const SizedBox(height: 10,),
+                                //Submit & Cancel
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: GreenElevatedButton(
+                                        text: 'Submit',
+                                        onPressed: () {
+                                          List<dynamic> validation = [
+                                            true,
+                                            true,
+                                            taskEditState[2],
+                                            taskEditState[3],
+                                          ];
+                                          if (_titleController.text.isEmpty) {
+                                            validation[0] = false;
+                                          }
+                                          if (_descController.text.isEmpty) {
+                                            validation[1] = false;
+                                          }
+                                          bool isValid =
+                                              taskEditCubit.updateState(validation);
+                                          if (isValid) {
+                                            taskCubit.addTask(
+                                              _titleController.text,
+                                              _descController.text,
+                                              taskEditState[2],
+                                              taskEditState[3],
+                                            );
+                                            Navigator.pop(context);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content:
+                                                    Text("Task has been created!"),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: WhiteElevatedButton(
+                                        text: 'Cancel',
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          _titleController.clear();
+                                          _descController.clear();
+                                          _duedateController.clear();
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       );

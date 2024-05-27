@@ -219,50 +219,57 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                                     color: Colors.transparent,
                                     width: 2.0), // Add border color and width
                               ),
-                              content: Container(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 400),
-                                width: MediaQuery.of(context).size.width * .6,
-                                child: ListView.builder(
-                                  padding: const EdgeInsets.all(16.0),
-                                  shrinkWrap: true,
-                                  itemCount: chatUsersList.length,
-                                  itemBuilder: (context, index) {
-                                    final employee = chatUsersList[index];
-                                    return ListTile(
-                                      leading: Container(
-                                        padding: const EdgeInsets.all(8.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.green.withOpacity(0.1),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: ClipOval(
-                                          child: Image.memory(
-                                            employee.picture,
-                                            width: 50,
-                                            height: 50,
-                                            fit: BoxFit.cover,
+                              content: SingleChildScrollView(
+                                child: Container(
+                                  constraints: const BoxConstraints(maxWidth: 400),
+                                  width: MediaQuery.of(context).size.width*.6,
+                                  child: ListView.builder(
+                                    padding: const EdgeInsets.all(16.0),
+                                    shrinkWrap: true,
+                                    itemCount: chatUsersList.length,
+                                    itemBuilder: (context, index) {
+                                      final employee = chatUsersList[index];
+                                      return Card(
+                                        shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    elevation: 4.0,
+                                    margin: EdgeInsets.only(bottom: 16.0),
+                                        child: ListTile(
+                                          leading: Container(
+                                            padding: const EdgeInsets.all(8.0),
+                                            decoration: BoxDecoration(
+                                              color: Colors.green.withOpacity(0.1),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: ClipOval(
+                                              child: Image.memory(
+                                                employee.picture,
+                                                width: 50,
+                                                height: 50,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
                                           ),
+                                          title: Text(
+                                              " ${employee.name + employee.surname}",
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12)),
+                                          subtitle: Text(employee.role,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w300,
+                                                color: Colors.grey,
+                                                fontSize: 8.0,
+                                              )),
+                                          onTap: () {
+                                            chatsCubit.createChat(
+                                                context, employee.reference);
+                                          },
                                         ),
-                                      ),
-                                      title: Text(
-                                          " ${employee.name + employee.surname}",
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              overflow: TextOverflow.ellipsis,
-                                              fontSize: 12)),
-                                      subtitle: Text(employee.role,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w300,
-                                            color: Colors.grey,
-                                            fontSize: 8.0,
-                                          )),
-                                      onTap: () {
-                                        chatsCubit.createChat(
-                                            context, employee.reference);
-                                      },
-                                    );
-                                  },
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             );

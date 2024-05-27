@@ -195,59 +195,61 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                 ),
               ),
             ),
-            child: Column(
-              children: [
-                Container(
-                  width: double.maxFinite,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.green.shade700, Colors.teal.shade400],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Container(
+                    width: double.maxFinite,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.green.shade700, Colors.teal.shade400],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                     ),
-                  ),
-                  child: Center(
-                    child: ToggleButtons(
-                      renderBorder: false,
-                      fillColor: Colors.teal.withOpacity(1),
-                      selectedColor: Colors.white,
-                      splashColor: Colors.tealAccent,
-                      hoverColor: Colors.tealAccent.withOpacity(0.1),
-                      isSelected: _isSelected,
-                      onPressed: _onToggle,
-                      children: <Widget>[
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: const Align(
-                            alignment: Alignment.center,
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Dashbord',
-                                style: TextStyle(fontSize: 16),
+                    child: Center(
+                      child: ToggleButtons(
+                        renderBorder: false,
+                        fillColor: Colors.teal.withOpacity(1),
+                        selectedColor: Colors.white,
+                        splashColor: Colors.tealAccent,
+                        hoverColor: Colors.tealAccent.withOpacity(0.1),
+                        isSelected: _isSelected,
+                        onPressed: _onToggle,
+                        children: <Widget>[
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: const Align(
+                              alignment: Alignment.center,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Dashbord',
+                                  style: TextStyle(fontSize: 16),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: const Align(
-                            alignment: Alignment.center,
-                            child: Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                'Notifications',
-                                style: TextStyle(fontSize: 16),
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: const Align(
+                              alignment: Alignment.center,
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Notifications',
+                                  style: TextStyle(fontSize: 16),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                _getDisplayWidget()
-              ],
+                  _getDisplayWidget()
+                ],
+              ),
             )),
 
         // Footer nav bar
@@ -376,7 +378,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           Align(
             alignment: Alignment.topCenter,
             child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.3,
+                height: MediaQuery.of(context).size.height * 0.5,
                 child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     itemExtent: MediaQuery.of(context).size.width * 0.8,

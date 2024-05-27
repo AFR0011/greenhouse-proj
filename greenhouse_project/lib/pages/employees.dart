@@ -170,6 +170,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
       // ),
       appBar: createAltAppbar(context, "Employees"),
       body: Container(
+        height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -188,112 +189,114 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
             ),
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 40.0),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width - 20,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 40.0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width - 20,
+                ),
               ),
-            ),
-            // BlocBuilder for manageEmployees state
-            BlocBuilder<ManageEmployeesCubit, ManagementState>(
-              builder: (context, state) {
-                // Show "loading screen" if processing manageEmployees state
-                if (state is ManageEmployeesLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                // Show employees if manageEmployees state is loaded
-                else if (state is ManageEmployeesLoaded) {
-                  List<EmployeeData> employeeList =
-                      state.employees; // employees list
-
-                  // Display nothing if no employees
-                  if (employeeList.isEmpty) {
-                    return const Center(child: Text("No Employees..."));
+              // BlocBuilder for manageEmployees state
+              BlocBuilder<ManageEmployeesCubit, ManagementState>(
+                builder: (context, state) {
+                  // Show "loading screen" if processing manageEmployees state
+                  if (state is ManageEmployeesLoading) {
+                    return const Center(child: CircularProgressIndicator());
                   }
-                  // Display employees
-                  else {
-                    return Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.7,
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: employeeList.length,
-                              itemBuilder: (context, index) {
-                                EmployeeData employee =
-                                    employeeList[index]; // employee info
-                                return Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  elevation: 4.0,
-                                  margin: const EdgeInsets.only(bottom: 16.0),
-                                  child: ListTile(
-                                    leading: Container(
-                                      padding: const EdgeInsets.all(8.0),
-                                      decoration: BoxDecoration(
-                                        color: Colors.green.withOpacity(0.1),
-                                        shape: BoxShape.circle,
+                  // Show employees if manageEmployees state is loaded
+                  else if (state is ManageEmployeesLoaded) {
+                    List<EmployeeData> employeeList =
+                        state.employees; // employees list
+          
+                    // Display nothing if no employees
+                    if (employeeList.isEmpty) {
+                      return const Center(child: Text("No Employees..."));
+                    }
+                    // Display employees
+                    else {
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: MediaQuery.of(context).size.height * 0.7,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: employeeList.length,
+                                itemBuilder: (context, index) {
+                                  EmployeeData employee =
+                                      employeeList[index]; // employee info
+                                  return Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                    ),
+                                    elevation: 4.0,
+                                    margin: const EdgeInsets.only(bottom: 16.0),
+                                    child: ListTile(
+                                      leading: Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        decoration: BoxDecoration(
+                                          color: Colors.green.withOpacity(0.1),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.account_box_outlined,
+                                          color: Colors.grey[600]!,
+                                          size: 30,
+                                        ),
                                       ),
-                                      child: Icon(
-                                        Icons.account_box_outlined,
-                                        color: Colors.grey[600]!,
-                                        size: 30,
+                                      title: Text(
+                                        employee.name,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 18),
+                                      ),
+                                      subtitle: Text(employee.enabled
+                                          ? "Active"
+                                          : "Inactive"),
+                                      trailing: WhiteElevatedButton(
+                                        text: 'Details',
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return EmployeeDetailsDialog(
+                                                userRole: _userRole,
+                                                employee: employee,
+                                                tasksFunction: tasksFunction,
+                                                toggleAccount: toggleAccount,
+                                                profileFunction: profileFunction,
+                                              );
+                                            },
+                                          );
+                                        },
                                       ),
                                     ),
-                                    title: Text(
-                                      employee.name,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18),
-                                    ),
-                                    subtitle: Text(employee.enabled
-                                        ? "Active"
-                                        : "Inactive"),
-                                    trailing: WhiteElevatedButton(
-                                      text: 'Details',
-                                      onPressed: () {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return EmployeeDetailsDialog(
-                                              userRole: _userRole,
-                                              employee: employee,
-                                              tasksFunction: tasksFunction,
-                                              toggleAccount: toggleAccount,
-                                              profileFunction: profileFunction,
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
+                          ],
+                        ),
+                      );
+                    }
                   }
-                }
-                // Show error message once an error occurs
-                else if (state is ManageEmployeesError) {
-                  return Center(child: Text(state.error.toString()));
-                }
-                // If the state is not any of the predefined states;
-                // never happens; but, anything can happen
-                else {
-                  return const Center(child: Text('Unexpected State'));
-                }
-              },
-            ),
-          ],
+                  // Show error message once an error occurs
+                  else if (state is ManageEmployeesError) {
+                    return Center(child: Text(state.error.toString()));
+                  }
+                  // If the state is not any of the predefined states;
+                  // never happens; but, anything can happen
+                  else {
+                    return const Center(child: Text('Unexpected State'));
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: _userRole == "admin"
