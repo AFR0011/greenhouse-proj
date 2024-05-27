@@ -12,26 +12,35 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
       FirebaseFirestore.instance.collection('logs');
 
   bool _isActive = true;
+  bool _isProcessing = false;
 
   EquipmentStatusCubit() : super(StatusLoading()) {
     _getEquipmentStatus();
   }
 
-  _getEquipmentStatus() {
+  void _getEquipmentStatus() {
     if (!_isActive) return;
-    equipment.orderBy('type', descending: true).snapshots().listen((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
-        final List<EquipmentStatus> status = snapshot.docs
-            .map((doc) => EquipmentStatus.fromFirestore(doc))
-            .toList();
-        emit(StatusLoaded([...status]));
-      }
-    });
+    try {
+      equipment
+          .orderBy('type', descending: true)
+          .snapshots()
+          .listen((snapshot) {
+        if (snapshot.docs.isNotEmpty) {
+          final List<EquipmentStatus> status = snapshot.docs
+              .map((doc) => EquipmentStatus.fromFirestore(doc))
+              .toList();
+          if (_isActive && !_isProcessing) emit(StatusLoaded([...status]));
+        }
+      });
+    } catch (error) {
+      if (_isActive && !_isProcessing) emit(StatusError(error.toString()));
+    }
   }
 
   void toggleStatus(DocumentReference userReference,
       DocumentReference equipment, bool currentStatus) async {
     if (!_isActive) return;
+    _isProcessing = true;
     equipment.update({'status': !currentStatus});
 
     String equipmentType = (await equipment.get()).get("type");
@@ -50,6 +59,8 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
       "userId": userReference,
       "externalId": equipment,
     });
+
+    _isProcessing = false;
   }
 
   @override

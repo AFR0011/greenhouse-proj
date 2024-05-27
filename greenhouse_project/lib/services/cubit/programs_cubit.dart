@@ -12,6 +12,7 @@ class ProgramsCubit extends Cubit<ProgramsState> {
       FirebaseFirestore.instance.collection('logs');
 
   bool _isActive = true;
+  bool _isProcessing = false;
 
   ProgramsCubit() : super(ProgramsLoading()) {
     _getPrograms();
@@ -23,16 +24,16 @@ class ProgramsCubit extends Cubit<ProgramsState> {
         (snapshot) {
       final List<ProgramData> programs =
           snapshot.docs.map((doc) => ProgramData.fromFirestore(doc)).toList();
-      emit(ProgramsLoaded([...programs]));
+      if (_isActive && !_isProcessing) emit(ProgramsLoaded([...programs]));
     }, onError: (error) {
-      emit(ProgramsError(error));
+      if (_isActive && !_isProcessing) emit(ProgramsError(error));
     });
   }
 
   void addProgram(
       Map<String, dynamic> data, DocumentReference userReference) async {
     if (!_isActive) return;
-
+    _isProcessing = true;
     emit(ProgramsLoading());
     try {
       DocumentReference externalId = await programs.add(data);
@@ -56,12 +57,13 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   void removeProgram(
       DocumentReference program, DocumentReference userReference) async {
     if (!_isActive) return;
-
+    _isProcessing = true;
     emit(ProgramsLoading());
     try {
       DocumentReference externalId = program;
@@ -89,12 +91,13 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   void updatePrograms(DocumentReference program, Map<String, dynamic> data,
       DocumentReference userReference) async {
     if (!_isActive) return;
-
+    _isProcessing = true;
     emit(ProgramsLoading());
     try {
       await program.update(data);
@@ -120,6 +123,7 @@ class ProgramsCubit extends Cubit<ProgramsState> {
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }
+    _isProcessing = false;
   }
 
   @override

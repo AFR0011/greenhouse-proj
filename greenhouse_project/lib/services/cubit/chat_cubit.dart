@@ -18,6 +18,7 @@ class ChatCubit extends Cubit<ChatState> {
   final DocumentReference? chatReference;
   // Flag to check if the cubit is active.
   bool _isActive = true;
+  bool _isProcessing = false;
 
   // Constructor initializing the cubit with a document reference and loading initial state.
   ChatCubit(this.chatReference) : super(ChatLoading()) {
@@ -35,9 +36,9 @@ class ChatCubit extends Cubit<ChatState> {
       final List<MessageData> messages =
           snapshot.docs.map((doc) => MessageData.fromFirestore(doc)).toList();
 
-      if (_isActive) emit(ChatLoaded([...messages]));
+      if (_isActive && !_isProcessing) emit(ChatLoaded([...messages]));
     }, onError: (error) {
-      if (_isActive) emit(ChatError(error.toString()));
+      if (_isActive && !_isProcessing) emit(ChatError(error.toString()));
     });
   }
 
@@ -45,6 +46,7 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> sendMessage(String message, DocumentReference receiver,
       DocumentReference sender, DocumentReference chat) async {
     if (!_isActive) return;
+    _isProcessing = true;
 
     DocumentSnapshot senderSnapshot = await sender.get();
     String name, surname;
@@ -71,6 +73,9 @@ class ChatCubit extends Cubit<ChatState> {
         "userId": sender,
         "externalId": externalId,
       });
+
+      _isProcessing = false;
+      _getMessages();
     } catch (error) {
       emit(ChatError(error.toString()));
     }
