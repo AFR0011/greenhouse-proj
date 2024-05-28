@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:greenhouse_project/pages/login.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
@@ -473,32 +474,32 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                                 return Readings(
                                     title: "Temperature",
                                     value: temperatures.last.round(),
-                                    icon: Icons.grass,
-                                    color: Colors.brown);
+                                    icon: FontAwesomeIcons.temperatureHalf,
+                                    color: Colors.red);
                               case 1:
                                 return Readings(
                                     title: "Humidity",
                                     value: humidities.last,
-                                    icon: Icons.grass,
-                                    color: Colors.brown);
+                                    icon: FontAwesomeIcons.water,
+                                    color: Colors.teal);
                               case 2:
                                 return Readings(
                                     title: "Soil Moisture",
                                     value: soilMoistures.last,
-                                    icon: Icons.grass,
-                                    color: Colors.brown);
+                                    icon: FontAwesomeIcons.droplet,
+                                    color: Colors.blue);
                               case 3:
                                 return Readings(
                                     title: "Light",
                                     value: lightIntensities.last,
-                                    icon: Icons.grass,
-                                    color: Colors.brown);
+                                    icon: FontAwesomeIcons.sun,
+                                    color: Colors.yellow);
                               case 4:
                                 return Readings(
                                     title: "Gas",
                                     value: gases.last.round(),
-                                    icon: Icons.grass,
-                                    color: Colors.brown);
+                                    icon: FontAwesomeIcons.wind,
+                                    color: Colors.grey);
                             }
                             return null;
                           }),
