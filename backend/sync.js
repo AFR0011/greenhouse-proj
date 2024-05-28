@@ -14,17 +14,7 @@
     const express = require("express");
     const bodyParser = require("body-parser");
     const admin = require("firebase-admin");
-    const {
-    initializeApp,
-    applicationDefault,
-    cert,
-    } = require("firebase-admin/app");
-    const {
-    getFirestore,
-    Timestamp,
-    FieldValue,
-    Filter,
-    } = require("firebase-admin/firestore");
+
 
     // Fetch the service account key JSON file contents
     var serviceAccount = require("./greenhouse-ctrl-system-firebase-adminsdk-9eh50-d761bbaa6a.json");
@@ -39,47 +29,12 @@
 
     // Realtime database
     var rtdb = admin.database();
-    // var ref = rtdb.ref("restricted_access/secret_document");
-    // ref.once("value", function(snapshot) {
-    //   console.log(snapshot.val());
-    // });
 
     // Firestore database
     var firedb = getFirestore();
 
     const app = express();
     app.use(bodyParser.json());
-
-    //firebase classes
-    // Equipment class
-    class Equipment {
-    constructor(board, status, type) {
-        this.board = board; // integer
-        this.status = status; // boolean
-        this.type = type; // string
-    }
-    }
-
-    // Programs class
-    class Programs {
-    constructor(action, condition, limit, equipment, creationDate, title) {
-        this.action = action; // {fan: string, light: string}
-        this.condition = condition; // {gas: string, temperature: string}
-        this.limit = limit; // {gas: string, temperature: string}
-        this.equipment = equipment; // {gas: string, temperature: string}
-        this.creationDate = creationDate; // Date object
-        this.title = title; // string
-    }
-    }
-
-    // Readings class
-    class Readings {
-    constructor(boardNo, readings, timestamp) {
-        this.boardNo = boardNo;
-        this.readings = readings; // {gas: integer, humidity: float, intruder: boolean, lightIntensity: integer, soilMoisture: float, temperature: float, timestamp: integer}
-        this.timestamp = timestamp; //
-    }
-    }
 
     // Endpoint to synchronize Cloud Firestore to Realtime Database
     app.post("/sync/firestore-to-realtime", async (req, res) => {
