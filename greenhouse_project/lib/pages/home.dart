@@ -473,31 +473,31 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                               case 0:
                                 return Readings(
                                     title: "Temperature",
-                                    value: temperatures.last.round(),
+                                    value: '${temperatures.last.round()}°C',
                                     icon: FontAwesomeIcons.temperatureHalf,
                                     color: Colors.red);
                               case 1:
                                 return Readings(
                                     title: "Humidity",
-                                    value: humidities.last,
+                                    value: '${humidities.last}%',
                                     icon: FontAwesomeIcons.water,
                                     color: Colors.teal);
                               case 2:
                                 return Readings(
                                     title: "Soil Moisture",
-                                    value: soilMoistures.last,
+                                    value: '${soilMoistures.last}%',
                                     icon: FontAwesomeIcons.droplet,
                                     color: Colors.blue);
                               case 3:
                                 return Readings(
                                     title: "Light",
-                                    value: lightIntensities.last,
+                                    value: '${lightIntensities.last}%',
                                     icon: FontAwesomeIcons.sun,
                                     color: Colors.yellow);
                               case 4:
                                 return Readings(
                                     title: "Gas",
-                                    value: gases.last.round(),
+                                    value: '${gases.last.round()}%',
                                     icon: FontAwesomeIcons.wind,
                                     color: Colors.grey);
                             }
