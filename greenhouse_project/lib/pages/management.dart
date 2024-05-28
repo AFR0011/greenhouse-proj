@@ -164,7 +164,7 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                 userReference: _userReference,
               ),
         "title": _userRole == "admin" ? "Logs" : "Tasks",
-        "icon": "lib/utils/Icons/tasks.png"
+        "icon": _userRole == "admin" ?"lib/utils/Icons/log.png":"lib/utils/Icons/tasks.png",
       },
       {
         'route': EmployeesPage(userCredential: widget.userCredential),
