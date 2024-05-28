@@ -3,12 +3,12 @@ const admin = require("firebase-admin");
 const bodyParser = require("body-parser");
 
 // Fetch the service account key JSON file contents
-var serviceAccount = require("./greenhouse-ctrl-system-firebase-adminsdk-9eh50-d761bbaa6a.json");
+var serviceAccount = require("../greenhouse-ctrl-system-firebase-adminsdk-9eh50-d761bbaa6a.json");
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(
-    require("./greenhouse-ctrl-system-firebase-adminsdk-9eh50-d761bbaa6a.json")
+    require("../greenhouse-ctrl-system-firebase-adminsdk-9eh50-d761bbaa6a.json")
   ),
   databaseURL:
     "https://greenhouse-ctrl-system-default-rtdb.europe-west1.firebasedatabase.app/",
