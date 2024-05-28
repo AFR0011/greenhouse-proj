@@ -131,16 +131,33 @@ class _LogsPageContentState extends State<_LogsPageContent> {
           }
           // Display notifications
           else {
-            return ListView.builder(
-              shrinkWrap: true,
-              itemCount: logsList.length,
-              itemBuilder: (context, index) {
-                LogsData log = logsList[index]; // notification data
-                // Notification message
-                return ListTile(
-                  title: Text("${log.action} ${log.description} "),
-                );
-              },
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: logsList.length,
+                itemBuilder: (context, index) {
+                  LogsData log = logsList[index]; // notification data
+                  // Notification message
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    elevation: 4.0,
+                    child: ListTile(
+                      leading: Container(
+                        padding: EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.add_alert_outlined),
+                      ),
+                      title: Text("${log.action} ${log.description} "),
+                    ),
+                  );
+                },
+              ),
             );
           }
         }
