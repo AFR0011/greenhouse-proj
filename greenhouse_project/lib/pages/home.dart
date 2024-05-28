@@ -67,7 +67,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   late DocumentReference _userReference;
   late bool _enabled;
   List<bool> _isSelected = [true, false];
-  static List<ReadingsData> readings = [];
 
   // Custom theme
   final ThemeData customTheme = theme;

@@ -62,6 +62,32 @@ class NotificationsCubit extends HomeCubit {
 //       // APNS token is available, make FCM plugin API requests...
 //     }
 //   }
+
+  Future<void> sendNotification(
+      String userId, String title, String body) async {
+    final url = Uri.parse(
+        'https://your-heroku-app-name.herokuapp.com/sendNotification'); // Replace with your Heroku app URL
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'userId': userId,
+        'title': title,
+        'body': body,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Notification sent successfully');
+    } else {
+      print('Failed to send notification: ${response.statusCode}');
+      print('Response body: ${response.body}');
+    }
+  }
+
   @override
   Future<void> close() {
     _isActive = false;
