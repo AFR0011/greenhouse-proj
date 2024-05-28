@@ -1,0 +1,18 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "API for Greenhouse Control System",
+  "main": "sync.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "Start" : "node sync.js"
+  },
+  "author": "Ali Farrokhnejad",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "depd": "^2.0.0",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.0.0"
+  }
+}
