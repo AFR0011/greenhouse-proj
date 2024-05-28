@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/foundation.dart';
@@ -73,11 +75,39 @@ class ChatCubit extends Cubit<ChatState> {
         "userId": sender,
         "externalId": externalId,
       });
-
+      await sendNotification(
+          receiver.toString(), "You have a new message", message);
       _isProcessing = false;
       _getMessages();
-    } catch (error) {
+    } catch (error, stack) {
+      print(stack);
+      print(error);
       emit(ChatError(error.toString()));
+    }
+  }
+
+  Future<void> sendNotification(
+      String userId, String title, String body) async {
+    final url = Uri.parse(
+        'https://greenhouse-5b1d55d4ffae.herokuapp.com/sendNotification');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'userId': userId,
+        'title': title,
+        'body': body,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Notification sent successfully');
+    } else {
+      print('Failed to send notification: ${response.statusCode}');
+      print('Response body: ${response.body}');
     }
   }
 
