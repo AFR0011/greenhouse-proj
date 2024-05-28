@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "pm2": "^5.4.0",
     "web-push": "^3.6.7"
   }
 }

@@ -4,6 +4,8 @@
 /// - (then) write code to send notifications when they occur
 library;
 
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
