@@ -1,1 +1,1 @@
-web: pm2 start sync.js && pm2 start notifications.js
+web: pm2 start && pm2 notifications 
