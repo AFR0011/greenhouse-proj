@@ -166,84 +166,82 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
         ),
 
         // Call function to build notificaitons list
-        body: SingleChildScrollView(
-          child: Container(
-              height: MediaQuery.of(context).size.height,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.lightBlueAccent.shade100.withOpacity(0.6),
-                    Colors.teal.shade100.withOpacity(0.6),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                image: DecorationImage(
-                  image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.white.withOpacity(0.05),
-                    BlendMode.dstATop,
-                  ),
+        body: Container(
+            height: MediaQuery.of(context).size.height * 0.75,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                  Colors.teal.shade100.withOpacity(0.6),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              image: DecorationImage(
+                image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                fit: BoxFit.cover,
+                colorFilter: ColorFilter.mode(
+                  Colors.white.withOpacity(0.05),
+                  BlendMode.dstATop,
                 ),
               ),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.green.shade700, Colors.teal.shade400],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Center(
-                      child: ToggleButtons(
-                        renderBorder: false,
-                        fillColor: Colors.teal.withOpacity(1),
-                        selectedColor: Colors.white,
-                        splashColor: Colors.tealAccent,
-                        hoverColor: Colors.tealAccent.withOpacity(0.1),
-                        isSelected: _isSelected,
-                        onPressed: _onToggle,
-                        children: <Widget>[
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: const Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Dashbord',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: const Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Notifications',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: double.maxFinite,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.green.shade700, Colors.teal.shade400],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
                   ),
-                  SingleChildScrollView(
-                    child: Container(child: _getDisplayWidget()),
-                  )
-                ],
-              )),
-        ),
+                  child: Center(
+                    child: ToggleButtons(
+                      renderBorder: false,
+                      fillColor: Colors.teal.withOpacity(1),
+                      selectedColor: Colors.white,
+                      splashColor: Colors.tealAccent,
+                      hoverColor: Colors.tealAccent.withOpacity(0.1),
+                      isSelected: _isSelected,
+                      onPressed: _onToggle,
+                      children: <Widget>[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: const Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Dashbord',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: const Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Notifications',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SingleChildScrollView(
+                  child: Container(child: _getDisplayWidget()),
+                )
+              ],
+            )),
 
         // Footer nav bar
         bottomNavigationBar: PreferredSize(
@@ -283,7 +281,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   Widget _buildNotifications() {
     return Column(
       children: [
-        const SizedBox(
+        SizedBox(
           height: 16,
         ),
         // BlocBuilder for notifications
@@ -371,6 +369,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           Align(
             alignment: Alignment.topCenter,
             child: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.5,
                 child: BlocProvider(
                   create: (context) => ReadingsCubit(),
                   child: BlocBuilder<ReadingsCubit, GreenhouseState>(
@@ -456,44 +455,50 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                               },
                             ),
                           ),
-                          ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: 5,
-                              itemBuilder: (context, index) {
-                                switch (index) {
-                                  case 0:
-                                    return Readings(
-                                        title: "Temperature",
-                                        value: temperatures.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                  case 1:
-                                    return Readings(
-                                        title: "Humidity",
-                                        value: humidities.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                  case 2:
-                                    return Readings(
-                                        title: "Soil Moisture",
-                                        value: soilMoistures.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                  case 3:
-                                    return Readings(
-                                        title: "Light",
-                                        value: lightIntensities.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                  case 4:
-                                    return Readings(
-                                        title: "Gas",
-                                        value: gases.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                }
-                                return null;
-                              }),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: 5,
+                                itemBuilder: (context, index) {
+                                  switch (index) {
+                                    case 0:
+                                      return Readings(
+                                          title: "Temperature",
+                                          value: temperatures.last.round(),
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                    case 1:
+                                      return Readings(
+                                          title: "Humidity",
+                                          value: humidities.last,
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                    case 2:
+                                      return Readings(
+                                          title: "Soil Moisture",
+                                          value: soilMoistures.last,
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                    case 3:
+                                      return Readings(
+                                          title: "Light",
+                                          value: lightIntensities.last,
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                    case 4:
+                                      return Readings(
+                                          title: "Gas",
+                                          value: gases.last.round(),
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                  }
+                                  return null;
+                                }),
+                          ),
                         ],
                       );
                     } else {
