@@ -5,8 +5,9 @@
   "main": "sync.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start" : "node sync.js",
-    "notifications": "node notifications.js"
+    "start": "pm2 start npm --name sync -- run start-sync && pm2 start npm --name notifications -- run start-notifications && pm2 logs",
+    "start-sync": "node sync.js",
+    "start-notifications": "node notifications.js"
   },
   "author": "Ali Farrokhnejad",
   "license": "MIT",
