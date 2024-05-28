@@ -11,6 +11,7 @@ library;
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/firebase_options.dart';
 import 'package:greenhouse_project/pages/equipment.dart';
 import 'package:greenhouse_project/pages/plants.dart';
 import 'package:greenhouse_project/pages/programs.dart';
@@ -86,15 +87,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      String? deviceFcmToken =
-          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
-      if (mounted) {
-        context
-            .read<UserInfoCubit>()
-            .getUserInfo(widget.userCredential, deviceFcmToken!);
-      }
-    });
+    _initializeUserInfo();
   }
 
   @override
@@ -319,5 +312,24 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
                     createFooterNav(_selectedIndex, footerNavCubit, _userRole)),
           ),
         ));
+  }
+
+  Future<void> _initializeUserInfo() async {
+    try {
+      if (DefaultFirebaseOptions.currentPlatform !=
+          DefaultFirebaseOptions.android) {
+        context.read<UserInfoCubit>().getUserInfo(widget.userCredential, null);
+      } else {
+        String? deviceFcmToken =
+            await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+        if (mounted) {
+          context
+              .read<UserInfoCubit>()
+              .getUserInfo(widget.userCredential, deviceFcmToken);
+        }
+      }
+    } catch (e) {
+      print('Error getting FCM token: $e');
+    }
   }
 }

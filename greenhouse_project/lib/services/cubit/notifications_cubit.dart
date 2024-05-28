@@ -55,13 +55,6 @@ class NotificationsCubit extends HomeCubit {
     _isProcessing = false;
   }
 
-// // For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
-//     final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-//     if (apnsToken != null) {
-//       // APNS token is available, make FCM plugin API requests...
-//     }
-//   }
-
   @override
   Future<void> close() {
     _isActive = false;
