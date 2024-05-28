@@ -161,8 +161,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
         // Main appbar (header)
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(80.0),
-          child: createMainAppBar(
-              context, widget.userCredential, _userReference, "Welcome"),
+          child: createHomeAppBar(
+              context, widget.userCredential, _userReference, "lib/utils/Icons/logo.png"),
         ),
 
         // Call function to build notificaitons list
