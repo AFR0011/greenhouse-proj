@@ -217,7 +217,7 @@ class ToggleButtonContainer extends StatelessWidget {
 
 class Readings extends StatelessWidget {
   final String title;
-  final int value;
+  final String value;
   final IconData icon;
   final Color color;
 
