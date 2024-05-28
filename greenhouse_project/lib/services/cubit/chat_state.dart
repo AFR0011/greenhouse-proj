@@ -15,5 +15,4 @@ final class ChatError extends ChatState {
   final String error;
 
   ChatError(this.error);
-  String test = Timestamp.now().toString();
 }

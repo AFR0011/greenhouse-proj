@@ -468,7 +468,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                                     case 0:
                                       return Readings(
                                           title: "Temperature",
-                                          value: temperatures.last,
+                                          value: temperatures.last.round(),
                                           icon: Icons.grass,
                                           color: Colors.brown);
                                     case 1:
@@ -492,7 +492,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                                     case 4:
                                       return Readings(
                                           title: "Gas",
-                                          value: gases.last,
+                                          value: gases.last.round(),
                                           icon: Icons.grass,
                                           color: Colors.brown);
                                   }

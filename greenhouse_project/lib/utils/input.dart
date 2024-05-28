@@ -217,7 +217,7 @@ class ToggleButtonContainer extends StatelessWidget {
 
 class Readings extends StatelessWidget {
   final String title;
-  final double value;
+  final int value;
   final IconData icon;
   final Color color;
 
@@ -238,7 +238,6 @@ class Readings extends StatelessWidget {
         leading: Icon(icon, color: color, size: 40),
         title: Text(title,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-        subtitle: Text('Seasonal normal'),
         trailing: Text(value.toString(),
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
       ),
