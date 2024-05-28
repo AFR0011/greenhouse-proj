@@ -95,68 +95,64 @@ class _LoginPageState extends State<LoginPage> {
                   child: CircularProgressIndicator(),
                 );
               }
-              return Padding(
-                padding: const EdgeInsets.all(25.0),
-                child: SafeArea(
-                  child: SizedBox(
-                    width: double.maxFinite,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(bottom: 60),
-                          child: Text(
-                            "Greenhouse Control System",
-                            style: headingTextStyle,
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Container(
-                          constraints: const BoxConstraints(maxWidth: 400),
-                          width: MediaQuery.of(context).size.width * .6,
-                          child: TextField(
-                            controller: emailController,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor:
-                                  theme.colorScheme.secondary.withOpacity(0.5),
-                              labelText: 'Email',
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20)),
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(25.0),
+                  child: SafeArea(
+                    child: SizedBox(
+                      width: double.maxFinite,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset('lib/utils/Icons/logo.png'),
+                          
+                          Container(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            width: MediaQuery.of(context).size.width * .6,
+                            child: TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor:
+                                    theme.colorScheme.secondary.withOpacity(0.5),
+                                labelText: 'Email',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20.0),
-                        Container(
-                          constraints: const BoxConstraints(maxWidth: 400),
-                          width: MediaQuery.of(context).size.width * .6,
-                          child: TextField(
-                            controller: passwordController,
-                            obscureText: _isSecurePassword,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Colors.white70.withOpacity(0.5),
-                              labelText: 'Password',
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(20)),
-                              suffixIcon: togglePassword(),
+                          const SizedBox(height: 20.0),
+                          Container(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            width: MediaQuery.of(context).size.width * .6,
+                            child: TextField(
+                              controller: passwordController,
+                              obscureText: _isSecurePassword,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.white70.withOpacity(0.5),
+                                labelText: 'Password',
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20)),
+                                suffixIcon: togglePassword(),
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 20.0),
-                        ElevatedButton(
-                          onPressed: () {
-                            context.read<AuthCubit>().authLoginRequest(
-                                emailController.text.trim(),
-                                passwordController.text);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 50, vertical: 15),
+                          const SizedBox(height: 20.0),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<AuthCubit>().authLoginRequest(
+                                  emailController.text.trim(),
+                                  passwordController.text);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 50, vertical: 15),
+                            ),
+                            child: const Text('Login'),
                           ),
-                          child: const Text('Login'),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
