@@ -11,8 +11,6 @@
         - Sync latest sensor readings and equipment status whenever ESP module sends data to realtime database
         - Send a request to API whenever realtime database is updated 
     */
-
-    // Express.js example
     const express = require("express");
     const bodyParser = require("body-parser");
     const admin = require("firebase-admin");
