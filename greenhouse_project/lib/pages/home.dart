@@ -103,15 +103,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      String? deviceFcmToken =
-          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
-      if (mounted) {
-        context
-            .read<UserInfoCubit>()
-            .getUserInfo(widget.userCredential, deviceFcmToken!);
-      }
-    });
+    _initializeFCMToken();
   }
 
   @override
@@ -563,5 +555,20 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
         ],
       ),
     );
+  }
+
+  Future<void> _initializeFCMToken() async {
+    try {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      print(deviceFcmToken);
+      if (mounted && deviceFcmToken != null) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken);
+      }
+    } catch (e) {
+      print('Error getting FCM token: $e');
+    }
   }
 }

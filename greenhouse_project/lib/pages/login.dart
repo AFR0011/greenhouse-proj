@@ -92,6 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: CircularProgressIndicator(),
                 );
               }
+              context.read<AuthCubit>().checkLoggedIn();
               return SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(25.0),

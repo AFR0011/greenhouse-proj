@@ -7,7 +7,7 @@ class UserInfoCubit extends HomeCubit {
   UserInfoCubit() : super(UserInfoLoading());
 
   Future<void> getUserInfo(
-      UserCredential userCredential, String fcmToken) async {
+      UserCredential userCredential, String? fcmToken) async {
     if (!_isActive) return;
     try {
       String? email = userCredential.user?.email;
@@ -24,7 +24,9 @@ class UserInfoCubit extends HomeCubit {
         final String userName = userData?['name'] ?? 'Unknown';
         final DocumentReference userReference = userSnapshot.reference;
         final bool enabled = userData?['enabled'];
-        await updateUserFCMToken(userQuery.docs.first.reference, fcmToken);
+        if (fcmToken != null) {
+          await updateUserFCMToken(userQuery.docs.first.reference, fcmToken);
+        }
         if (_isActive && !_isProcessing) {
           emit(UserInfoLoaded(userRole, userName, userReference, enabled));
         }

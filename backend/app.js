@@ -1,23 +1,25 @@
 const express = require("express");
 const admin = require("firebase-admin");
 const bodyParser = require("body-parser");
+const path = require("path");
 
 // Fetch the service account key JSON file contents
 var serviceAccount = require("../greenhouse-ctrl-system-firebase-adminsdk-9eh50-d761bbaa6a.json");
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  credential: admin.credential.cert(
-    require("../greenhouse-ctrl-system-firebase-adminsdk-9eh50-d761bbaa6a.json")
-  ),
+  credential: admin.credential.cert(serviceAccount),
   databaseURL:
     "https://greenhouse-ctrl-system-default-rtdb.europe-west1.firebasedatabase.app/",
 });
 
 // Create Express app
 const app = express();
-app.use(express.json()); // Middleware to parse JSON bodies
-app.use(bodyParser.json()); // Middleware to parse JSON bodies
+app.use(express.json());
+app.use(bodyParser.json());
+
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, "public")));
 
 // Define the port for your Express app
 const PORT = process.env.PORT || 3000;
