@@ -2,12 +2,10 @@
   "name": "api",
   "version": "1.0.0",
   "description": "API for Greenhouse Control System",
-  "main": "sync.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "pm2 start npm --name sync -- run start-sync && pm2 start npm --name notifications -- run start-notifications && pm2 logs",
-    "start-sync": "node sync.js",
-    "start-notifications": "node notifications.js"
+    "start": "node app.js"
   },
   "author": "Ali Farrokhnejad",
   "license": "MIT",
