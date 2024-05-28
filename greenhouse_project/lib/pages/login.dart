@@ -47,8 +47,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    passwordController.text = "12345678";
-    emailController.text = "admin@admin.com";
+    passwordController.text = "123456";
+    emailController.text = "admin2@admin.com";
 
     return Scaffold(
       body: SizedBox(
@@ -92,6 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: CircularProgressIndicator(),
                 );
               }
+              context.read<AuthCubit>().checkLoggedIn();
               return SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(25.0),

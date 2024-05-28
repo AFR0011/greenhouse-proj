@@ -346,7 +346,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                   programEditCubit
                                       .checkValidationAndUpdate(values);
                                 },
-                                currentSliderValue: inputValues[2]),
+                                currentSliderValue:
+                                    inputValues[2].roundToDouble()),
                             Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Center(
