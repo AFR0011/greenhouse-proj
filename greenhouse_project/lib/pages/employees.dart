@@ -7,6 +7,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/profile.dart';
@@ -20,6 +21,9 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class EmployeesPage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
@@ -79,8 +83,16 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
   // InitState - get user info state to check authentication later
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken!);
+      }
+    });
   }
 
   @override
@@ -160,7 +172,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                   else if (state is ManageEmployeesLoaded) {
                     List<EmployeeData> employeeList =
                         state.employees; // employees list
-          
+
                     // Display nothing if no employees
                     if (employeeList.isEmpty) {
                       return const Center(child: Text("No Employees..."));
@@ -218,7 +230,8 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                                 employee: employee,
                                                 tasksFunction: tasksFunction,
                                                 toggleAccount: toggleAccount,
-                                                profileFunction: profileFunction,
+                                                profileFunction:
+                                                    profileFunction,
                                               );
                                             },
                                           );
@@ -269,7 +282,8 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                             title: const Text("Add employee"),
                             content: SingleChildScrollView(
                               child: Container(
-                                constraints: const BoxConstraints(maxWidth: 400),
+                                constraints:
+                                    const BoxConstraints(maxWidth: 400),
                                 width: MediaQuery.of(context).size.width * .6,
                                 child: Column(
                                   mainAxisSize: MainAxisSize

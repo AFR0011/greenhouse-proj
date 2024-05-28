@@ -6,6 +6,7 @@
 library;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
@@ -13,6 +14,9 @@ import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/logs_cubit.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class LogsPage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
@@ -67,9 +71,16 @@ class _LogsPageContentState extends State<_LogsPageContent> {
   // InitState - get user info state to check authentication later
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
-    context.read<NotificationsCubit>().initNotifications();
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken!);
+      }
+    });
   }
 
   @override

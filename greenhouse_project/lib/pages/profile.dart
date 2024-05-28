@@ -11,6 +11,7 @@ library;
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
@@ -21,6 +22,9 @@ import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class ProfilePage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
@@ -97,8 +101,16 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   // InitState - get user info state to check authentication later
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken!);
+      }
+    });
   }
 
   @override
@@ -208,20 +220,32 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                 },
               ),
               // Display user profile picture
-          
+
               // Display user name
               const SizedBox(height: 20.0),
-              ProfileTextField(name: "Name", data: userData.name, icon: userIcon(),),
+              ProfileTextField(
+                name: "Name",
+                data: userData.name,
+                icon: userIcon(),
+              ),
               // _buildProfileField("Name", userData.name),
               // Display user email
               // _buildProfileField("Email", userData.email),
               const SizedBox(height: 20.0),
-              ProfileTextField(name: "Email", data: userData.email, icon: emailIcon(),),
+              ProfileTextField(
+                name: "Email",
+                data: userData.email,
+                icon: emailIcon(),
+              ),
               // Display password (if user is viewing their own profile)
               const SizedBox(height: 20.0),
               if (userData.email == widget.userCredential.user?.email)
-                ProfileTextField(name: "Password", data: "********", icon: passwordIcon(),),
-                // _buildProfileField("Password", "*******"),
+                ProfileTextField(
+                  name: "Password",
+                  data: "********",
+                  icon: passwordIcon(),
+                ),
+              // _buildProfileField("Password", "*******"),
               // Action buttons based on user role and authorization
               const SizedBox(height: 20.0),
               _buildActionButtons(userData),
@@ -274,142 +298,169 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     ScaffoldMessengerState scaffoldMessenger = ScaffoldMessenger.of(context);
 
     // Provide profile edit cubit
-                        showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          side: BorderSide(
-                        color: Colors.transparent,
-                        width: 2.0), // Add border color and width
-                          ),
-                          title: const Text("Edit profil"),
-                          content: SingleChildScrollView(
-                            child: Container(
-                                                    constraints: const BoxConstraints(maxWidth: 400),
-                                                    width: MediaQuery.of(context).size.width*.6,
-                              child:  BlocProvider(
-                                        create: (context) => ProfileEditCubit(),
-                                        // BlocBuilder for profile edit state
-                                        child: BlocBuilder<ProfileEditCubit, List<bool>>(
-                                          builder: (context, state) {
-                                            return Column(
-                                              mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                          InputTextField(
-                                              controller: _nameController,
-                                              errorText: state[0]
-                                                  ? ""
-                                                  : "Name should be longer than 4 characters.",
-                                              labelText: "Name"),
-                                          InputTextField(
-                                              controller: _emailController,
-                                              errorText: state[1] ? "" : "Email format invalid.",
-                                              labelText: "Email"),
-                                          InputTextField(
-                                              controller: _passwordController,
-                                              errorText: state[2]
-                                                  ? ""
-                                                  : "Password should be longer than 8 characters.",
-                                              labelText: "Password"),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: GreenElevatedButton(
-                                                    text: "Submit",
-                                                    onPressed: () {
-                            List<bool> validation = [true, true, true];
-                            if (_nameController.text.length < 4) {
-                              validation[0] = !validation[0];
-                            }
-                            if (!_emailController.text
-                                .contains(RegExp(r'.+@.+\..+'))) {
-                              validation[1] = !validation[1];
-                            }
-                            if (_passwordController.text.length < 8 &&
-                                _passwordController.text.isNotEmpty) {
-                              validation[2] = !validation[2];
-                            }
-                                                
-                            bool isValid = context
-                                .read<ProfileEditCubit>()
-                                .updateState(validation);
-                                                
-                            if (isValid) {
-                              Navigator.pop(context);
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10.0),
-                                        side: BorderSide(
-                                            color: Colors.transparent,
-                                            width: 2.0), // Add border color and width
-                                      ),
-                                      title: const Text("Enter password"),
-                                      content: SingleChildScrollView(
-                                        child: Container(
-                                          constraints: const BoxConstraints(maxWidth: 400),
-                                          width: MediaQuery.of(context).size.width*.6,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min, // Set column to minimum size
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              InputTextField(
-                                                controller: _passwordConfirmController,
-                                                errorText: state[2]
-                                                    ? ""
-                                                    : "Password should be longer than 8 characters.",
-                                                labelText: "Password"),
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: GreenElevatedButton(
-                                                        text: "Confirm",
-                                                        onPressed: () => _updateProfile(
-                                                            userInfoCubit,
-                                                            scaffoldMessenger)),
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            side: BorderSide(
+                color: Colors.transparent,
+                width: 2.0), // Add border color and width
+          ),
+          title: const Text("Edit profil"),
+          content: SingleChildScrollView(
+            child: Container(
+                constraints: const BoxConstraints(maxWidth: 400),
+                width: MediaQuery.of(context).size.width * .6,
+                child: BlocProvider(
+                  create: (context) => ProfileEditCubit(),
+                  // BlocBuilder for profile edit state
+                  child: BlocBuilder<ProfileEditCubit, List<bool>>(
+                    builder: (context, state) {
+                      return Column(
+                        mainAxisSize:
+                            MainAxisSize.min, // Set column to minimum size
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          InputTextField(
+                              controller: _nameController,
+                              errorText: state[0]
+                                  ? ""
+                                  : "Name should be longer than 4 characters.",
+                              labelText: "Name"),
+                          InputTextField(
+                              controller: _emailController,
+                              errorText:
+                                  state[1] ? "" : "Email format invalid.",
+                              labelText: "Email"),
+                          InputTextField(
+                              controller: _passwordController,
+                              errorText: state[2]
+                                  ? ""
+                                  : "Password should be longer than 8 characters.",
+                              labelText: "Password"),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GreenElevatedButton(
+                                    text: "Submit",
+                                    onPressed: () {
+                                      List<bool> validation = [
+                                        true,
+                                        true,
+                                        true
+                                      ];
+                                      if (_nameController.text.length < 4) {
+                                        validation[0] = !validation[0];
+                                      }
+                                      if (!_emailController.text
+                                          .contains(RegExp(r'.+@.+\..+'))) {
+                                        validation[1] = !validation[1];
+                                      }
+                                      if (_passwordController.text.length < 8 &&
+                                          _passwordController.text.isNotEmpty) {
+                                        validation[2] = !validation[2];
+                                      }
+
+                                      bool isValid = context
+                                          .read<ProfileEditCubit>()
+                                          .updateState(validation);
+
+                                      if (isValid) {
+                                        Navigator.pop(context);
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10.0),
+                                                  side: BorderSide(
+                                                      color: Colors.transparent,
+                                                      width:
+                                                          2.0), // Add border color and width
+                                                ),
+                                                title: const Text(
+                                                    "Enter password"),
+                                                content: SingleChildScrollView(
+                                                  child: Container(
+                                                    constraints:
+                                                        const BoxConstraints(
+                                                            maxWidth: 400),
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            .6,
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize
+                                                          .min, // Set column to minimum size
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        InputTextField(
+                                                            controller:
+                                                                _passwordConfirmController,
+                                                            errorText: state[2]
+                                                                ? ""
+                                                                : "Password should be longer than 8 characters.",
+                                                            labelText:
+                                                                "Password"),
+                                                        Row(
+                                                          children: [
+                                                            Expanded(
+                                                              child: GreenElevatedButton(
+                                                                  text:
+                                                                      "Confirm",
+                                                                  onPressed: () =>
+                                                                      _updateProfile(
+                                                                          userInfoCubit,
+                                                                          scaffoldMessenger)),
+                                                            ),
+                                                            Expanded(
+                                                              child:
+                                                                  WhiteElevatedButton(
+                                                                      text:
+                                                                          "Cancel",
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        _createEditDialog();
+                                                                      }),
+                                                            )
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
                                                   ),
-                                                  Expanded(
-                                                    child: WhiteElevatedButton(
-                                                        text: "Cancel",
-                                                        onPressed: () {
-                                                          Navigator.pop(context);
-                                                          _createEditDialog();
-                                                        }),
-                                                  )
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  });
-                            }
-                                                    }),
-                                              ),
-                                              Expanded(
-                                                child: WhiteElevatedButton(
-                                                    text: "Cancel",
-                                                    onPressed: () {
-                            Navigator.pop(context);
-                                                    }),
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                )),
-                          ),
-                        );
-                      },
-                    );
+                                                ),
+                                              );
+                                            });
+                                      }
+                                    }),
+                              ),
+                              Expanded(
+                                child: WhiteElevatedButton(
+                                    text: "Cancel",
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    }),
+                              ),
+                            ],
+                          )
+                        ],
+                      );
+                    },
+                  ),
+                )),
+          ),
+        );
+      },
+    );
   }
 
   // Function to submit profile edits

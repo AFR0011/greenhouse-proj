@@ -5,7 +5,6 @@ class NotificationsCubit extends HomeCubit {
       FirebaseFirestore.instance.collection('notifications');
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   final UserCredential? user;
 

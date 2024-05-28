@@ -32,7 +32,10 @@ const firedb = admin.firestore();
 app.post("/sync/firestore-to-realtime", async (req, res) => {
   try {
     // Retrieve data from request body
-    const newData = req.body;
+    // const newData = {
+    //   "programs" : firestore.collection("programs"),
+    //   "equipment" : firestore.collection("equipment").
+    // }
 
     // Update corresponding data in Realtime Database
     await rtdb

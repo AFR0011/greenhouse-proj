@@ -2,7 +2,7 @@
 library;
 
 import 'package:flutter/material.dart';
- import 'package:greenhouse_project/utils/text_styles.dart';
+import 'package:greenhouse_project/utils/text_styles.dart';
 
 class GreenElevatedButton extends StatelessWidget {
   final String text;

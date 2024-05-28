@@ -9,6 +9,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/chat.dart';
@@ -21,6 +22,9 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class ChatsPage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
@@ -83,8 +87,16 @@ class _ChatsPageState extends State<_ChatsPageContent> {
   // InitState - get user info state to check authentication later
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken!);
+      }
+    });
   }
 
   @override
@@ -221,8 +233,9 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                               ),
                               content: SingleChildScrollView(
                                 child: Container(
-                                  constraints: const BoxConstraints(maxWidth: 400),
-                                  width: MediaQuery.of(context).size.width*.6,
+                                  constraints:
+                                      const BoxConstraints(maxWidth: 400),
+                                  width: MediaQuery.of(context).size.width * .6,
                                   child: ListView.builder(
                                     padding: const EdgeInsets.all(16.0),
                                     shrinkWrap: true,
@@ -231,15 +244,17 @@ class _ChatsPageState extends State<_ChatsPageContent> {
                                       final employee = chatUsersList[index];
                                       return Card(
                                         shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    ),
-                                    elevation: 4.0,
-                                    margin: EdgeInsets.only(bottom: 16.0),
+                                          borderRadius:
+                                              BorderRadius.circular(15.0),
+                                        ),
+                                        elevation: 4.0,
+                                        margin: EdgeInsets.only(bottom: 16.0),
                                         child: ListTile(
                                           leading: Container(
                                             padding: const EdgeInsets.all(8.0),
                                             decoration: BoxDecoration(
-                                              color: Colors.green.withOpacity(0.1),
+                                              color:
+                                                  Colors.green.withOpacity(0.1),
                                               shape: BoxShape.circle,
                                             ),
                                             child: ClipOval(

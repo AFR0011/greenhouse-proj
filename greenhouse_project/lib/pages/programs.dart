@@ -6,6 +6,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
@@ -16,6 +17,9 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class ProgramsPage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
@@ -78,8 +82,16 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
   // InitState - get user info state to check authentication later
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken!);
+      }
+    });
   }
 
   @override
@@ -227,6 +239,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                   context: context,
                                   builder: (context) => ProgramDetailsDialog(
                                       program: program,
+                                      userRole: _userRole,
                                       editProgram: () => _showEditForm(program),
                                       deleteProgram: () =>
                                           _showDeleteForm(program)));
@@ -272,7 +285,7 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
             content: SingleChildScrollView(
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
-                width: MediaQuery.of(context).size.width*.6,
+                width: MediaQuery.of(context).size.width * .6,
                 child: Column(
                   mainAxisSize: MainAxisSize.min, // Set column to minimum size
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -321,8 +334,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     ],
                                     onChanged: (selection) {
                                       inputValues[5] = selection;
-                                      programEditCubit
-                                          .checkValidationAndUpdate(inputValues);
+                                      programEditCubit.checkValidationAndUpdate(
+                                          inputValues);
                                     }),
                               ),
                             ),
@@ -365,8 +378,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     ],
                                     onChanged: (selection) {
                                       inputValues[3] = selection;
-                                      programEditCubit
-                                          .checkValidationAndUpdate(inputValues);
+                                      programEditCubit.checkValidationAndUpdate(
+                                          inputValues);
                                     }),
                               ),
                             ),
@@ -397,8 +410,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     ],
                                     onChanged: (selection) {
                                       inputValues[4] = selection;
-                                      programEditCubit
-                                          .checkValidationAndUpdate(inputValues);
+                                      programEditCubit.checkValidationAndUpdate(
+                                          inputValues);
                                     }),
                               ),
                             ),
@@ -431,7 +444,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                     "pending":
                                         _userRole != 'worker' ? false : true,
                                   };
-                                  programsCubit.addProgram(data, _userReference);
+                                  programsCubit.addProgram(
+                                      data, _userReference);
                                   _titleController.clear();
                                   _descriptionController.clear();
                                   Navigator.pop(context);
@@ -492,15 +506,17 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
               content: SingleChildScrollView(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  width: MediaQuery.of(context).size.width*.6,
+                  width: MediaQuery.of(context).size.width * .6,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    mainAxisSize:
+                        MainAxisSize.min, // Set column to minimum size
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       InputTextField(
                           controller: _titleController,
-                          errorText:
-                              validation[0] ? null : "Title cannot be be empty!",
+                          errorText: validation[0]
+                              ? null
+                              : "Title cannot be be empty!",
                           labelText: "Title"),
                       InputTextField(
                           controller: _descriptionController,
@@ -540,8 +556,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                       ],
                                       onChanged: (selection) {
                                         inputValues[5] = selection;
-                                        programEditCubit.checkValidationAndUpdate(
-                                            inputValues);
+                                        programEditCubit
+                                            .checkValidationAndUpdate(
+                                                inputValues);
                                       }),
                                 ),
                               ),
@@ -584,8 +601,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                       ],
                                       onChanged: (selection) {
                                         inputValues[3] = selection;
-                                        programEditCubit.checkValidationAndUpdate(
-                                            inputValues);
+                                        programEditCubit
+                                            .checkValidationAndUpdate(
+                                                inputValues);
                                       }),
                                 ),
                               ),
@@ -616,8 +634,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                       ],
                                       onChanged: (selection) {
                                         inputValues[4] = selection;
-                                        programEditCubit.checkValidationAndUpdate(
-                                            inputValues);
+                                        programEditCubit
+                                            .checkValidationAndUpdate(
+                                                inputValues);
                                       }),
                                 ),
                               ),
@@ -641,7 +660,8 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                   } else {
                                     Map<String, dynamic> data = {
                                       "title": _titleController.text,
-                                      "description": _descriptionController.text,
+                                      "description":
+                                          _descriptionController.text,
                                       "limit": inputValues[2],
                                       "equipment": inputValues[3],
                                       "action": inputValues[4],
@@ -651,7 +671,9 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
                                           _userRole != 'worker' ? false : true,
                                     };
                                     programsCubit.updatePrograms(
-                                        program.reference, data, _userReference);
+                                        program.reference,
+                                        data,
+                                        _userReference);
                                     _titleController.clear();
                                     _descriptionController.clear();
                                     Navigator.pop(context);
@@ -697,9 +719,10 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
               content: SingleChildScrollView(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  width: MediaQuery.of(context).size.width*.6,
+                  width: MediaQuery.of(context).size.width * .6,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    mainAxisSize:
+                        MainAxisSize.min, // Set column to minimum size
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
