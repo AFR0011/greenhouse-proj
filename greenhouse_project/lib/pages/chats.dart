@@ -12,6 +12,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/firebase_options.dart';
 import 'package:greenhouse_project/pages/chat.dart';
 import 'package:greenhouse_project/services/cubit/chat_users_cubit.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
@@ -88,15 +89,7 @@ class _ChatsPageState extends State<_ChatsPageContent> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      String? deviceFcmToken =
-          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
-      if (mounted) {
-        context
-            .read<UserInfoCubit>()
-            .getUserInfo(widget.userCredential, deviceFcmToken!);
-      }
-    });
+    _initializeUserInfo();
   }
 
   @override
@@ -396,5 +389,24 @@ class _ChatsPageState extends State<_ChatsPageContent> {
           ),
         ));
     //it's up
+  }
+
+  Future<void> _initializeUserInfo() async {
+    try {
+      if (DefaultFirebaseOptions.currentPlatform !=
+          DefaultFirebaseOptions.android) {
+        context.read<UserInfoCubit>().getUserInfo(widget.userCredential, null);
+      } else {
+        String? deviceFcmToken =
+            await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+        if (mounted) {
+          context
+              .read<UserInfoCubit>()
+              .getUserInfo(widget.userCredential, deviceFcmToken);
+        }
+      }
+    } catch (e) {
+      print('Error getting FCM token: $e');
+    }
   }
 }

@@ -13,6 +13,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:greenhouse_project/firebase_options.dart';
 import 'package:greenhouse_project/pages/login.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
 import 'package:greenhouse_project/services/cubit/footer_nav_cubit.dart';
@@ -103,7 +104,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   @override
   void initState() {
     super.initState();
-    _initializeFCMToken();
+    _initializeUserInfo();
   }
 
   @override
@@ -119,6 +120,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
         builder: (context, state) {
           // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
+            print("hi1");
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -300,6 +302,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
           builder: (context, state) {
             // Show "loading screen" if processing notification state
             if (state is NotificationsLoading) {
+              print("hi2");
               return const Center(child: CircularProgressIndicator());
             }
             // Show equipment status once notification state is loaded
@@ -385,6 +388,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
               child: BlocBuilder<ReadingsCubit, GreenhouseState>(
                   builder: (context, state) {
                 if (state is ReadingsLoading) {
+                  print("hi3");
                   return const Center(
                     child: CircularProgressIndicator(),
                   );
@@ -557,15 +561,19 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  Future<void> _initializeFCMToken() async {
+  Future<void> _initializeUserInfo() async {
     try {
-      String? deviceFcmToken =
-          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
-      print(deviceFcmToken);
-      if (mounted && deviceFcmToken != null) {
-        context
-            .read<UserInfoCubit>()
-            .getUserInfo(widget.userCredential, deviceFcmToken);
+      if (DefaultFirebaseOptions.currentPlatform !=
+          DefaultFirebaseOptions.android) {
+        context.read<UserInfoCubit>().getUserInfo(widget.userCredential, null);
+      } else {
+        String? deviceFcmToken =
+            await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+        if (mounted) {
+          context
+              .read<UserInfoCubit>()
+              .getUserInfo(widget.userCredential, deviceFcmToken);
+        }
       }
     } catch (e) {
       print('Error getting FCM token: $e');

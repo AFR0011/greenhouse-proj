@@ -14,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greenhouse_project/firebase_options.dart';
 import 'package:greenhouse_project/services/cubit/chats_cubit.dart';
 import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:greenhouse_project/services/cubit/profile_cubit.dart';
@@ -102,15 +103,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      String? deviceFcmToken =
-          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
-      if (mounted) {
-        context
-            .read<UserInfoCubit>()
-            .getUserInfo(widget.userCredential, deviceFcmToken!);
-      }
-    });
+    _initializeUserInfo();
   }
 
   @override
@@ -497,6 +490,25 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Profile updated successfully!")));
+  }
+
+  Future<void> _initializeUserInfo() async {
+    try {
+      if (DefaultFirebaseOptions.currentPlatform !=
+          DefaultFirebaseOptions.android) {
+        context.read<UserInfoCubit>().getUserInfo(widget.userCredential, null);
+      } else {
+        String? deviceFcmToken =
+            await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+        if (mounted) {
+          context
+              .read<UserInfoCubit>()
+              .getUserInfo(widget.userCredential, deviceFcmToken);
+        }
+      }
+    } catch (e) {
+      print('Error getting FCM token: $e');
+    }
   }
 }
 
