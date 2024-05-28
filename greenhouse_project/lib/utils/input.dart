@@ -24,7 +24,7 @@ class InputTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 16),
       child: TextField(
         controller: controller,
         decoration: InputDecoration(
@@ -140,75 +140,75 @@ class ToggleButtonContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(15)),
-            color: equipment.status
-                ? theme.colorScheme.secondary.withOpacity(0.75)
-                : theme.colorScheme.primary.withOpacity(0.75),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black26,
-                offset: Offset(0, 4),
-                blurRadius: 8,
-              )
-            ]
-            //border: Border.all(width: 2, color: Colors.white30),
-            ),
+    return Container(
+      constraints: const BoxConstraints(
+          minHeight: 240, minWidth: 240, maxHeight: 400, maxWidth: 400),
+      decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(15)),
+          color: equipment.status
+              ? theme.colorScheme.secondary.withOpacity(0.75)
+              : theme.colorScheme.primary.withOpacity(0.75),
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black26,
+              offset: Offset(0, 4),
+              blurRadius: 8,
+            )
+          ]
+          //border: Border.all(width: 2, color: Colors.white30),
+          ),
 
-        margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-        // color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary,
+      margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+      // color: equipment.status? theme.colorScheme.primary : theme.colorScheme.secondary,
+      width: MediaQuery.of(context).size.width * 0.5,
+      height: MediaQuery.of(context).size.height * 0.5,
+      child: Container(
+        //padding: const EdgeInsets.all(1),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
-        child: Container(
-          padding: const EdgeInsets.all(8),
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomCenter,
-              colors: [Colors.white60, Colors.white10],
-            ),
-            //borderRadius: BorderRadius.circular(25),
-            border: Border.all(width: 2, color: Colors.white30),
-            borderRadius: BorderRadius.circular(15),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomCenter,
+            colors: [Colors.white60, Colors.white10],
           ),
-          child: SizedBox(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    equipment.type,
-                    style: headingTextStyle,
-                  ),
-                ),
-                ClipOval(
-                  child: Image.asset(imgPath,
-                      width: 100, height: 100, fit: BoxFit.cover),
-                ),
-                //Spacer(),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: Switch(
-                    value: equipment.status,
-                    onChanged: (value) {
-                      context.read<EquipmentStatusCubit>().toggleStatus(
-                          userReference, equipment.reference, equipment.status);
-                    },
-                    activeColor: theme.colorScheme.secondary,
-                    inactiveThumbColor: theme.colorScheme.primary,
-                    inactiveTrackColor: Colors.grey,
-                  ),
-                ),
-              ],
+          //borderRadius: BorderRadius.circular(25),
+          border: Border.all(width: 2, color: Colors.white30),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                equipment.type,
+                style: headingTextStyle,
+              ),
             ),
-          ),
+            ClipOval(
+              child: Image.asset(imgPath,
+                  width: 100, height: 100, fit: BoxFit.cover),
+            ),
+            //Spacer(),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
+                child: Switch(
+                  value: equipment.status,
+                  onChanged: (value) {
+                    context.read<EquipmentStatusCubit>().toggleStatus(
+                        userReference, equipment.reference, equipment.status);
+                  },
+                  activeColor: theme.colorScheme.secondary,
+                  inactiveThumbColor: theme.colorScheme.primary,
+                  inactiveTrackColor: Colors.grey,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -217,12 +217,13 @@ class ToggleButtonContainer extends StatelessWidget {
 
 class Readings extends StatelessWidget {
   final String title;
-  final String value;
+  final double value;
   final IconData icon;
   final Color color;
 
-  Readings(
-      {required this.title,
+  const Readings(
+      {super.key,
+      required this.title,
       required this.value,
       required this.icon,
       required this.color});
@@ -238,7 +239,7 @@ class Readings extends StatelessWidget {
         title: Text(title,
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         subtitle: Text('Seasonal normal'),
-        trailing: Text(value,
+        trailing: Text(value.toString(),
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
       ),
     ));

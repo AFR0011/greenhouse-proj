@@ -9,7 +9,9 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/login.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
@@ -20,6 +22,7 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/chart.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
+import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
@@ -126,8 +129,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             _userReference = state.userReference;
             _enabled = state.enabled;
 
-            // Get device token for notifications
-
             // Call function to create home page
             if (_enabled) {
               return Theme(data: customTheme, child: _createHomePage());
@@ -186,61 +187,61 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                 ),
               ),
             ),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Container(
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.green.shade700, Colors.teal.shade400],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Center(
-                      child: ToggleButtons(
-                        renderBorder: false,
-                        fillColor: Colors.teal.withOpacity(1),
-                        selectedColor: Colors.white,
-                        splashColor: Colors.tealAccent,
-                        hoverColor: Colors.tealAccent.withOpacity(0.1),
-                        isSelected: _isSelected,
-                        onPressed: _onToggle,
-                        children: <Widget>[
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: const Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Dashbord',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: const Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Notifications',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+            child: Column(
+              children: [
+                Container(
+                  width: double.maxFinite,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Colors.green.shade700, Colors.teal.shade400],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
                   ),
-                  _getDisplayWidget()
-                ],
-              ),
+                  child: Center(
+                    child: ToggleButtons(
+                      renderBorder: false,
+                      fillColor: Colors.teal.withOpacity(1),
+                      selectedColor: Colors.white,
+                      splashColor: Colors.tealAccent,
+                      hoverColor: Colors.tealAccent.withOpacity(0.1),
+                      isSelected: _isSelected,
+                      onPressed: _onToggle,
+                      children: <Widget>[
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: const Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Dashbord',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: const Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Notifications',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SingleChildScrollView(
+                  child: Container(child: _getDisplayWidget()),
+                )
+              ],
             )),
 
         // Footer nav bar
@@ -254,7 +255,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                     Colors.teal.shade400,
                     Colors.blue.shade300
                   ],
-                  stops: [0.2, 0.5, 0.9],
+                  stops: const [0.2, 0.5, 0.9],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -386,57 +387,120 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                       List soilMoistures = [];
                       List lightIntensities = [];
                       List humidities = [];
-  
-                      for (int i = 0; i < min(allReadings.length, 24 * 120); i++) {
-                        Map<String, dynamic> boardReadings = allReadings[i].allReadings; // {"1" : {}, "2" : {}, ...}
+
+                      for (int i = 0;
+                          i < min(allReadings.length, 24 * 120);
+                          i++) {
+                        Map<String, dynamic> boardReadings = allReadings[i]
+                            .allReadings; // {"1" : {}, "2" : {}, ...}
                         for (int j = 0; j < boardReadings.length; j++) {
                           Map<String, dynamic> singleBoardReadings =
-                              boardReadings.entries.elementAt(j).value as Map<String, dynamic>;
-    
+                              boardReadings.entries.elementAt(j).value
+                                  as Map<String, dynamic>;
+
                           temperatures.add(singleBoardReadings["temperature"]);
                           humidities.add(singleBoardReadings["humidity"]);
-                          soilMoistures.add(singleBoardReadings["soilMoisture"]);
+                          soilMoistures
+                              .add(singleBoardReadings["soilMoisture"]);
                           lightIntensities
                               .add(singleBoardReadings["lightIntensity"]);
                           gases.add(singleBoardReadings["gas"]);
                         }
                       }
-                      return ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemExtent: MediaQuery.of(context).size.width * 0.8,
-                        itemCount: 5,
-                        itemBuilder: (context, index) {
-                          switch (index) {
-                            case 0:
-                              return Center(
-                                child: ChartClass(
-                                    miny: 10, maxy: 50, values: temperatures),
-                              );
-                            case 1:
-                              return Center(
-                                child: ChartClass(
-                                    miny: 00, maxy: 100, values: humidities),
-                              );
-                            case 2:
-                              return Center(
-                                child: ChartClass(
-                                    miny: 00, maxy: 100, values: soilMoistures),
-                              );
-                            case 3:
-                              return Center(
-                                child: ChartClass(
-                                    miny: 00,
-                                    maxy: 100,
-                                    values: lightIntensities),
-                              );
-                            case 4:
-                              return Center(
-                                child: ChartClass(
-                                    miny: 00, maxy: 100, values: gases),
-                              );
-                          }
-                          return null;
-                        },
+                      return Column(
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemExtent:
+                                  MediaQuery.of(context).size.width * 0.8,
+                              itemCount: 5,
+                              itemBuilder: (context, index) {
+                                switch (index) {
+                                  case 0:
+                                    return Center(
+                                      child: ChartClass(
+                                          miny: 10,
+                                          maxy: 50,
+                                          values: temperatures),
+                                    );
+                                  case 1:
+                                    return Center(
+                                      child: ChartClass(
+                                          miny: 00,
+                                          maxy: 100,
+                                          values: humidities),
+                                    );
+                                  case 2:
+                                    return Center(
+                                      child: ChartClass(
+                                          miny: 00,
+                                          maxy: 100,
+                                          values: soilMoistures),
+                                    );
+                                  case 3:
+                                    return Center(
+                                      child: ChartClass(
+                                          miny: 00,
+                                          maxy: 100,
+                                          values: lightIntensities),
+                                    );
+                                  case 4:
+                                    return Center(
+                                      child: ChartClass(
+                                          miny: 00, maxy: 100, values: gases),
+                                    );
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.3,
+                            child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: 5,
+                                itemBuilder: (context, index) {
+                                  switch (index) {
+                                    case 0:
+                                      return Readings(
+                                          title: "Temperature",
+                                          value: temperatures.last,
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                    case 1:
+                                      return Readings(
+                                          title: "Humidity",
+                                          value: humidities.last,
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                    case 2:
+                                      return Readings(
+                                          title: "Soil Moisture",
+                                          value: soilMoistures.last,
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                    case 3:
+                                      return Readings(
+                                          title: "Light",
+                                          value: lightIntensities.last,
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                    case 4:
+                                      return Readings(
+                                          title: "Gas",
+                                          value: gases.last,
+                                          icon: Icons.grass,
+                                          color: Colors.brown);
+                                  }
+                                  return null;
+                                }),
+                          ),
+                        ],
                       );
                     } else {
                       return const Text("Unexpected State");
@@ -444,36 +508,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   }),
                 )),
           ),
-          const Text(
-            "Readings",
-            style: headingTextStyle,
-            textAlign: TextAlign.center,
-          ),
-          BlocProvider(
-            create: (context) => ReadingsCubit(),
-            child: BlocBuilder<ReadingsCubit, GreenhouseState>(
-              builder: (context, state) {
-                if (state is ReadingsLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (state is ReadingsLoaded) {
-                  for (var reading in state.readings) {
-                    // reading.allReadings.where((element) => element == 5);
-                  }
-                  return Container(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(""),
-                  );
-                } else if (state is ReadingsError) {
-                  print(state.error);
-                  return Text(state.error);
-                } else {
-                  return const Text("Unexpected State");
-                }
-              },
-            ),
-          )
         ],
       ),
     );

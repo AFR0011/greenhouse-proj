@@ -425,7 +425,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
             content: SingleChildScrollView(
               child: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
-                width: MediaQuery.of(context).size.width*.6,
+                width: MediaQuery.of(context).size.width * .6,
                 child: BlocBuilder<InventoryEditCubit, List<bool>>(
                   bloc: inventoryEditCubit,
                   builder: (context, state) {
@@ -440,14 +440,14 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                 ? ""
                                 : "Name should be longer than 1 characters.",
                             labelText: "Name"),
-                       
+
                         InputTextField(
                             controller: _descController,
                             errorText: state[1]
                                 ? ""
                                 : "Description should be longer than 2 characters.",
                             labelText: "Description"),
-                        
+
                         TextFormField(
                           controller: _amountController,
                           keyboardType: TextInputType.number,
@@ -465,7 +465,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                             ),
                           ),
                         ),
-              
+
                         // Submit and cancel buttons
                         Row(
                           children: [
@@ -481,10 +481,11 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                       validation[1] = !validation[1];
                                     }
                                     if (_amountController.text.isEmpty ||
-                                        int.parse(_amountController.text) <= 0) {
+                                        int.parse(_amountController.text) <=
+                                            0) {
                                       validation[2] = !validation[2];
                                     }
-              
+
                                     bool isValid = inventoryEditCubit
                                         .updateState(validation);
                                     if (!isValid) {
@@ -495,8 +496,9 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                         "description": _descController.text,
                                         "name": _equipmentController.text,
                                         "timeAdded": DateTime.now(),
-                                        "pending":
-                                            _userRole == 'manager' ? false : true,
+                                        "pending": _userRole == 'manager'
+                                            ? false
+                                            : true,
                                       };
                                       await inventoryCubit
                                           .addInventory(data, _userReference)
@@ -563,7 +565,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                 return SingleChildScrollView(
                   child: Container(
                     constraints: const BoxConstraints(maxWidth: 400),
-                    width: MediaQuery.of(context).size.width*.6,
+                    width: MediaQuery.of(context).size.width * .6,
                     child: Column(
                       mainAxisSize:
                           MainAxisSize.min, // Set column to minimum size
@@ -606,8 +608,9 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                               labelText: "Amount",
                               filled: true,
                               fillColor: theme.colorScheme.secondary,
-                              errorText:
-                                  state[2] ? "" : "Amount should be more than 0.",
+                              errorText: state[2]
+                                  ? ""
+                                  : "Amount should be more than 0.",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -636,10 +639,11 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                       validation[1] = !validation[1];
                                     }
                                     if (_amountController.text.isEmpty ||
-                                        int.parse(_amountController.text) <= 0) {
+                                        int.parse(_amountController.text) <=
+                                            0) {
                                       validation[2] = !validation[2];
                                     }
-                  
+
                                     bool isValid = inventoryEditCubit
                                         .updateState(validation);
                                     if (!isValid) {
@@ -650,10 +654,11 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                                         "description": _descController.text,
                                         "name": _equipmentController.text,
                                         "timeAdded": DateTime.now(),
-                                        "pending":
-                                            _userRole == 'manager' ? false : true,
+                                        "pending": _userRole == 'manager'
+                                            ? false
+                                            : true,
                                       };
-                  
+
                                       inventoryCubit
                                           .updateInventory(inventory.reference,
                                               data, _userReference)
@@ -710,9 +715,11 @@ class _InventoryPageState extends State<_InventoryPageContent> {
               content: SingleChildScrollView(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  width: MediaQuery.of(context).size.width*.6, // Set maximum width
+                  width: MediaQuery.of(context).size.width *
+                      .6, // Set maximum width
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    mainAxisSize:
+                        MainAxisSize.min, // Set column to minimum size
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(

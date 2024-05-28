@@ -5,8 +5,6 @@
 ///
 library;
 
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -158,10 +156,10 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                                   crossAxisCount:
-                                      (MediaQuery.of(context).size.width < 800)
+                                      (MediaQuery.of(context).size.width < 650)
                                           ? 2
                                           : 4),
-                          shrinkWrap: true,
+                          shrinkWrap: false,
                           itemCount: equipmentList.length,
                           itemBuilder: (context, index) {
                             EquipmentStatus equipment =
