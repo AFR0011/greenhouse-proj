@@ -59,7 +59,9 @@ class TaskDetailsDialog extends StatelessWidget {
                       children: [
                         Expanded(
                           child: WhiteElevatedButton(
-                              text: "Contact Manager", onPressed: () {}),
+                              text: "Contact Manager",
+                              onPressed: () => deleteOrContact(
+                                  mainContext, managerReference)),
                         ),
                         Expanded(
                           child: WhiteElevatedButton(
@@ -72,32 +74,38 @@ class TaskDetailsDialog extends StatelessWidget {
                         )
                       ],
                     )
-                  : Row(children: [
-                      Expanded(
-                        child: WhiteElevatedButton(
-                            text: userRole == "worker"
-                                ? "Mark as Complete"
-                                : "Edit",
-                            onPressed: () => editOrComplete(task)),
-                      ),
-                      Expanded(
-                        child: RedElevatedButton(
-                            text: userRole == "worker"
-                                ? "Contact Manager"
-                                : "Delete",
-                            onPressed: () => deleteOrContact(
-                                userRole == "worker" ? managerReference : task)),
-                      ),
-                      task.status == "waiting"
-                          ? Expanded(
-                              child: GreenElevatedButton(
-                                  text: "Approve", onPressed: () {}),
-                            )
-                          : const SizedBox(),
-                    ]),
-        
+                  : userRole == "manager"
+                      ? Row(children: [
+                          Expanded(
+                            child: WhiteElevatedButton(
+                                text: userRole == "worker"
+                                    ? "Mark as Complete"
+                                    : "Edit",
+                                onPressed: () => editOrComplete(task)),
+                          ),
+                          Expanded(
+                            child: RedElevatedButton(
+                                text: userRole == "worker"
+                                    ? "Contact Manager"
+                                    : "Delete",
+                                onPressed: () => deleteOrContact(
+                                    userRole == "worker"
+                                        ? managerReference
+                                        : task)),
+                          ),
+                          task.status == "waiting"
+                              ? Expanded(
+                                  child: GreenElevatedButton(
+                                      text: "Approve",
+                                      onPressed: () => editOrComplete(
+                                          mainContext, task.taskReference)),
+                                )
+                              : const SizedBox(),
+                        ])
+                      : const Row(),
+
               const SizedBox(height: 20),
-        
+
               Align(
                 alignment: Alignment.center,
                 child: WhiteElevatedButton(
@@ -190,7 +198,7 @@ class EmployeeDetailsDialog extends StatelessWidget {
                   "Status:", employee.enabled ? "Enabled" : "Disabled"),
               const SizedBox(
                   height: 20), // Add spacing between details and buttons
-        
+
               Row(
                 children: [
                   Expanded(
@@ -201,21 +209,27 @@ class EmployeeDetailsDialog extends StatelessWidget {
                   ),
                   Expanded(
                     child: WhiteElevatedButton(
-                      text: "Show profile",
+                      text: "Profile",
                       onPressed: () => profileFunction(employee),
                     ),
                   ),
-                  Expanded(
-                    child: RedElevatedButton(
-                      text:
-                          employee.enabled ? "Disable account" : "Enable account",
-                      onPressed: () => toggleAccount(),
-                    ),
-                  )
+                  userRole == "admin"
+                      ? Expanded(
+                          child: employee.enabled
+                              ? RedElevatedButton(
+                                  text: "Disable",
+                                  onPressed: () => toggleAccount(employee),
+                                )
+                              : GreenElevatedButton(
+                                  text: "Enable",
+                                  onPressed: () => toggleAccount(employee),
+                                ),
+                        )
+                      : const Text("")
                 ],
               ),
               const SizedBox(height: 20),
-        
+
               Align(
                 alignment: Alignment.center,
                 child: WhiteElevatedButton(
@@ -265,12 +279,14 @@ class EmployeeDetailsDialog extends StatelessWidget {
 
 class InventoryDetailsDialog extends StatelessWidget {
   final InventoryData inventory;
+  final String userRole;
   final Function editInventory;
   final Function deleteInventory;
 
   const InventoryDetailsDialog(
       {super.key,
       required this.inventory,
+      required this.userRole,
       required this.editInventory,
       required this.deleteInventory});
 
@@ -302,26 +318,28 @@ class InventoryDetailsDialog extends StatelessWidget {
                       .substring(0, inventory.timeAdded.toString().length - 7)),
               const SizedBox(
                   height: 20), // Add spacing between details and buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: WhiteElevatedButton(
-                        text: "Edit",
-                        onPressed: () {
-                          editInventory();
-                        }),
-                  ),
-                  Expanded(
-                    child: RedElevatedButton(
-                        text: "Delete",
-                        onPressed: () {
-                          deleteInventory();
-                        }),
-                  ),
-                ],
-              ),
+              userRole == "manager"
+                  ? Row(
+                      children: [
+                        Expanded(
+                          child: WhiteElevatedButton(
+                              text: "Edit",
+                              onPressed: () {
+                                editInventory();
+                              }),
+                        ),
+                        Expanded(
+                          child: RedElevatedButton(
+                              text: "Delete",
+                              onPressed: () {
+                                deleteInventory();
+                              }),
+                        ),
+                      ],
+                    )
+                  : const Row(),
               const SizedBox(height: 20),
-        
+
               Align(
                 alignment: Alignment.center,
                 child: WhiteElevatedButton(
@@ -373,12 +391,14 @@ class PlantDetailsDialog extends StatelessWidget {
   final PlantData plant;
   final Function removePlant;
   final BuildContext mainContext;
+  final String userRole;
 
   const PlantDetailsDialog(
       {super.key,
       required this.plant,
       required this.removePlant,
-      required this.mainContext});
+      required this.mainContext,
+      required this.userRole});
 
   @override
   Widget build(BuildContext context) {
@@ -411,11 +431,13 @@ class PlantDetailsDialog extends StatelessWidget {
               alignment: Alignment.center,
               child: Row(
                 children: [
-                  Expanded(
-                    child: RedElevatedButton(
-                        onPressed: () => removePlant(mainContext, plant),
-                        text: "Remove Plant"),
-                  ),
+                  userRole == "manager"
+                      ? Expanded(
+                          child: RedElevatedButton(
+                              onPressed: () => removePlant(mainContext, plant),
+                              text: "Remove Plant"),
+                        )
+                      : const SizedBox(),
                   Expanded(
                     child: WhiteElevatedButton(
                       onPressed: () {
@@ -424,7 +446,6 @@ class PlantDetailsDialog extends StatelessWidget {
                       text: "Close",
                     ),
                   ),
-                  
                 ],
               ),
             ),
@@ -469,12 +490,14 @@ class ProgramDetailsDialog extends StatelessWidget {
   final ProgramData program;
   final Function editProgram;
   final Function deleteProgram;
+  final String userRole;
 
   const ProgramDetailsDialog(
       {super.key,
       required this.program,
       required this.editProgram,
-      required this.deleteProgram});
+      required this.deleteProgram,
+      required this.userRole});
 
   @override
   Widget build(BuildContext context) {
@@ -498,29 +521,30 @@ class ProgramDetailsDialog extends StatelessWidget {
               _buildDetailRow("Title", program.title),
               _buildDetailRow(
                   "Creation date:",
-                  program.creationDate
-                      .toString()
-                      .substring(0, program.creationDate.toString().length - 7)),
+                  program.creationDate.toString().substring(
+                      0, program.creationDate.toString().length - 7)),
               const SizedBox(
                   height: 20), // Add spacing between details and buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: WhiteElevatedButton(
-                        text: "Edit",
-                        onPressed: () {
-                          editProgram();
-                        }),
-                  ),
-                  Expanded(
-                    child: RedElevatedButton(
-                        text: "Delete",
-                        onPressed: () {
-                          deleteProgram();
-                        }),
-                  ),
-                ],
-              ),
+              userRole == "manager"
+                  ? Row(
+                      children: [
+                        Expanded(
+                          child: WhiteElevatedButton(
+                              text: "Edit",
+                              onPressed: () {
+                                editProgram();
+                              }),
+                        ),
+                        Expanded(
+                          child: RedElevatedButton(
+                              text: "Delete",
+                              onPressed: () {
+                                deleteProgram();
+                              }),
+                        ),
+                      ],
+                    )
+                  : const SizedBox(),
               const SizedBox(height: 20),
               Align(
                 alignment: Alignment.center,

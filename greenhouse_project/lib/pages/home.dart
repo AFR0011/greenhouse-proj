@@ -9,9 +9,8 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/login.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
@@ -25,6 +24,9 @@ import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class HomePage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
@@ -99,9 +101,16 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // InitState - get user info state to check authentication later
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
-    context.read<NotificationsCubit>().initNotifications();
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken!);
+      }
+    });
   }
 
   @override
@@ -161,8 +170,15 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
         // Main appbar (header)
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(80.0),
-          child: createHomeAppBar(
-              context, widget.userCredential, _userReference, "lib/utils/Icons/logo.png"),
+          child: createMainAppBar(
+              context,
+              widget.userCredential,
+              _userReference,
+              const Image(
+                image: AssetImage('lib/utils/Icons/logo.png'),
+                width: 120,
+                height: 120,
+              )),
         ),
 
         // Call function to build notificaitons list
@@ -372,135 +388,127 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             alignment: Alignment.topCenter,
             child: SizedBox(
                 child: BlocProvider(
-                  create: (context) => ReadingsCubit(),
-                  child: BlocBuilder<ReadingsCubit, GreenhouseState>(
-                      builder: (context, state) {
-                    if (state is ReadingsLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (state is ReadingsLoaded) {
-                      List<ReadingsData> allReadings = state.readings;
+              create: (context) => ReadingsCubit(),
+              child: BlocBuilder<ReadingsCubit, GreenhouseState>(
+                  builder: (context, state) {
+                if (state is ReadingsLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is ReadingsLoaded) {
+                  List<ReadingsData> allReadings = state.readings;
 
-                      List temperatures = [];
-                      List gases = [];
-                      List soilMoistures = [];
-                      List lightIntensities = [];
-                      List humidities = [];
+                  List temperatures = [];
+                  List gases = [];
+                  List soilMoistures = [];
+                  List lightIntensities = [];
+                  List humidities = [];
 
-                      for (int i = 0;
-                          i < min(allReadings.length, 24 * 120);
-                          i++) {
-                        Map<String, dynamic> boardReadings = allReadings[i]
-                            .allReadings; // {"1" : {}, "2" : {}, ...}
-                        for (int j = 0; j < boardReadings.length; j++) {
-                          Map<String, dynamic> singleBoardReadings =
-                              boardReadings.entries.elementAt(j).value
-                                  as Map<String, dynamic>;
+                  for (int i = 0; i < min(allReadings.length, 24 * 120); i++) {
+                    Map<String, dynamic> boardReadings =
+                        allReadings[i].allReadings; // {"1" : {}, "2" : {}, ...}
+                    for (int j = 0; j < boardReadings.length; j++) {
+                      Map<String, dynamic> singleBoardReadings =
+                          boardReadings.entries.elementAt(j).value
+                              as Map<String, dynamic>;
 
-                          temperatures.add(singleBoardReadings["temperature"]);
-                          humidities.add(singleBoardReadings["humidity"]);
-                          soilMoistures
-                              .add(singleBoardReadings["soilMoisture"]);
-                          lightIntensities
-                              .add(singleBoardReadings["lightIntensity"]);
-                          gases.add(singleBoardReadings["gas"]);
-                        }
-                      }
-                      return Column(
-                        children: [
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.3,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemExtent:
-                                  MediaQuery.of(context).size.width * 0.8,
-                              itemCount: 5,
-                              itemBuilder: (context, index) {
-                                switch (index) {
-                                  case 0:
-                                    return Center(
-                                      child: ChartClass(
-                                          miny: 10,
-                                          maxy: 50,
-                                          values: temperatures),
-                                    );
-                                  case 1:
-                                    return Center(
-                                      child: ChartClass(
-                                          miny: 00,
-                                          maxy: 100,
-                                          values: humidities),
-                                    );
-                                  case 2:
-                                    return Center(
-                                      child: ChartClass(
-                                          miny: 00,
-                                          maxy: 100,
-                                          values: soilMoistures),
-                                    );
-                                  case 3:
-                                    return Center(
-                                      child: ChartClass(
-                                          miny: 00,
-                                          maxy: 100,
-                                          values: lightIntensities),
-                                    );
-                                  case 4:
-                                    return Center(
-                                      child: ChartClass(
-                                          miny: 00, maxy: 100, values: gases),
-                                    );
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: 5,
-                              itemBuilder: (context, index) {
-                                switch (index) {
-                                  case 0:
-                                    return Readings(
-                                        title: "Temperature",
-                                        value: temperatures.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                  case 1:
-                                    return Readings(
-                                        title: "Humidity",
-                                        value: humidities.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                  case 2:
-                                    return Readings(
-                                        title: "Soil Moisture",
-                                        value: soilMoistures.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                  case 3:
-                                    return Readings(
-                                        title: "Light",
-                                        value: lightIntensities.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                  case 4:
-                                    return Readings(
-                                        title: "Gas",
-                                        value: gases.last,
-                                        icon: Icons.grass,
-                                        color: Colors.brown);
-                                }
-                                return null;
-                              }),
-                        ],
-                      );
-                    } else {
-                      return const Text("Unexpected State");
+                      temperatures.add(singleBoardReadings["temperature"]);
+                      humidities.add(singleBoardReadings["humidity"]);
+                      soilMoistures.add(singleBoardReadings["soilMoisture"]);
+                      lightIntensities
+                          .add(singleBoardReadings["lightIntensity"]);
+                      gases.add(singleBoardReadings["gas"]);
                     }
-                  }),
-                )),
+                  }
+                  return Column(
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemExtent: MediaQuery.of(context).size.width * 0.8,
+                          itemCount: 5,
+                          itemBuilder: (context, index) {
+                            switch (index) {
+                              case 0:
+                                return Center(
+                                  child: ChartClass(
+                                      miny: 10, maxy: 50, values: temperatures),
+                                );
+                              case 1:
+                                return Center(
+                                  child: ChartClass(
+                                      miny: 00, maxy: 100, values: humidities),
+                                );
+                              case 2:
+                                return Center(
+                                  child: ChartClass(
+                                      miny: 00,
+                                      maxy: 100,
+                                      values: soilMoistures),
+                                );
+                              case 3:
+                                return Center(
+                                  child: ChartClass(
+                                      miny: 00,
+                                      maxy: 100,
+                                      values: lightIntensities),
+                                );
+                              case 4:
+                                return Center(
+                                  child: ChartClass(
+                                      miny: 00, maxy: 100, values: gases),
+                                );
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: 5,
+                          itemBuilder: (context, index) {
+                            switch (index) {
+                              case 0:
+                                return Readings(
+                                    title: "Temperature",
+                                    value: temperatures.last.round(),
+                                    icon: Icons.grass,
+                                    color: Colors.brown);
+                              case 1:
+                                return Readings(
+                                    title: "Humidity",
+                                    value: humidities.last,
+                                    icon: Icons.grass,
+                                    color: Colors.brown);
+                              case 2:
+                                return Readings(
+                                    title: "Soil Moisture",
+                                    value: soilMoistures.last,
+                                    icon: Icons.grass,
+                                    color: Colors.brown);
+                              case 3:
+                                return Readings(
+                                    title: "Light",
+                                    value: lightIntensities.last,
+                                    icon: Icons.grass,
+                                    color: Colors.brown);
+                              case 4:
+                                return Readings(
+                                    title: "Gas",
+                                    value: gases.last.round(),
+                                    icon: Icons.grass,
+                                    color: Colors.brown);
+                            }
+                            return null;
+                          }),
+                    ],
+                  );
+                } else {
+                  return const Text("Unexpected State");
+                }
+              }),
+            )),
           ),
         ],
       ),

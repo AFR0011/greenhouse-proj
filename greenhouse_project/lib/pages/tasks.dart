@@ -8,6 +8,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_holo_date_picker/flutter_holo_date_picker.dart';
@@ -22,8 +23,10 @@ import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
-import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class TasksPage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
@@ -103,8 +106,16 @@ class _TasksPageState extends State<_TasksPageContent> {
   // InitState - get user info state to check authentication later
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken!);
+      }
+    });
   }
 
   @override
@@ -163,39 +174,43 @@ class _TasksPageState extends State<_TasksPageContent> {
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
-              decoration:_userRole == "worker"? BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.lightBlueAccent.shade100.withOpacity(0.6),
-                    Colors.teal.shade100.withOpacity(0.6),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                image: DecorationImage(
-                  image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.white.withOpacity(0.05),
-                    BlendMode.dstATop,
+          decoration: _userRole == "worker"
+              ? BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                      Colors.teal.shade100.withOpacity(0.6),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  image: DecorationImage(
+                    image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white.withOpacity(0.05),
+                      BlendMode.dstATop,
+                    ),
+                  ),
+                )
+              : BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                      Colors.teal.shade100.withOpacity(0.6),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  image: DecorationImage(
+                    image: const AssetImage('lib/utils/Icons/tasks.png'),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white.withOpacity(0.05),
+                      BlendMode.dstATop,
+                    ),
                   ),
                 ),
-              ) : BoxDecoration(gradient: LinearGradient(
-                  colors: [
-                    Colors.lightBlueAccent.shade100.withOpacity(0.6),
-                    Colors.teal.shade100.withOpacity(0.6),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                image: DecorationImage(
-                  image: const AssetImage('lib/utils/Icons/tasks.png'),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.white.withOpacity(0.05),
-                    BlendMode.dstATop,
-                  ),
-                ),),
           child: Column(
             children: [
               SizedBox(
@@ -211,7 +226,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                   // Show tasks if tasks state is loaded
                   else if (state is TaskLoaded) {
                     List<TaskData> taskList = state.tasks; // tasks list
-          
+
                     // Display nothing if no tasks
                     if (taskList.isEmpty) {
                       return const Center(child: Text("No Tasks..."));
@@ -223,23 +238,28 @@ class _TasksPageState extends State<_TasksPageContent> {
                           child: Column(
                             children: [
                               SizedBox(
-                                height: MediaQuery.of(context).size.height * 0.5,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.5,
                                 child: ListView.builder(
                                   shrinkWrap: true,
                                   itemCount: taskList.length,
                                   itemBuilder: (context, index) {
-                                    TaskData task = taskList[index]; // task info
+                                    TaskData task =
+                                        taskList[index]; // task info
                                     return Card(
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15.0),
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
                                       ),
                                       elevation: 4.0,
-                                      margin: const EdgeInsets.only(bottom: 16.0),
+                                      margin:
+                                          const EdgeInsets.only(bottom: 16.0),
                                       child: ListTile(
                                         leading: Container(
                                           padding: const EdgeInsets.all(8.0),
                                           decoration: BoxDecoration(
-                                            color: Colors.green.withOpacity(0.1),
+                                            color:
+                                                Colors.green.withOpacity(0.1),
                                             shape: BoxShape.circle,
                                           ),
                                           child: Icon(
@@ -258,27 +278,31 @@ class _TasksPageState extends State<_TasksPageContent> {
                                         trailing: WhiteElevatedButton(
                                           text: 'Details',
                                           onPressed: () {
+                                            BuildContext mainContext = context;
                                             showDialog(
                                               context: context,
                                               builder: (context) {
                                                 return TaskDetailsDialog(
-                                                    task: task,
-                                                    userRole: _userRole,
-                                                    managerReference:
-                                                        _userRole == "worker"
-                                                            ? task.manager
-                                                            : null,
-                                                    editOrComplete:
-                                                        _userRole == "worker"
-                                                            ? completeTask
-                                                            : showEditForm,
-                                                    deleteOrContact:
-                                                        _userRole == "worker"
-                                                            ? contactManager
-                                                            : showDeleteForm,
-                                                            
-                                                    mainContext: context,);
-                                                    
+                                                  task: task,
+                                                  userRole: _userRole,
+                                                  managerReference:
+                                                      _userRole == "worker"
+                                                          ? task.manager
+                                                          : null,
+                                                  editOrComplete: _userRole ==
+                                                              "worker" ||
+                                                          (task.status ==
+                                                                  "waiting" &&
+                                                              _userRole ==
+                                                                  "manager")
+                                                      ? completeTask
+                                                      : showEditForm,
+                                                  deleteOrContact:
+                                                      _userRole == "worker"
+                                                          ? contactManager
+                                                          : showDeleteForm,
+                                                  mainContext: mainContext,
+                                                );
                                               },
                                             );
                                           },
@@ -403,7 +427,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                     content: SingleChildScrollView(
                       child: Container(
                         constraints: const BoxConstraints(maxWidth: 400),
-                        width: MediaQuery.of(context).size.width*.6,
+                        width: MediaQuery.of(context).size.width * .6,
                         child: Column(
                           mainAxisSize:
                               MainAxisSize.min, // Set column to minimum size
@@ -434,10 +458,11 @@ class _TasksPageState extends State<_TasksPageContent> {
                               onChanged: taskDropdownCubit.updateDropdown,
                             ),
                             Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
-                                child: Center(
+                              padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
+                              child: Center(
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 25),
                                   child: DatePickerWidget(
                                     looping: false, // default is not looping
                                     firstDate: DateTime.now(),
@@ -445,16 +470,23 @@ class _TasksPageState extends State<_TasksPageContent> {
                                     initialDate: DateTime.now(),
                                     dateFormat: "dd-MMM-yyyy",
                                     locale: DatePicker.localeFromString('en'),
-                                    onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
+                                    onChange: (DateTime newDate, _) =>
+                                        taskEditCubit.updateState([
+                                      taskEditState[0],
+                                      taskEditState[1],
+                                      newDate,
+                                      taskEditState[3]
+                                    ]),
                                     pickerTheme: const DateTimePickerTheme(
-                                      itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
+                                      itemTextStyle: TextStyle(
+                                          color: Colors.black, fontSize: 19),
                                       dividerColor: Colors.blue,
                                       backgroundColor: Colors.transparent,
                                     ),
                                   ),
                                 ),
-                                                          ),
                               ),
+                            ),
                             const SizedBox(height: 10),
                             // Submit & Cancel
                             Row(
@@ -482,7 +514,8 @@ class _TasksPageState extends State<_TasksPageContent> {
                                             task.taskReference,
                                             {
                                               "title": _titleController.text,
-                                              "description": _descController.text,
+                                              "description":
+                                                  _descController.text,
                                               "worker": taskEditState[3],
                                               "dueDate": Timestamp
                                                   .fromMillisecondsSinceEpoch(
@@ -490,12 +523,11 @@ class _TasksPageState extends State<_TasksPageContent> {
                                                           .millisecondsSinceEpoch)
                                             },
                                             _userReference);
-                                                        
+
                                         Navigator.pop(context);
                                         Navigator.pop(context);
-                                        Navigator.pop(context);
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
                                                 content: Text(
                                                     "Task edited successfully")));
                                       } else {
@@ -550,9 +582,11 @@ class _TasksPageState extends State<_TasksPageContent> {
               content: SingleChildScrollView(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  width: MediaQuery.of(context).size.width*.6, // Set maximum width
+                  width: MediaQuery.of(context).size.width *
+                      .6, // Set maximum width
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    mainAxisSize:
+                        MainAxisSize.min, // Set column to minimum size
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
@@ -567,8 +601,8 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   Navigator.pop(context);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content:
-                                              Text("Task deleted succesfully!")));
+                                          content: Text(
+                                              "Task deleted succesfully!")));
                                 }),
                           ),
                           Expanded(
@@ -624,10 +658,10 @@ class _TasksPageState extends State<_TasksPageContent> {
                         content: SingleChildScrollView(
                           child: Container(
                             constraints: const BoxConstraints(maxWidth: 400),
-                            width: MediaQuery.of(context).size.width*.6,
+                            width: MediaQuery.of(context).size.width * .6,
                             child: Column(
-                              mainAxisSize:
-                                  MainAxisSize.min, // Set column to minimum size
+                              mainAxisSize: MainAxisSize
+                                  .min, // Set column to minimum size
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 InputTextField(
@@ -649,35 +683,51 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   value: dropdownItems.entries
                                       .firstWhere(
                                         (element) =>
-                                            element.value == widget.userReference,
-                                        orElse: () => dropdownItems.entries.first,
+                                            element.value ==
+                                            widget.userReference,
+                                        orElse: () =>
+                                            dropdownItems.entries.first,
                                       )
                                       .value,
                                   onChanged: taskDropdownCubit.updateDropdown,
                                 ),
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
-                                child: Center(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 25),
-                                  child: DatePickerWidget(
-                                    looping: false, // default is not looping
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime(2040, 1, 1),
-                                    initialDate: DateTime.now(),
-                                    dateFormat: "dd-MMM-yyyy",
-                                    locale: DatePicker.localeFromString('en'),
-                                    onChange: (DateTime newDate, _) => taskEditCubit.updateState([taskEditState[0], taskEditState[1], newDate, taskEditState[3]]) ,
-                                    pickerTheme: const DateTimePickerTheme(
-                                      itemTextStyle: TextStyle(color: Colors.black, fontSize: 19),
-                                      dividerColor: Colors.blue,
-                                      backgroundColor: Colors.transparent,
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(0, 10, 0, 5),
+                                  child: Center(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 25),
+                                      child: DatePickerWidget(
+                                        looping:
+                                            false, // default is not looping
+                                        firstDate: DateTime.now(),
+                                        lastDate: DateTime(2040, 1, 1),
+                                        initialDate: DateTime.now(),
+                                        dateFormat: "dd-MMM-yyyy",
+                                        locale:
+                                            DatePicker.localeFromString('en'),
+                                        onChange: (DateTime newDate, _) =>
+                                            taskEditCubit.updateState([
+                                          taskEditState[0],
+                                          taskEditState[1],
+                                          newDate,
+                                          taskEditState[3]
+                                        ]),
+                                        pickerTheme: const DateTimePickerTheme(
+                                          itemTextStyle: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 19),
+                                          dividerColor: Colors.blue,
+                                          backgroundColor: Colors.transparent,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                                                          ),
-                              ),
-                              const SizedBox(height: 10,),
+                                const SizedBox(
+                                  height: 10,
+                                ),
                                 //Submit & Cancel
                                 Row(
                                   children: [
@@ -697,8 +747,8 @@ class _TasksPageState extends State<_TasksPageContent> {
                                           if (_descController.text.isEmpty) {
                                             validation[1] = false;
                                           }
-                                          bool isValid =
-                                              taskEditCubit.updateState(validation);
+                                          bool isValid = taskEditCubit
+                                              .updateState(validation);
                                           if (isValid) {
                                             taskCubit.addTask(
                                               _titleController.text,
@@ -710,8 +760,8 @@ class _TasksPageState extends State<_TasksPageContent> {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
-                                                content:
-                                                    Text("Task has been created!"),
+                                                content: Text(
+                                                    "Task has been created!"),
                                               ),
                                             );
                                           }

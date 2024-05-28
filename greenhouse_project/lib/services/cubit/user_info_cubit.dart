@@ -6,7 +6,8 @@ class UserInfoCubit extends HomeCubit {
 
   UserInfoCubit() : super(UserInfoLoading());
 
-  Future<void> getUserInfo(UserCredential userCredential) async {
+  Future<void> getUserInfo(
+      UserCredential userCredential, String fcmToken) async {
     if (!_isActive) return;
     try {
       String? email = userCredential.user?.email;
@@ -23,9 +24,10 @@ class UserInfoCubit extends HomeCubit {
         final String userName = userData?['name'] ?? 'Unknown';
         final DocumentReference userReference = userSnapshot.reference;
         final bool enabled = userData?['enabled'];
-
-        if (_isActive && !_isProcessing)
+        await updateUserFCMToken(userQuery.docs.first.reference, fcmToken);
+        if (_isActive && !_isProcessing) {
           emit(UserInfoLoaded(userRole, userName, userReference, enabled));
+        }
       } else {
         if (_isActive && !_isProcessing) emit(UserInfoError("User not found"));
       }
@@ -47,8 +49,9 @@ class UserInfoCubit extends HomeCubit {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
       userCredential.user?.updatePassword(password);
-
-      getUserInfo(userCredential);
+      DocumentSnapshot userSnapshot = await userReference.get();
+      String fcmToken = userSnapshot.get("fcmToken");
+      getUserInfo(userCredential, fcmToken);
     } catch (error) {
       print(error.toString());
       emit(UserInfoError(error.toString()));
@@ -65,6 +68,20 @@ class UserInfoCubit extends HomeCubit {
       await userReference.delete();
     } catch (e) {
       emit(UserInfoError(e.toString()));
+    }
+    _isProcessing = false;
+  }
+
+  Future<void> updateUserFCMToken(
+      DocumentReference userReference, String fcmToken) async {
+    if (!_isActive) return;
+    _isProcessing = true;
+
+    try {
+      await userReference.update({"fcmToken": fcmToken});
+    } catch (error) {
+      print(error.toString());
+      emit(UserInfoError(error.toString()));
     }
     _isProcessing = false;
   }

@@ -7,6 +7,7 @@
 library;
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,6 +19,9 @@ import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 // ignore: must_be_immutable
 class SettingsPage extends StatelessWidget {
@@ -44,6 +48,7 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
+// ignore: must_be_immutable
 class SettingsPageContent extends StatefulWidget {
   UserCredential? userCredential;
 
@@ -59,8 +64,16 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
 
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential!);
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential!, deviceFcmToken!);
+      }
+    });
   }
 
   @override
@@ -85,43 +98,29 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                       Colors.lightBlueAccent.shade100.withOpacity(0.6),
                       Colors.teal.shade100.withOpacity(0.6),
                     ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                image: DecorationImage(
-                  image: const AssetImage('lib/utils/Icons/setting_bg.jpg'),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.1),
-                    BlendMode.dstATop,
+                  image: DecorationImage(
+                    image: const AssetImage('lib/utils/Icons/setting_bg.jpg'),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white.withOpacity(0.1),
+                      BlendMode.dstATop,
+                    ),
                   ),
-                ),
                 ),
                 child: Column(
                   children: [
-                    const Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            "",
-                            style: subheadingTextStyle,
-                          ),
-                        ),
-                        Padding(
-                            padding: EdgeInsets.fromLTRB(0, 0, 25, 0),
-                            child: null),
-                
-                
-                      ],
-                    ),
+                    const SizedBox(height: 10),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                      padding: const EdgeInsets.all(10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           //Notifications switch
                           const Text(
-                            "Notificatiions",
+                            "Notifications",
                             style: subheadingTextStyle,
                           ),
                           Align(
@@ -136,59 +135,64 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                               iconOff: Icons.alarm_off,
                               textSize: 18.0,
                               width: 130,
-                              onTap: (){},
-                              onSwipe: (){},
-                              onDoubleTap: (){},
-                              onChanged: (bool position) {},
+                              onTap: () {},
+                              onSwipe: () {},
+                              onDoubleTap: () {},
+                              onChanged: (bool position) {
+                                // context
+                                //     .read<NotificationsCubit>()
+                                //     .toggleNotifications(position);
+                              },
                             ),
                           ),
                         ],
                       ),
                     ),
                     //Dark mode switch
-                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Dark Mode",
-                              style: subheadingTextStyle,
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Dark Mode",
+                            style: subheadingTextStyle,
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: LiteRollingSwitch(
+                              value: true,
+                              textOn: "On",
+                              textOnColor: Colors.white,
+                              textOff: "Off",
+                              textOffColor: Colors.black,
+                              colorOn: Colors.black,
+                              colorOff: Colors.grey.shade400,
+                              iconOn: Icons.dark_mode,
+                              iconOff: Icons.light_mode_outlined,
+                              textSize: 18.0,
+                              width: 130,
+                              onTap: () {},
+                              onSwipe: () {},
+                              onDoubleTap: () {},
+                              onChanged: (bool position) {
+                                // Set theme to "dark" for "true"
+                              },
                             ),
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: LiteRollingSwitch(
-                                value: true,
-                                textOn: "On",
-                                textOnColor: Colors.white,
-                                textOff: "Off",
-                                textOffColor: Colors.black,
-                                colorOn: Colors.black,
-                                colorOff: Colors.grey.shade400,
-                                iconOn: Icons.dark_mode,
-                                iconOff: Icons.light_mode_outlined,
-                                textSize: 18.0,
-                                width: 130,
-                                onTap: (){},
-                                onSwipe: (){},
-                                onDoubleTap: (){},
-                                onChanged: (bool position) {},
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
               //Sign Out Button
-            floatingActionButton: GreenElevatedButton(
-              text: "Sign Out",
-              onPressed: () =>
-               context.read<AuthCubit>().authLogoutRequest()),
-            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-          )
-        )
-    );
+              floatingActionButton: GreenElevatedButton(
+                  text: "Sign Out",
+                  onPressed: () =>
+                      context.read<AuthCubit>().authLogoutRequest()),
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerFloat,
+            )));
   }
 }

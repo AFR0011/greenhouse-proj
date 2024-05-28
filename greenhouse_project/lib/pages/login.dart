@@ -6,13 +6,10 @@
 /// - Review cubit usage; builder and listener usage might be unnecessary
 library;
 
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/auth_cubit.dart';
-import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 import 'home.dart';
 
@@ -105,7 +102,6 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Image.asset('lib/utils/Icons/logo.png'),
-                          
                           Container(
                             constraints: const BoxConstraints(maxWidth: 400),
                             width: MediaQuery.of(context).size.width * .6,
@@ -113,8 +109,8 @@ class _LoginPageState extends State<LoginPage> {
                               controller: emailController,
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor:
-                                    theme.colorScheme.secondary.withOpacity(0.5),
+                                fillColor: theme.colorScheme.secondary
+                                    .withOpacity(0.5),
                                 labelText: 'Email',
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20)),

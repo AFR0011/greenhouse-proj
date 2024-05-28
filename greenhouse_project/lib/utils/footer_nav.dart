@@ -11,7 +11,6 @@ import "package:greenhouse_project/pages/inventory.dart";
 import "package:greenhouse_project/pages/management.dart";
 import "package:greenhouse_project/pages/tasks.dart";
 import "package:greenhouse_project/services/cubit/footer_nav_cubit.dart";
-import "package:greenhouse_project/utils/theme.dart";
 
 void navigateToPage(BuildContext context, int index, String userRole,
     UserCredential userCredential,
@@ -86,8 +85,7 @@ BottomNavigationBar createFooterNav(
           ? const BottomNavigationBarItem(
               icon: Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Icon(Icons.precision_manufacturing_rounded)
-              ),
+                  child: Icon(Icons.precision_manufacturing_rounded)),
               label: "Manage")
           : const BottomNavigationBarItem(
               icon: Padding(
@@ -96,29 +94,30 @@ BottomNavigationBar createFooterNav(
               ),
               label: "Tasks"),
       const BottomNavigationBarItem(
-        icon: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Icon(Icons.inventory),
-        ),
-        label: "Inventory"),
+          icon: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(Icons.inventory),
+          ),
+          label: "Inventory"),
       const BottomNavigationBarItem(
-        icon: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Icon(Icons.home),
-        ),
-        label: "Home"),
+          icon: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(Icons.home),
+          ),
+          label: "Home"),
       BottomNavigationBarItem(
-        icon: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Image.asset("lib/utils/Icons/Leaf.png", width: 24, height: 24),
-        ),
-        label: "Grow"),
+          icon: Padding(
+            padding: EdgeInsets.all(8.0),
+            child:
+                Image.asset("lib/utils/Icons/Leaf.png", width: 24, height: 24),
+          ),
+          label: "Grow"),
       const BottomNavigationBarItem(
-        icon: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Icon(Icons.chat),
-        ),
-        label: "Chat"),
+          icon: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(Icons.chat),
+          ),
+          label: "Chat"),
     ],
     currentIndex: selectedIndex,
     selectedItemColor: Colors.white60,

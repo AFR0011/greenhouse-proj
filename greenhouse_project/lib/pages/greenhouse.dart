@@ -9,6 +9,7 @@
 ///
 library;
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/pages/equipment.dart';
 import 'package:greenhouse_project/pages/plants.dart';
@@ -19,11 +20,12 @@ import 'package:greenhouse_project/services/cubit/home_cubit.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
-import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class GreenhousePage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
@@ -74,15 +76,6 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   // Index of footer nav selection
   final int _selectedIndex = 3;
 
-  // List of sensors being measured
-  final List<String> _sensors = [
-    "gas",
-    "humidity",
-    "lightIntensity",
-    "soilMoisture",
-    "temperature"
-  ];
-
   // Dispose (destructor)
   @override
   void dispose() {
@@ -92,8 +85,16 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   // InitState - get user info state to check authentication later
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken!);
+      }
+    });
   }
 
   @override
@@ -150,66 +151,69 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
   }
 
   // Function to create a subheading row with a details button
-  Widget _buildSubheadingRow(String subheading, Widget pageWidget, Color color,IconData icon) {
+  Widget _buildSubheadingRow(
+      String subheading, Widget pageWidget, Color color, IconData icon) {
     return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-      elevation: 4.0,
-      margin: EdgeInsets.only(bottom: 16.0),
-      child: ListTile(
-        leading: Container(
-          padding: EdgeInsets.all(8.0),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: color,
-            size: 30.0,
-          ),
-        ),
-        title: Text(
-          subheading,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18.0,
-          ),
-        ),
-        trailing: ElevatedButton(
-          onPressed: () {
-                  _navigateToDetailsPage(pageWidget);
-                },
-          child: Text('Details'),
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: color,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+        elevation: 4.0,
+        margin: EdgeInsets.only(bottom: 16.0),
+        child: ListTile(
+          leading: Container(
+            padding: EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: color,
+              size: 30.0,
             ),
           ),
-        ),
-      // child: Padding(
-      //   padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-      //   child: Row(
-      //     children: [
-      //       Expanded(
-      //         child: Text(
-      //           subheading,
-      //           style: subheadingTextStyle,
-      //         ),
-      //       ),
-      //       Padding(
-      //         padding: const EdgeInsets.fromLTRB(25, 15, 25, 15),
-      //         child: WhiteElevatedButton(
-      //           text: "Details",
-                // onPressed: () {
-                //   _navigateToDetailsPage(pageWidget);
-                // },
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
-    ));
+          title: Text(
+            subheading,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 18.0,
+            ),
+          ),
+          trailing: ElevatedButton(
+            onPressed: () {
+              _navigateToDetailsPage(pageWidget);
+            },
+            child: Text('Details'),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: color,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+          ),
+          // child: Padding(
+          //   padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
+          //   child: Row(
+          //     children: [
+          //       Expanded(
+          //         child: Text(
+          //           subheading,
+          //           style: subheadingTextStyle,
+          //         ),
+          //       ),
+          //       Padding(
+          //         padding: const EdgeInsets.fromLTRB(25, 15, 25, 15),
+          //         child: WhiteElevatedButton(
+          //           text: "Details",
+          // onPressed: () {
+          //   _navigateToDetailsPage(pageWidget);
+          // },
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+        ));
   }
 
   /// Creates the main content of the greenhouse page.
@@ -219,95 +223,101 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
 
     // Page content
     return Scaffold(
-      // Main appbar (header)
-      appBar: createMainAppBar(
-          context, widget.userCredential, _userReference, "Greenhouse"),
+        // Main appbar (header)
+        appBar: createMainAppBar(
+            context, widget.userCredential, _userReference, "Greenhouse"),
 
-      // Scrollable column for items
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Colors.lightBlueAccent.shade100.withOpacity(0.6),
-              Colors.teal.shade100.withOpacity(0.6),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+        // Scrollable column for items
+        body: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                Colors.teal.shade100.withOpacity(0.6),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            image: DecorationImage(
+              image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.white.withOpacity(0.05),
+                BlendMode.dstATop,
+              ),
+            ),
           ),
-          image: DecorationImage(
-            image: AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.05),
-              BlendMode.dstATop,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Plant status subheading and details button
+                  _buildSubheadingRow(
+                    "Plant Status",
+                    PlantsPage(
+                      userCredential: widget.userCredential,
+                      userReference: _userReference,
+                    ),
+                    Colors.greenAccent,
+                    Icons.local_florist,
+                  ),
+
+                  // Active programs subheading and details button
+                  _buildSubheadingRow(
+                    "Active Programs",
+                    ProgramsPage(userCredential: widget.userCredential),
+                    Colors.blueAccent,
+                    Icons.play_circle_fill,
+                  ),
+
+                  // Equipment status subheading and details button
+                  _buildSubheadingRow(
+                    "Equipment Status",
+                    EquipmentPage(userCredential: widget.userCredential),
+                    Colors.orangeAccent,
+                    Icons.build,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Plant status subheading and details button
-                _buildSubheadingRow(
-                  "Plant Status",
-                  PlantsPage(userCredential: widget.userCredential, userReference: _userReference,),
-                  Colors.greenAccent,
-                  Icons.local_florist,
-                ),
-          
-                // Active programs subheading and details button
-                _buildSubheadingRow(
-                  "Active Programs",
-                  ProgramsPage(userCredential: widget.userCredential),
-                  Colors.blueAccent,
-                  Icons.play_circle_fill,
-                ),
-          
-                // Equipment status subheading and details button
-                _buildSubheadingRow(
-                  "Equipment Status",
-                  EquipmentPage(userCredential: widget.userCredential),
-                  Colors.orangeAccent,
-                   Icons.build,
+
+        // Footer nav bar
+        bottomNavigationBar: PreferredSize(
+          preferredSize: Size.fromHeight(50.0),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.green.shade700,
+                  Colors.teal.shade400,
+                  Colors.blue.shade300
+                ],
+                stops: [0.2, 0.5, 0.9],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: Offset(0, 3), // changes position of shadow
                 ),
               ],
             ),
+            child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30.0),
+                  topRight: Radius.circular(30.0),
+                ),
+                child:
+                    createFooterNav(_selectedIndex, footerNavCubit, _userRole)),
           ),
-        ),
-      ),
-
-      // Footer nav bar
-      bottomNavigationBar:
-          PreferredSize(
-            preferredSize: Size.fromHeight(50.0),
-            child: Container(
-                     decoration: BoxDecoration(
-                       gradient: LinearGradient(
-              colors: [Colors.green.shade700, Colors.teal.shade400, Colors.blue.shade300],
-              stops: [0.2, 0.5, 0.9],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-                       ),
-                       boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
-              ),
-                       ],
-                     ),
-                     child: ClipRRect(
-                       borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30.0),
-              topRight: Radius.circular(30.0),
-                       ),
-            child: createFooterNav(_selectedIndex, footerNavCubit, _userRole)),
-            ),
-            ));
-    
+        ));
   }
 }

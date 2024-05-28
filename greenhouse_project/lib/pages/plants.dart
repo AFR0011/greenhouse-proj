@@ -7,6 +7,7 @@ library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/greenhouse_cubit.dart';
@@ -17,8 +18,10 @@ import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/buttons.dart';
 import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/input.dart';
-import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
+
+const String webVapidKey =
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class PlantsPage extends StatelessWidget {
   final UserCredential userCredential;
@@ -82,8 +85,16 @@ class _PlantsPageState extends State<_PlantsPageContent> {
   // InitState - get user info state to check authentication later
   @override
   void initState() {
-    context.read<UserInfoCubit>().getUserInfo(widget.userCredential);
     super.initState();
+    Future.microtask(() async {
+      String? deviceFcmToken =
+          await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+      if (mounted) {
+        context
+            .read<UserInfoCubit>()
+            .getUserInfo(widget.userCredential, deviceFcmToken!);
+      }
+    });
   }
 
   @override
@@ -166,7 +177,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                   // Show plants once plantStatus state is loaded
                   else if (state is PlantsLoaded) {
                     List<PlantData> plantList = state.plants; // plants list
-          
+
                     // Display nothing if no plants
                     if (plantList.isEmpty) {
                       return const Center(child: Text("No Plants..."));
@@ -182,8 +193,9 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                 shrinkWrap: true,
                                 itemCount: plantList.length,
                                 itemBuilder: (context, index) {
-                                  PlantData plant = plantList[index]; //plant data
-          
+                                  PlantData plant =
+                                      plantList[index]; //plant data
+
                                   // Display plant info
                                   return Card(
                                     shape: RoundedRectangleBorder(
@@ -222,6 +234,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                               builder: (context) =>
                                                   PlantDetailsDialog(
                                                       plant: plant,
+                                                      userRole: _userRole,
                                                       mainContext: mainContext,
                                                       removePlant:
                                                           showDeleteForm));
@@ -237,7 +250,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                       );
                     }
                   }
-          
+
                   // Show error message once an error occurs
                   else if (state is PlantsError) {
                     return Center(child: Text('Error: ${state.error}'));
@@ -260,7 +273,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
           : null,
     );
   }
-  
+
   // Item addition form function
   void showAdditionForm(BuildContext context) {
     // Get instance of inventory cubit from main context
@@ -321,7 +334,9 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                           onTap: () {},
                           disabledHint: Text(dropdownValue),
                         ),
-                        SizedBox(height: 10,),
+                        SizedBox(
+                          height: 10,
+                        ),
                         // Submit and cancel buttons
                         Row(
                           children: [
@@ -336,7 +351,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                     if (_textController.text.isEmpty) {
                                       validation[1] = !validation[1];
                                     }
-              
+
                                     bool isValid =
                                         plantsEditCubit.updateState(validation);
                                     if (!isValid) {
@@ -400,10 +415,11 @@ class _PlantsPageState extends State<_PlantsPageContent> {
               content: SingleChildScrollView(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  width:
-                      MediaQuery.of(context).size.width * .6, // Set maximum width
+                  width: MediaQuery.of(context).size.width *
+                      .6, // Set maximum width
                   child: Column(
-                    mainAxisSize: MainAxisSize.min, // Set column to minimum size
+                    mainAxisSize:
+                        MainAxisSize.min, // Set column to minimum size
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
