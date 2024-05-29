@@ -525,7 +525,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
       body: Column(
         children: [
           const Text(
-              "Your account has been disabled by the greenhouse administration.\n If you don't work here anymore, please delete your account."),
+              "Your account has been disabled by the greenhouse administration.\n If you don't work here anymore, please delete your account and the application."),
           Row(
             children: [
               GreenElevatedButton(
