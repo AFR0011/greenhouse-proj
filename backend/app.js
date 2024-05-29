@@ -33,16 +33,27 @@ const firedb = admin.firestore();
 // Endpoint to synchronize Cloud Firestore to Realtime Database
 app.post("/sync/firestore-to-realtime", async (req, res) => {
   try {
-    // Retrieve data from request body
-    // const newData = {
-    //   "programs" : firestore.collection("programs"),
-    //   "equipment" : firestore.collection("equipment").
-    // }
+    // Get current timestamp
+    const timestamp = Date.now();
 
-    // Update corresponding data in Realtime Database
+    // Retrieve all data from firestore collection matching req.body.data
+    const collection = req.body.data;
+    const newData = firestore.collection(collection).get();
+    var programs = {};
+    newData.forEach(async (doc) => {
+      const docData = doc.data();
+      const programKey = docData.title;
+    
+      programs[programKey] = {
+        action: docData.action,
+        limit: docData.limit,
+        equipment: docData.equipment,
+        condition: docData.condition
+      };
+    })
     await rtdb
-      .ref(`/${newData.timestamp}/${newData.boardNo}/readings`)
-      .set(newData);
+      .ref(`/${timestamp}/${req.body.boardNo}/${collection}`)
+      .set(programs);
 
     res.status(200).send("Data synchronized successfully.");
   } catch (error) {
@@ -54,13 +65,16 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
 // Endpoint to synchronize Realtime Database to Cloud Firestore
 app.post("/sync/realtime-to-firestore", async (req, res) => {
   try {
-    // Retrieve data from request body
+    // Get current timestamp
+    const timestamp = Date.now();
+
+    // Retrieve req.body as new readings
     const newData = req.body;
 
-    // Update corresponding document in Cloud Firestore
+    // Set data in firestore database in the collection "readings" with the id of timestamp
     await firedb
       .collection("readings")
-      .doc(`${newData.timestamp}`)
+      .doc(`${timestamp}`)
       .set(newData);
 
     res.status(200).send("Data synchronized successfully.");

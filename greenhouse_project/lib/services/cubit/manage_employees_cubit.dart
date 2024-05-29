@@ -32,11 +32,7 @@ class ManageEmployeesCubit extends ManagementCubit {
   void _getEmployees() {
     if (!_isActive) return;
     List<EmployeeData> employees;
-    users
-        .where(Filter.or(Filter("role", isEqualTo: "worker"),
-            Filter("role", isEqualTo: "manager")))
-        .snapshots()
-        .listen((snapshot) {
+    users.where("role", isEqualTo: "worker").snapshots().listen((snapshot) {
       employees =
           snapshot.docs.map((doc) => EmployeeData.fromFirestore(doc)).toList();
 
