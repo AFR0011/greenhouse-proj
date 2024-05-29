@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/plants_cubit.dart';
@@ -54,7 +53,7 @@ class TaskDetailsDialog extends StatelessWidget {
               _buildDetailRow("Status:", task.status),
               const SizedBox(
                   height: 20), // Add spacing between details and buttons
-              userRole == "worker"
+              userRole == "worker" && task.status == "incomplete"
                   ? Row(
                       children: [
                         Expanded(
@@ -66,28 +65,23 @@ class TaskDetailsDialog extends StatelessWidget {
                         Expanded(
                           child: WhiteElevatedButton(
                               text: "Mark as Complete",
-                              onPressed: () {
-                                context
-                                    .read<TaskCubit>()
-                                    .completeTask(task.taskReference);
-                              }),
+                              onPressed: () => editOrComplete(
+                                  mainContext, task.taskReference)),
                         )
                       ],
                     )
                   : userRole == "manager"
                       ? Row(children: [
-                          Expanded(
-                            child: WhiteElevatedButton(
-                                text: userRole == "worker"
-                                    ? "Mark as Complete"
-                                    : "Edit",
-                                onPressed: () => editOrComplete(task)),
-                          ),
+                          task.status != "completed"
+                              ? Expanded(
+                                  child: WhiteElevatedButton(
+                                      text: "Edit",
+                                      onPressed: () => editOrComplete(task)),
+                                )
+                              : const SizedBox(),
                           Expanded(
                             child: RedElevatedButton(
-                                text: userRole == "worker"
-                                    ? "Contact Manager"
-                                    : "Delete",
+                                text: "Delete",
                                 onPressed: () => deleteOrContact(
                                     userRole == "worker"
                                         ? managerReference
@@ -318,7 +312,7 @@ class InventoryDetailsDialog extends StatelessWidget {
                       .substring(0, inventory.timeAdded.toString().length - 7)),
               const SizedBox(
                   height: 20), // Add spacing between details and buttons
-              userRole == "manager"
+              userRole != "admin"
                   ? Row(
                       children: [
                         Expanded(
