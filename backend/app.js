@@ -38,7 +38,7 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
 
     // Retrieve all data from firestore collection matching req.body.data
     const collection = req.body.data;
-    const newData = firestore.collection(collection).get();
+    const newData = firedb.collection(collection).get();
     var programs = {};
     newData.forEach(async (doc) => {
       const docData = doc.data();
