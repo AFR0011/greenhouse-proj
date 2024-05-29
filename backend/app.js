@@ -36,29 +36,38 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
     // Get current timestamp
     const timestamp = Date.now();
 
-    // Retrieve all data from firestore collection matching req.body.data
+    // Retrieve all data from Firestore collection matching req.body.data
     const collection = req.body.data;
-    const newData = firedb.collection(collection).get();
-    var programs = {};
-    newData.forEach(async (doc) => {
+    const snapshot = await firedb.collection(collection).get();
+
+    // Initialize an empty object to store programs
+    const programs = {};
+
+    // Iterate over the documents in the snapshot
+    snapshot.forEach((doc) => {
       const docData = doc.data();
       const programKey = docData.title;
-    
+
       programs[programKey] = {
         action: docData.action,
         limit: docData.limit,
         equipment: docData.equipment,
-        condition: docData.condition
+        condition: docData.condition,
       };
-    })
-    await rtdb
-      .ref(`/${timestamp}/${req.body.boardNo}/${collection}`)
-      .set(programs);
+    });
 
-    res.status(200).send("Data synchronized successfully.");
+    // Send the programs object as a response
+    res.status(200).json({
+      timestamp,
+      programs,
+    });
   } catch (error) {
-    console.error("Error synchronizing data:", error);
-    res.status(500).send("Internal server error.");
+    // Handle errors and send an appropriate response
+    console.error("Error syncing Firestore to Realtime Database:", error);
+    res.status(500).json({
+      error: "Failed to sync Firestore to Realtime Database",
+      details: error.message,
+    });
   }
 });
 
@@ -72,10 +81,7 @@ app.post("/sync/realtime-to-firestore", async (req, res) => {
     const newData = req.body;
 
     // Set data in firestore database in the collection "readings" with the id of timestamp
-    await firedb
-      .collection("readings")
-      .doc(`${timestamp}`)
-      .set(newData);
+    await firedb.collection("readings").doc(`${timestamp}`).set(newData);
 
     res.status(200).send("Data synchronized successfully.");
   } catch (error) {
