@@ -44,7 +44,7 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
     const programs = {};
 
     // Iterate over the documents in the snapshot
-    snapshot.forEach((doc) => {
+    snapshot.docs.forEach((doc) => {
       const docData = doc.data();
       const programKey = docData.title;
 
