@@ -41,13 +41,13 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
     const snapshot = await firedb.collection(collection).get();
     if (collection == "equipment") {
       var equipment = {};
-      var boardNo;
+      var boardNo = 1;
       // Iterate over the documents in the snapshot
       snapshot.docs.forEach((doc) => {
         const docData = doc.data();
         const equipmentKey = docData.type;
         equipment[equipmentKey] = docData.status;
-        boardNo = docData.boardNo;
+        boardNo = docData.board;
       });
 
       rtdb.ref(`${timestamp}/${boardNo}/equipment`).set(equipment);
