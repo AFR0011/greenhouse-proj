@@ -45,7 +45,7 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
       // Iterate over the documents in the snapshot
       snapshot.docs.forEach((doc) => {
         const docData = doc.data();
-        const equipmentKey = docDate.type;
+        const equipmentKey = docData.type;
         equipment[equipmentKey] = docData.status;
         boardNo = docData.boardNo;
       });
