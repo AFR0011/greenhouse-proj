@@ -70,6 +70,13 @@ class TaskDetailsDialog extends StatelessWidget {
                                 context
                                     .read<TaskCubit>()
                                     .completeTask(task.taskReference);
+                                    Navigator.pop(context);
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                                content: Text(
+                                                    "Task marked successfully")));
+
+                                
                               }),
                         )
                       ],
@@ -312,7 +319,7 @@ class InventoryDetailsDialog extends StatelessWidget {
               _buildDetailRow("Description:", inventory.description),
               _buildDetailRow("Amount:", inventory.amount.toString()),
               _buildDetailRow(
-                  "Time added",
+                  "Time added:",
                   inventory.timeAdded
                       .toString()
                       .substring(0, inventory.timeAdded.toString().length - 7)),
@@ -421,7 +428,7 @@ class PlantDetailsDialog extends StatelessWidget {
             _buildDetailRow("Subtype:", plant.subtype),
             _buildDetailRow("Bord No:", plant.boardNo.toString()),
             _buildDetailRow(
-                "Birthdate",
+                "Birthdate:",
                 plant.birthdate
                     .toString()
                     .substring(0, plant.birthdate.toString().length - 7)),
@@ -518,11 +525,12 @@ class ProgramDetailsDialog extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildDetailRow("Equipment:", program.equipment),
-              _buildDetailRow("Title", program.title),
+              _buildDetailRow("Title:", program.title),
               _buildDetailRow(
                   "Creation date:",
                   program.creationDate.toString().substring(
                       0, program.creationDate.toString().length - 7)),
+                      _buildDetailRow("Action:", program.action),
               const SizedBox(
                   height: 20), // Add spacing between details and buttons
               userRole == "manager"
