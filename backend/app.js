@@ -39,14 +39,32 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
     // Retrieve all data from Firestore collection matching req.body.data
     const collection = req.body.data;
     const snapshot = await firedb.collection(collection).get();
+    if (collection == "equipment") {
+      var equipment = {};
+      var boardNo;
+      // Iterate over the documents in the snapshot
+      snapshot.docs.forEach((doc) => {
+        const docData = doc.data();
+        const equipmentKey = docDate.type;
+        equipment[equipmentKey] = docData.status;
+        boardNo = docData.boardNo;
+      });
 
-    // Initialize an empty object to store programs
-    const programs = {};
-
-    // Iterate over the documents in the snapshot
-    snapshot.docs.forEach((doc) => {
-      const docData = doc.data();
-      const programKey = docData.title;
+      rtdb.ref(`${timestamp}/${boardNo}/equipment`).set(equipment);
+    } else {
+      var programs = {};
+      var boardNo = 1; 
+      // Iterate over the documents in the snapshot
+      snapshot.docs.forEach((doc) => {
+        const docData = doc.data();
+        const programKey = docData.title;
+        programs[programKey] = {
+          action: docData.action,
+          limit: docData.limit,
+          equipment: docData.equipment,
+          condition: docData.condition,
+        };
+      });
 
       programs[programKey] = {
         action: docData.action,
@@ -54,13 +72,13 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
         equipment: docData.equipment,
         condition: docData.condition,
       };
-    });
 
-    // Send the programs object as a response
-    res.status(200).json({
-      timestamp,
-      programs,
-    });
+      // Send the programs object as a response
+      res.status(200).json({
+        timestamp,
+        programs,
+      });
+    }
   } catch (error) {
     // Handle errors and send an appropriate response
     console.error("Error syncing Firestore to Realtime Database:", error);
