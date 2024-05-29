@@ -51,9 +51,10 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
       });
 
       rtdb.ref(`${timestamp}/${boardNo}/equipment`).set(equipment);
+
       res.status(200).json({
         timestamp,
-        equipment
+        equipment,
       });
     } else {
       var programs = {};
@@ -70,12 +71,7 @@ app.post("/sync/firestore-to-realtime", async (req, res) => {
         };
       });
 
-      programs[programKey] = {
-        action: docData.action,
-        limit: docData.limit,
-        equipment: docData.equipment,
-        condition: docData.condition,
-      };
+      rtdb.ref(`${timestamp}/${boardNo}/programs`).set(programs);
 
       // Send the programs object as a response
       res.status(200).json({
