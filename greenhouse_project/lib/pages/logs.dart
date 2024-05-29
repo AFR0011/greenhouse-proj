@@ -115,7 +115,27 @@ class _LogsPageContentState extends State<_LogsPageContent> {
       appBar: createAltAppbar(context, "Logs"),
 
       // Call function to build notificaitons list
-      body: _buildLogs(),
+      body: Container(
+          height: MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                Colors.teal.shade100.withOpacity(0.6),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            image: DecorationImage(
+              image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+              fit: BoxFit.cover,
+              colorFilter: ColorFilter.mode(
+                Colors.white.withOpacity(0.05),
+                BlendMode.dstATop,
+              ),
+            ),
+          ),
+          child: _buildLogs()),
     );
   }
 

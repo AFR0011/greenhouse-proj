@@ -102,7 +102,10 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Image.asset('lib/utils/Icons/logo.png'),
+                          SizedBox(
+                              height: MediaQuery.of(context).size.height*.3,
+                              width: MediaQuery.of(context).size.height*.3,
+                              child: Image.asset('lib/utils/Icons/logo.png')),
                           Container(
                             constraints: const BoxConstraints(maxWidth: 400),
                             width: MediaQuery.of(context).size.width * .6,
