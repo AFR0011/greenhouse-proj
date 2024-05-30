@@ -163,7 +163,6 @@ class _ProgramsPageState extends State<_ProgramsPageContent> {
               return _createProgramsList(programsList);
             } // Show error if there is an issue with program retrieval
             else if (state is ProgramsError) {
-              print(state.error);
               return Center(child: Text('Error: ${state.error}'));
             }
             // Handle unexpected states

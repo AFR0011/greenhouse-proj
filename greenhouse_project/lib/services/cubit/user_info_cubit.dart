@@ -51,12 +51,9 @@ class UserInfoCubit extends HomeCubit {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: currentPassword);
       userCredential.user?.updatePassword(password);
-      DocumentSnapshot userSnapshot = await userReference.get();
-      
-      // String fcmToken = userSnapshot.get("fcmToken");
+
       getUserInfo(userCredential, null);
     } catch (error) {
-      print(error.toString());
       emit(UserInfoError(error.toString()));
     }
     _isProcessing = false;
@@ -83,7 +80,6 @@ class UserInfoCubit extends HomeCubit {
     try {
       await userReference.update({"fcmToken": fcmToken});
     } catch (error) {
-      print(error.toString());
       emit(UserInfoError(error.toString()));
     }
     _isProcessing = false;

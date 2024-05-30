@@ -19,10 +19,6 @@ class NotificationsCubit extends HomeCubit {
 
   void initNotifications() async {
     if (!_isActive) return;
-    // _firebaseMessaging.requestPermission();
-
-    // String? fcmToken = await _firebaseMessaging.getToken();
-    // print("Device Token: $fcmToken");
 
     // Get user reference
     QuerySnapshot userQuery = await FirebaseFirestore.instance

@@ -21,7 +21,6 @@ class ChartClass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Values $values");
     return Column(
       children: [
         Container(

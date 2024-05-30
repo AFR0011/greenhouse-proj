@@ -134,7 +134,6 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
         } else if (state is ProfileLoaded) {
           return _buildProfileContent(state.userData);
         } else if (state is ProfileError) {
-          print(state.error);
           return Center(child: Text('Error: ${state.error}'));
         } else {
           return const Center(child: Text('Unexpected State'));
@@ -406,15 +405,11 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     FirebaseAuth auth = FirebaseAuth.instance;
     String email = widget.userCredential.user!.email as String;
     try {
-      print(_passwordConfirmController.text);
-      print(_passwordController.text);
-
       await auth.signInWithEmailAndPassword(
         email: email,
         password: _passwordConfirmController.text,
       );
-      print(_nameController.text);
-      print(_emailController.text);
+
       await userInfoCubit.setUserInfo(
           _userReference,
           _nameController.text,
@@ -422,7 +417,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           _passwordController.text.isNotEmpty
               ? _passwordController.text
               : _passwordConfirmController.text,
-              _passwordConfirmController.text);
+          _passwordConfirmController.text);
       _passwordConfirmController.text = "";
       _passwordController.text = "";
       _showConfirmation();

@@ -36,7 +36,6 @@ class ReadingsData {
   factory ReadingsData.fromFirestore(DocumentSnapshot doc) {
     LinkedHashMap<String, dynamic> databaseReadings =
         doc.data() as LinkedHashMap<String, dynamic>;
-    print("databasereadings $databaseReadings");
     // Converting LinkedHashMap to a list of maps preserving keys
     Map<String, dynamic> readingsList = databaseReadings.entries
         .map(

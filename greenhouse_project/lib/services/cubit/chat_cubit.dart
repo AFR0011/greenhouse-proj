@@ -75,12 +75,10 @@ class ChatCubit extends Cubit<ChatState> {
         "userId": sender,
         "externalId": externalId,
       });
-      
+
       _isProcessing = false;
       _getMessages();
-    } catch (error, stack) {
-      print(stack);
-      print(error);
+    } catch (error) {
       emit(ChatError(error.toString()));
     }
   }
