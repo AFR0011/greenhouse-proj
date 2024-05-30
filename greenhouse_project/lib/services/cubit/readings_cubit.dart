@@ -34,7 +34,6 @@ class ReadingsData {
   ReadingsData({required this.allReadings});
 
   factory ReadingsData.fromFirestore(DocumentSnapshot doc) {
-    
     LinkedHashMap<String, dynamic> databaseReadings =
         doc.data() as LinkedHashMap<String, dynamic>;
     print("databasereadings $databaseReadings");
@@ -45,8 +44,8 @@ class ReadingsData {
             boardReading.key: boardReading.value,
           },
         )
-        .toSet().first;
-        print("READINGSLIST $readingsList");
+        .toSet()
+        .first;
     return ReadingsData(allReadings: readingsList);
   }
 }

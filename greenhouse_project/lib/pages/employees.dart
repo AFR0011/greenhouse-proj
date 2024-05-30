@@ -290,6 +290,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                             ? null
                                             : "Email cannot be empty!",
                                         labelText: "email"),
+
                                     SizedBox(
                                         width: double.maxFinite,
                                         child: InputDropdown(
