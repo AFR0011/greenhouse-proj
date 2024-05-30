@@ -1,8 +1,3 @@
-/// Buttons to be used throughout the application
-/// Todo
-/// Review program to add action, limit etc...
-library;
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

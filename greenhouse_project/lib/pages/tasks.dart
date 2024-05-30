@@ -1,9 +1,4 @@
 /// Tasks page - CRUD for employee tasks
-///
-/// TODO:
-/// - Add task creation option
-/// - Delete task
-/// - add dropdown list for task edit status
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';

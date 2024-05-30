@@ -1,11 +1,4 @@
 /// Profile page - user profile information and actions
-///
-/// TODO:
-/// - Error snackbar shows outside of dialogs
-///   (either show a dialog for errors or fix this)
-/// - Add profile picture (https://stackoverflow.com/questions/78159230/instance-of-clientexception-type-clientexception-is-not-a-subtype-of-type)
-/// - Revert controller text after "cancel" on edit dialogue
-///
 library;
 
 import 'dart:typed_data';

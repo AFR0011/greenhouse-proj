@@ -15,11 +15,13 @@ import 'package:greenhouse_project/utils/message_bubble.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
+// Web VAPID key for Firebase Cloud Messaging
 const String webVapidKey =
     "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
+// ChatPage widget - displays the chat interface
 class ChatPage extends StatelessWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
   final DocumentReference? chatReference; // Chat database reference
 
   const ChatPage({
@@ -54,9 +56,10 @@ class ChatPage extends StatelessWidget {
   }
 }
 
+// _ChatPageContent widget - manages the state of the chat page
 class _ChatPageContent extends StatefulWidget {
-  final UserCredential userCredential; // user auth credentials
-  final DocumentReference? chatReference; //Chat database reference
+  final UserCredential userCredential; // User authentication credentials
+  final DocumentReference? chatReference; // Chat database reference
 
   const _ChatPageContent(
       {required this.userCredential, required this.chatReference});
@@ -65,7 +68,7 @@ class _ChatPageContent extends StatefulWidget {
   State<_ChatPageContent> createState() => _ChatPageState();
 }
 
-// Main page content goes here
+// _ChatPageState class - manages the state of the chat page content
 class _ChatPageState extends State<_ChatPageContent> {
   // User info local variables
   late DocumentReference _userReference;
@@ -77,14 +80,14 @@ class _ChatPageState extends State<_ChatPageContent> {
   final TextEditingController _textEditingController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  // Dispose (destructor)
+  // Dispose method to clean up controllers
   @override
   void dispose() {
     _textEditingController.dispose();
     super.dispose();
   }
 
-  // InitState - get user info state to check authentication later
+  // InitState method to initialize user info
   @override
   void initState() {
     super.initState();
@@ -102,7 +105,6 @@ class _ChatPageState extends State<_ChatPageContent> {
             child: CircularProgressIndicator(),
           );
         }
-        // Initiate page creation once user info is loaded
         // Show content once user info is loaded
         else if (state is UserInfoLoaded) {
           // Store user info in local variables
@@ -126,7 +128,7 @@ class _ChatPageState extends State<_ChatPageContent> {
     );
   }
 
-// Create chat page function
+  // Create chat page function
   Widget _createChatPage() {
     return BlocBuilder<ChatsCubit, ChatsState>(
       builder: (context, state) {
@@ -150,7 +152,7 @@ class _ChatPageState extends State<_ChatPageContent> {
     );
   }
 
-// Build chat page UI using the provided chat data
+  // Build chat page UI using the provided chat data
   Widget _buildChatUI(ChatsData chat) {
     return Scaffold(
       appBar: AppBar(
@@ -314,7 +316,7 @@ class _ChatPageState extends State<_ChatPageContent> {
     }
   }
 
-// Function to send a message
+  // Function to send a message
   void _sendMessage(ChatsData? chat) {
     if (_textEditingController.text.isNotEmpty) {
       context.read<ChatCubit>().sendMessage(
@@ -327,6 +329,7 @@ class _ChatPageState extends State<_ChatPageContent> {
     }
   }
 
+  // Widget for the send button
   Widget sendButton(chat) {
     return IconButton(
         onPressed: () {
@@ -340,6 +343,7 @@ class _ChatPageState extends State<_ChatPageContent> {
         color: Colors.grey);
   }
 
+  // Initialize user information
   Future<void> _initializeUserInfo() async {
     try {
       if (DefaultFirebaseOptions.currentPlatform !=

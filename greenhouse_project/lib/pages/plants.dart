@@ -1,8 +1,4 @@
 /// Plants page - view plants and sensor readings
-///
-/// TODO:
-/// - Chat graphs
-///
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';

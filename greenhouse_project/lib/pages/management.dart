@@ -1,8 +1,4 @@
 /// Management page - links to subpages: workers and tasks
-///
-/// TODO:
-/// -
-///
 library;
 
 //import 'dart:math';

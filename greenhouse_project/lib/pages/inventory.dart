@@ -1,8 +1,4 @@
 /// Inventory page - CRUD for inventory items
-///
-/// TODO:
-/// - Add form validation to delete, edit, and add operations
-///
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
