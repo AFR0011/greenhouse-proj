@@ -30,8 +30,6 @@ class InputTextField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: labelText,
           errorText: errorText,
-          filled: true,
-          fillColor: theme.colorScheme.secondary,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(20),
           ),
@@ -53,7 +51,7 @@ class LoginTextField extends StatelessWidget {
     return TextField(
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white70,
+        fillColor: theme.colorScheme.secondary.withOpacity(.3),
         label: Text(labelText),
         border: const OutlineInputBorder(),
       ),

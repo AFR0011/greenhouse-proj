@@ -36,6 +36,13 @@ class EmployeeEditCubit extends Cubit<List<dynamic>> {
       return true;
     }
   }
+  String updateDropdown(String value) {
+    if (!_isActive) return "worker";
+    bool valid = this.state[0];
+    List<dynamic> validation = [valid, value];
+    this.updateState(validation);
+    return value;
+  }
 
   @override
   Future<void> close() {

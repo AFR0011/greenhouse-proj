@@ -446,18 +446,22 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
     FirebaseAuth auth = FirebaseAuth.instance;
     String email = widget.userCredential.user!.email as String;
     try {
+      print(_passwordConfirmController.text);
+      print(_passwordController.text);
+
       await auth.signInWithEmailAndPassword(
           email: email,
           password: _passwordConfirmController.text); // attempt to login
       print(_nameController.text);
       print(_emailController.text);
-      userInfoCubit.setUserInfo(
+      await userInfoCubit.setUserInfo(
           _userReference,
           _nameController.text,
           _emailController.text,
           _passwordController.text.isNotEmpty
               ? _passwordController.text
-              : _passwordConfirmController.text);
+              : _passwordConfirmController.text,
+              _passwordConfirmController.text);
       _passwordConfirmController.text = "";
       _passwordController.text = "";
       _showConfirmation();

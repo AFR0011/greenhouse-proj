@@ -1,4 +1,7 @@
 /// Chat Page - allows communication between 2 users
+///
+/// TODO:
+/// - Check cubit usage (lines 129-200?)
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -256,10 +259,10 @@ class _ChatPageState extends State<_ChatPageContent> {
               child: TextField(
                 controller: _textEditingController,
                 decoration: InputDecoration(
+                    filled: true,
+                    fillColor: theme.colorScheme.background,
                     hintText: "send a message...",
                     suffixIcon: sendButton(chat),
-                    filled: true,
-                    fillColor: theme.colorScheme.secondary.withOpacity(0.4),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20))),
               ),
@@ -300,10 +303,10 @@ class _ChatPageState extends State<_ChatPageContent> {
               child: TextField(
                 controller: _textEditingController,
                 decoration: InputDecoration(
+                    filled: true,
+                    fillColor: theme.colorScheme.background,
                     hintText: "send a message...",
                     suffixIcon: sendButton(chat),
-                    filled: true,
-                    fillColor: theme.colorScheme.secondary.withOpacity(0.4),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20))),
               ),
@@ -316,7 +319,11 @@ class _ChatPageState extends State<_ChatPageContent> {
 
 // Function to send a message
   void _sendMessage(ChatsData? chat) {
+    // double scrollOffset =
+    //     (_scrollController.hasClients ? _scrollController.offset : 0) + 1;
+    // double addOffset = 0;
     if (_textEditingController.text.isNotEmpty) {
+      // addOffset = (_textEditingController.text.length / 25).ceil() * 25;
       context.read<ChatCubit>().sendMessage(
             _textEditingController.text,
             chat?.receiverData?['reference'],

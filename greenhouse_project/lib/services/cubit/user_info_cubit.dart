@@ -39,7 +39,7 @@ class UserInfoCubit extends HomeCubit {
   }
 
   Future<void> setUserInfo(DocumentReference userReference, String name,
-      String email, String password) async {
+      String email, String password, String currentPassword) async {
     if (!_isActive) return;
     _isProcessing = true;
     emit(UserInfoLoading());
@@ -49,11 +49,12 @@ class UserInfoCubit extends HomeCubit {
         "email": email,
       });
       UserCredential userCredential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+          .signInWithEmailAndPassword(email: email, password: currentPassword);
       userCredential.user?.updatePassword(password);
       DocumentSnapshot userSnapshot = await userReference.get();
-      String fcmToken = userSnapshot.get("fcmToken");
-      getUserInfo(userCredential, fcmToken);
+      
+      // String fcmToken = userSnapshot.get("fcmToken");
+      getUserInfo(userCredential, null);
     } catch (error) {
       print(error.toString());
       emit(UserInfoError(error.toString()));

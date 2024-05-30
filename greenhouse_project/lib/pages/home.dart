@@ -289,7 +289,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   Widget _buildNotifications() {
     return SingleChildScrollView(
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.75,
+        height: MediaQuery.of(context).size.height,
         child: Column(
           children: [
             const SizedBox(

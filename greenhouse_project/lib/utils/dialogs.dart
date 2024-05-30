@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greenhouse_project/services/cubit/inventory_cubit.dart';
 import 'package:greenhouse_project/services/cubit/management_cubit.dart';
 import 'package:greenhouse_project/services/cubit/plants_cubit.dart';
@@ -65,18 +66,7 @@ class TaskDetailsDialog extends StatelessWidget {
                         Expanded(
                           child: WhiteElevatedButton(
                               text: "Mark as Complete",
-                              onPressed: () {
-                                context
-                                    .read<TaskCubit>()
-                                    .completeTask(task.taskReference);
-                                    Navigator.pop(context);
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(const SnackBar(
-                                                content: Text(
-                                                    "Task marked successfully")));
-
-                                
-                              }),
+                              onPressed: () => editOrComplete(mainContext, task.taskReference)),
                         )
                       ],
                     )
