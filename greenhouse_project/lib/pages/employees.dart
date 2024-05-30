@@ -302,7 +302,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                               ? state[1]
                                               : "worker",
                                           onChanged:
-                                              employeeEditCubit.updateState,
+                                              employeeEditCubit.updateDropdown,
                                         )),
                                     //Submit or Cancel
                                     Row(

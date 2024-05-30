@@ -47,6 +47,9 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    passwordController.text ;
+    emailController.text ;
+
     return Scaffold(
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
@@ -110,8 +113,8 @@ class _LoginPageState extends State<LoginPage> {
                               controller: emailController,
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: theme.colorScheme.secondary
-                                    .withOpacity(0.5),
+                                fillColor:
+                                    theme.colorScheme.background.withOpacity(.4),
                                 labelText: 'Email',
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20)),
@@ -127,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                               obscureText: _isSecurePassword,
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor: Colors.white70.withOpacity(0.5),
+                                fillColor:theme.colorScheme.background.withOpacity(.4),
                                 labelText: 'Password',
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20)),

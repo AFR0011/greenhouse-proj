@@ -32,7 +32,7 @@ class ManageEmployeesCubit extends ManagementCubit {
   void _getEmployees() {
     if (!_isActive) return;
     List<EmployeeData> employees;
-    users.where("role", isEqualTo: "worker").snapshots().listen((snapshot) {
+    users.snapshots().listen((snapshot) {
       employees =
           snapshot.docs.map((doc) => EmployeeData.fromFirestore(doc)).toList();
 
@@ -86,6 +86,7 @@ class ManageEmployeesCubit extends ManagementCubit {
       });
 
       // Use EmailJS to send email
+      print("hi");
       String emailMessage =
           '''Your email  used to create an account in the Greenhouse Control
           System environment.\n\nIf you think this is a mistake, please ignore
@@ -95,8 +96,10 @@ class ManageEmployeesCubit extends ManagementCubit {
       EmailJS.init(const Options(
           publicKey: "Dzqja-Lc3erScWnmb", privateKey: "6--KQwTNaq-EKoZJg4-t6"));
 
-      EmailJS.send("service_1i330zn", "template_zx9tnxd",
+      EmailJSResponseStatus res = await EmailJS.send("service_1i330zn", "template_zx9tnxd",
           {"receiver": email, "message": emailMessage});
+          print(res);
+
     } catch (error) {
       emit(ManageEmployeesError(error.toString()));
     }
