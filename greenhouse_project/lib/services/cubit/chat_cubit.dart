@@ -75,8 +75,7 @@ class ChatCubit extends Cubit<ChatState> {
         "userId": sender,
         "externalId": externalId,
       });
-      await sendNotification(
-          receiver.toString(), "You have a new message", message);
+      
       _isProcessing = false;
       _getMessages();
     } catch (error, stack) {

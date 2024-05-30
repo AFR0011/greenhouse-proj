@@ -233,6 +233,7 @@ class _ChatPageState extends State<_ChatPageContent> {
             } else if (state is ChatLoaded) {
               return _buildChatContent(state.messages, chat);
             } else if (state is ChatError) {
+              print(state.error);
               return const Text("Something went wrong...");
             } else {
               return const Center(child: Text('Unexpected State'));
@@ -321,11 +322,7 @@ class _ChatPageState extends State<_ChatPageContent> {
 
   // Function to send a message
   void _sendMessage(ChatsData? chat) {
-    // double scrollOffset =
-    //     (_scrollController.hasClients ? _scrollController.offset : 0) + 1;
-    // double addOffset = 0;
     if (_textEditingController.text.isNotEmpty) {
-      // addOffset = (_textEditingController.text.length / 25).ceil() * 25;
       context.read<ChatCubit>().sendMessage(
             _textEditingController.text,
             chat?.receiverData?['reference'],
