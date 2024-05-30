@@ -1,8 +1,4 @@
-/// Home page - notifications, welcome message, and search
-///
-/// TODO:
-/// - Add delete notification option (individual and all)
-///
+/// Home page - notifications
 library;
 
 import 'dart:math';
@@ -178,82 +174,81 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
 
         // Call function to build notificaitons list
         body: SingleChildScrollView(
-          child: Container(
-              height: MediaQuery.of(context).size.height,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.lightBlueAccent.shade100.withOpacity(0.6),
-                    Colors.teal.shade100.withOpacity(0.6),
+          child: Expanded(
+            child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.lightBlueAccent.shade100.withOpacity(0.6),
+                      Colors.teal.shade100.withOpacity(0.6),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  image: DecorationImage(
+                    image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white.withOpacity(0.05),
+                      BlendMode.dstATop,
+                    ),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: double.maxFinite,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.green.shade700, Colors.teal.shade400],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                      child: Center(
+                        child: ToggleButtons(
+                          renderBorder: false,
+                          fillColor: Colors.teal.withOpacity(1),
+                          selectedColor: Colors.white,
+                          splashColor: Colors.tealAccent,
+                          hoverColor: Colors.tealAccent.withOpacity(0.1),
+                          isSelected: _isSelected,
+                          onPressed: _onToggle,
+                          children: <Widget>[
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: const Align(
+                                alignment: Alignment.center,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Dashbord',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: const Align(
+                                alignment: Alignment.center,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Notifications',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(child: _getDisplayWidget())
                   ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                image: DecorationImage(
-                  image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.white.withOpacity(0.05),
-                    BlendMode.dstATop,
-                  ),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.maxFinite,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [Colors.green.shade700, Colors.teal.shade400],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                    ),
-                    child: Center(
-                      child: ToggleButtons(
-                        renderBorder: false,
-                        fillColor: Colors.teal.withOpacity(1),
-                        selectedColor: Colors.white,
-                        splashColor: Colors.tealAccent,
-                        hoverColor: Colors.tealAccent.withOpacity(0.1),
-                        isSelected: _isSelected,
-                        onPressed: _onToggle,
-                        children: <Widget>[
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: const Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Dashbord',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width * 0.5,
-                            child: const Align(
-                              alignment: Alignment.center,
-                              child: Padding(
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(
-                                  'Notifications',
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    child: Container(child: _getDisplayWidget()),
-                  )
-                ],
-              )),
+                )),
+          ),
         ),
 
         // Footer nav bar
@@ -292,223 +287,238 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   }
 
   Widget _buildNotifications() {
-    return Column(
-      children: [
-        const SizedBox(
-          height: 16,
-        ),
-        // BlocBuilder for notifications
-        BlocBuilder<NotificationsCubit, HomeState>(
-          builder: (context, state) {
-            // Show "loading screen" if processing notification state
-            if (state is NotificationsLoading) {
-              print("hi2");
-              return const Center(child: CircularProgressIndicator());
-            }
-            // Show equipment status once notification state is loaded
-            else if (state is NotificationsLoaded) {
-              List<NotificationData> notificationsList =
-                  state.notifications; // notifications list
-              // Display nothing if no notifications
-              if (notificationsList.isEmpty) {
-                return const Center(child: Text("No Notifications..."));
-              }
-              // Display notifications
-              else {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: notificationsList.length,
-                  itemBuilder: (context, index) {
-                    NotificationData notification =
-                        notificationsList[index]; // notification data
-                    // Notification message
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15.0)),
-                        elevation: 4.0,
-                        margin: const EdgeInsets.only(bottom: 16.0),
-                        child: ListTile(
-                          leading: Container(
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              color: Colors.cyan.withOpacity(0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.notification_important_outlined,
-                              color: Colors.orange,
-                              size: 30.0,
+    return SingleChildScrollView(
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 16,
+            ),
+            // BlocBuilder for notifications
+            BlocBuilder<NotificationsCubit, HomeState>(
+              builder: (context, state) {
+                // Show "loading screen" if processing notification state
+                if (state is NotificationsLoading) {
+                  print("hi2");
+                  return const Center(child: CircularProgressIndicator());
+                }
+                // Show equipment status once notification state is loaded
+                else if (state is NotificationsLoaded) {
+                  List<NotificationData> notificationsList =
+                      state.notifications; // notifications list
+                  // Display nothing if no notifications
+                  if (notificationsList.isEmpty) {
+                    return const Center(child: Text("No Notifications..."));
+                  }
+                  // Display notifications
+                  else {
+                    return ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: notificationsList.length,
+                      itemBuilder: (context, index) {
+                        NotificationData notification =
+                            notificationsList[index]; // notification data
+                        // Notification message
+                        return Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                          child: Card(
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15.0)),
+                            elevation: 4.0,
+                            margin: const EdgeInsets.only(bottom: 16.0),
+                            child: ListTile(
+                              leading: Container(
+                                padding: const EdgeInsets.all(8.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.cyan.withOpacity(0.1),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.notification_important_outlined,
+                                  color: Colors.orange,
+                                  size: 30.0,
+                                ),
+                              ),
+                              title: Text(
+                                notification.message,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0,
+                                ),
+                              ),
                             ),
                           ),
-                          title: Text(
-                            notification.message,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18.0,
-                            ),
-                          ),
-                        ),
-                      ),
+                        );
+                      },
                     );
-                  },
-                );
-              }
-            }
-            // Show error message once an error occurs
-            else if (state is NotificationsError) {
-              return Center(child: Text('Error: ${state.errorMessage}'));
-            }
-            // If the state is not any of the predefined states;
-            // never happens; but, anything can happen
-            else {
-              return const Center(child: Text('Unexpected State'));
-            }
-          },
+                  }
+                }
+                // Show error message once an error occurs
+                else if (state is NotificationsError) {
+                  return Center(child: Text('Error: ${state.errorMessage}'));
+                }
+                // If the state is not any of the predefined states;
+                // never happens; but, anything can happen
+                else {
+                  return const Center(child: Text('Unexpected State'));
+                }
+              },
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
   Widget _buildDashbord() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const Text(
-            "Graphs",
-            style: headingTextStyle,
-            textAlign: TextAlign.center,
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: SizedBox(
-                child: BlocProvider(
-              create: (context) => ReadingsCubit(),
-              child: BlocBuilder<ReadingsCubit, GreenhouseState>(
-                  builder: (context, state) {
-                if (state is ReadingsLoading) {
-                  print("hi3");
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (state is ReadingsLoaded) {
-                  List<ReadingsData> allReadings = state.readings;
+    return Column(
+      children: [
+        Align(
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+              child: BlocProvider(
+            create: (context) => ReadingsCubit(),
+            child: BlocBuilder<ReadingsCubit, GreenhouseState>(
+                builder: (context, state) {
+              if (state is ReadingsLoading) {
+                print("hi3");
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is ReadingsLoaded) {
+                List<ReadingsData> allReadings = state.readings;
 
-                  List temperatures = [];
-                  List gases = [];
-                  List soilMoistures = [];
-                  List lightIntensities = [];
-                  List humidities = [];
+                List temperatures = [];
+                List gases = [];
+                List soilMoistures = [];
+                List lightIntensities = [];
+                List humidities = [];
 
-                  for (int i = 0; i < min(allReadings.length, 24 * 120); i++) {
-                    Map<String, dynamic> boardReadings =
-                        allReadings[i].allReadings; // {"1" : {}, "2" : {}, ...}
-                    for (int j = 0; j < boardReadings.length; j++) {
-                      Map<String, dynamic> singleBoardReadings =
-                          boardReadings.entries.elementAt(j).value
-                              as Map<String, dynamic>;
+                for (int i = 0; i < min(allReadings.length, 24 * 120); i++) {
+                  Map<String, dynamic> boardReadings =
+                      allReadings[i].allReadings; // {"1" : {}, "2" : {}, ...}
+                  for (int j = 0; j < boardReadings.length; j++) {
+                    Map<String, dynamic> singleBoardReadings =
+                        boardReadings.entries.elementAt(j).value
+                            as Map<String, dynamic>;
 
-                      temperatures.add(singleBoardReadings["temperature"]);
-                      humidities.add(singleBoardReadings["humidity"]);
-                      soilMoistures.add(singleBoardReadings["soilMoisture"]);
-                      lightIntensities
-                          .add(singleBoardReadings["lightIntensity"]);
-                      gases.add(singleBoardReadings["gas"]);
-                    }
+                    temperatures.add(singleBoardReadings["temperature"]);
+                    humidities.add(singleBoardReadings["humidity"]);
+                    soilMoistures.add(singleBoardReadings["soilMoisture"]);
+                    lightIntensities.add(singleBoardReadings["lightIntensity"]);
+                    gases.add(singleBoardReadings["gas"]);
                   }
-                  return Column(
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.3,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemExtent: MediaQuery.of(context).size.width * 0.8,
-                          itemCount: 5,
-                          itemBuilder: (context, index) {
-                            switch (index) {
-                              case 0:
-                                return Center(
-                                  child: ChartClass(
-                                      miny: 10, maxy: 50, values: temperatures),
-                                );
-                              case 1:
-                                return Center(
-                                  child: ChartClass(
-                                      miny: 00, maxy: 100, values: humidities),
-                                );
-                              case 2:
-                                return Center(
-                                  child: ChartClass(
-                                      miny: 00,
-                                      maxy: 100,
-                                      values: soilMoistures),
-                                );
-                              case 3:
-                                return Center(
-                                  child: ChartClass(
-                                      miny: 00,
-                                      maxy: 100,
-                                      values: lightIntensities),
-                                );
-                              case 4:
-                                return Center(
-                                  child: ChartClass(
-                                      miny: 00, maxy: 100, values: gases),
-                                );
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: 5,
-                          itemBuilder: (context, index) {
-                            switch (index) {
-                              case 0:
-                                return Readings(
-                                    title: "Temperature",
-                                    value: '${temperatures.last.round()}°C',
-                                    icon: FontAwesomeIcons.temperatureHalf,
-                                    color: Colors.red);
-                              case 1:
-                                return Readings(
-                                    title: "Humidity",
-                                    value: '${humidities.last}%',
-                                    icon: FontAwesomeIcons.water,
-                                    color: Colors.teal);
-                              case 2:
-                                return Readings(
-                                    title: "Soil Moisture",
-                                    value: '${soilMoistures.last}%',
-                                    icon: FontAwesomeIcons.droplet,
-                                    color: Colors.blue);
-                              case 3:
-                                return Readings(
-                                    title: "Light",
-                                    value: '${lightIntensities.last}%',
-                                    icon: FontAwesomeIcons.sun,
-                                    color: Colors.yellow);
-                              case 4:
-                                return Readings(
-                                    title: "Gas",
-                                    value: '${gases.last.round()}%',
-                                    icon: FontAwesomeIcons.wind,
-                                    color: Colors.grey);
-                            }
-                            return null;
-                          }),
-                    ],
-                  );
-                } else {
-                  return const Text("Unexpected State");
                 }
-              }),
-            )),
-          ),
-        ],
-      ),
+                return Column(
+                  children: [
+                    const Text(
+                      "Latest Readings",
+                      style: headingTextStyle,
+                      textAlign: TextAlign.center,
+                    ),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: 5,
+                        itemBuilder: (context, index) {
+                          switch (index) {
+                            case 0:
+                              return Readings(
+                                  title: "Temperature",
+                                  value: '${temperatures.last.round()}°C',
+                                  icon: FontAwesomeIcons.temperatureHalf,
+                                  color: Colors.red);
+                            case 1:
+                              return Readings(
+                                  title: "Humidity",
+                                  value: '${humidities.last}%',
+                                  icon: FontAwesomeIcons.water,
+                                  color: Colors.teal);
+                            case 2:
+                              return Readings(
+                                  title: "Soil Moisture",
+                                  value: '${soilMoistures.last}%',
+                                  icon: FontAwesomeIcons.droplet,
+                                  color: Colors.blue);
+                            case 3:
+                              return Readings(
+                                  title: "Light",
+                                  value: '${lightIntensities.last}%',
+                                  icon: FontAwesomeIcons.sun,
+                                  color: Colors.yellow);
+                            case 4:
+                              return Readings(
+                                  title: "Gas",
+                                  value: '${gases.last.round()}%',
+                                  icon: FontAwesomeIcons.wind,
+                                  color: Colors.grey);
+                          }
+                          return null;
+                        }),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.6,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemExtent: MediaQuery.of(context).size.width * 0.8,
+                        itemCount: 5,
+                        itemBuilder: (context, index) {
+                          switch (index) {
+                            case 0:
+                              return Center(
+                                child: ChartClass(
+                                  miny: 10,
+                                  maxy: 50,
+                                  values: temperatures,
+                                  title: "Temperature",
+                                ),
+                              );
+                            case 1:
+                              return Center(
+                                child: ChartClass(
+                                    miny: 00,
+                                    maxy: 100,
+                                    values: humidities,
+                                    title: "Humidity"),
+                              );
+                            case 2:
+                              return Center(
+                                child: ChartClass(
+                                    miny: 00,
+                                    maxy: 100,
+                                    values: soilMoistures,
+                                    title: "Soil Moisture"),
+                              );
+                            case 3:
+                              return Center(
+                                child: ChartClass(
+                                  miny: 00,
+                                  maxy: 100,
+                                  values: lightIntensities,
+                                  title: "Light Intensity",
+                                ),
+                              );
+                            case 4:
+                              return Center(
+                                child: ChartClass(
+                                    miny: 00,
+                                    maxy: 100,
+                                    values: gases,
+                                    title: "Gas Levels"),
+                              );
+                          }
+                          return null;
+                        },
+                      ),
+                    )
+                  ],
+                );
+              } else {
+                return const Text("Unexpected State");
+              }
+            }),
+          )),
+        ),
+      ],
     );
   }
 
@@ -521,7 +531,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
       // Main appbar (header)
       appBar: AppBar(),
 
-      // Call function to build notificaitons list
       body: Column(
         children: [
           const Text(

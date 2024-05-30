@@ -167,10 +167,6 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
 
 // Function to build profile content based on user data
   Widget _buildProfileContent(UserData userData) {
-    // Assign user data to controllers
-    _emailController.text = userData.email;
-    _nameController.text = userData.name;
-    _passwordController.text = "";
     // Get instance of cubit from main content
     ProfileCubit profileCubit = BlocProvider.of<ProfileCubit>(context);
 
@@ -221,9 +217,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                 data: userData.name,
                 icon: userIcon(),
               ),
-              // _buildProfileField("Name", userData.name),
-              // Display user email
-              // _buildProfileField("Email", userData.email),
+
               const SizedBox(height: 20.0),
               ProfileTextField(
                 name: "Email",
@@ -238,28 +232,12 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                   data: "********",
                   icon: passwordIcon(),
                 ),
-              // _buildProfileField("Password", "*******"),
-              // Action buttons based on user role and authorization
               const SizedBox(height: 20.0),
               _buildActionButtons(userData),
             ],
           ),
         ),
       ),
-    );
-  }
-
-// Function to build a profile information field
-  Widget _buildProfileField(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(label),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(value),
-        ),
-      ],
     );
   }
 
@@ -271,7 +249,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
           ? WhiteElevatedButton(
               text: "Edit",
               onPressed: () {
-                _createEditDialog();
+                _createEditDialog(userData);
               },
             )
           : WhiteElevatedButton(
@@ -283,7 +261,12 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
   }
 
   // Function to create profile edit form
-  void _createEditDialog() {
+  void _createEditDialog(UserData userData) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _emailController.text = userData.email;
+      _nameController.text = userData.name;
+      _passwordController.text = "";
+    });
     // Get instance of cubit from main context
     UserInfoCubit userInfoCubit = BlocProvider.of<UserInfoCubit>(context);
 
@@ -301,7 +284,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                 color: Colors.transparent,
                 width: 2.0), // Add border color and width
           ),
-          title: const Text("Edit profil"),
+          title: const Text("Edit profile"),
           content: SingleChildScrollView(
             child: Container(
                 constraints: const BoxConstraints(maxWidth: 400),
@@ -319,18 +302,18 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                           InputTextField(
                               controller: _nameController,
                               errorText: state[0]
-                                  ? ""
+                                  ? null
                                   : "Name should be longer than 4 characters.",
                               labelText: "Name"),
                           InputTextField(
                               controller: _emailController,
                               errorText:
-                                  state[1] ? "" : "Email format invalid.",
+                                  state[1] ? null : "Email format invalid.",
                               labelText: "Email"),
                           InputTextField(
                               controller: _passwordController,
                               errorText: state[2]
-                                  ? ""
+                                  ? null
                                   : "Password should be longer than 8 characters.",
                               labelText: "Password"),
                           Row(
@@ -398,7 +381,7 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                                                             controller:
                                                                 _passwordConfirmController,
                                                             errorText: state[2]
-                                                                ? ""
+                                                                ? null
                                                                 : "Password should be longer than 8 characters.",
                                                             labelText:
                                                                 "Password"),
@@ -422,7 +405,8 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
                                                                           () {
                                                                         Navigator.pop(
                                                                             context);
-                                                                        _createEditDialog();
+                                                                        _createEditDialog(
+                                                                            userData);
                                                                       }),
                                                             )
                                                           ],
@@ -465,7 +449,8 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
       await auth.signInWithEmailAndPassword(
           email: email,
           password: _passwordConfirmController.text); // attempt to login
-
+      print(_nameController.text);
+      print(_emailController.text);
       userInfoCubit.setUserInfo(
           _userReference,
           _nameController.text,
@@ -474,9 +459,10 @@ class __ProfilePageContentState extends State<_ProfilePageContent> {
               ? _passwordController.text
               : _passwordConfirmController.text);
       _passwordConfirmController.text = "";
-      // _passwordController.text = "";
+      _passwordController.text = "";
       _showConfirmation();
     } catch (error) {
+      Navigator.pop(context);
       scaffoldMessenger.showSnackBar(SnackBar(
         content: Text(error.toString()),
         backgroundColor: customTheme.colorScheme.error,

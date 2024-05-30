@@ -33,35 +33,73 @@ const firedb = admin.firestore();
 // Endpoint to synchronize Cloud Firestore to Realtime Database
 app.post("/sync/firestore-to-realtime", async (req, res) => {
   try {
-    // Retrieve data from request body
-    // const newData = {
-    //   "programs" : firestore.collection("programs"),
-    //   "equipment" : firestore.collection("equipment").
-    // }
+    // Get current timestamp
+    const timestamp = Date.now();
 
-    // Update corresponding data in Realtime Database
-    await rtdb
-      .ref(`/${newData.timestamp}/${newData.boardNo}/readings`)
-      .set(newData);
+    // Retrieve all data from Firestore collection matching req.body.data
+    const collection = req.body.data;
+    const snapshot = await firedb.collection(collection).get();
+    if (collection == "equipment") {
+      var equipment = {};
+      var boardNo = 1;
+      // Iterate over the documents in the snapshot
+      snapshot.docs.forEach((doc) => {
+        const docData = doc.data();
+        const equipmentKey = docData.type;
+        equipment[equipmentKey] = docData.status;
+        boardNo = docData.board;
+      });
 
-    res.status(200).send("Data synchronized successfully.");
+      rtdb.ref(`${timestamp}/${boardNo}/equipment`).set(equipment);
+
+      res.status(200).json({
+        timestamp,
+        equipment,
+      });
+    } else {
+      var programs = {};
+      var boardNo = 1;
+      // Iterate over the documents in the snapshot
+      snapshot.docs.forEach((doc) => {
+        const docData = doc.data();
+        const programKey = docData.title;
+        programs[programKey] = {
+          action: docData.action,
+          limit: docData.limit,
+          equipment: docData.equipment,
+          condition: docData.condition,
+        };
+      });
+
+      rtdb.ref(`${timestamp}/${boardNo}/programs`).set(programs);
+
+      // Send the programs object as a response
+      res.status(200).json({
+        timestamp,
+        programs,
+      });
+    }
   } catch (error) {
-    console.error("Error synchronizing data:", error);
-    res.status(500).send("Internal server error.");
+    // Handle errors and send an appropriate response
+    console.error("Error syncing Firestore to Realtime Database:", error);
+    res.status(500).json({
+      error: "Failed to sync Firestore to Realtime Database",
+      details: error.message,
+    });
   }
 });
 
 // Endpoint to synchronize Realtime Database to Cloud Firestore
 app.post("/sync/realtime-to-firestore", async (req, res) => {
   try {
-    // Retrieve data from request body
+    // Get current timestamp
+    const timestamp = Date.now();
+
+    // Retrieve req.body as new readings
     const newData = req.body;
 
-    // Update corresponding document in Cloud Firestore
-    await firedb
-      .collection("readings")
-      .doc(`${newData.timestamp}`)
-      .set(newData);
+    // Set data in firestore database in the collection "readings" with the id of timestamp
+    await firedb.collection("readings").doc(`${timestamp}`).set(newData);
 
     res.status(200).send("Data synchronized successfully.");
   } catch (error) {

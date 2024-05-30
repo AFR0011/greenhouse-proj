@@ -301,13 +301,13 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                         InputTextField(
                             controller: _typeController,
                             errorText: state[0]
-                                ? ""
+                                ? null
                                 : "Type should be longer than 1 characters.",
                             labelText: "Type"),
                         InputTextField(
                             controller: _textController,
                             errorText: state[1]
-                                ? ""
+                                ? null
                                 : "Subtype should be longer than 2 characters.",
                             labelText: "Subtype"),
                         //insert dropdown HERE!!
