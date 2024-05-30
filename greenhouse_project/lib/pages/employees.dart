@@ -1,8 +1,4 @@
 /// Employees page - CRUD for employee accounts
-///
-/// TODO:
-/// - Modularize code
-///
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,7 +23,7 @@ const String webVapidKey =
     "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
 class EmployeesPage extends StatelessWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User auth credentials
 
   const EmployeesPage({super.key, required this.userCredential});
 
@@ -55,7 +51,7 @@ class EmployeesPage extends StatelessWidget {
 }
 
 class _EmployeesPageContent extends StatefulWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User auth credentials
 
   const _EmployeesPageContent({required this.userCredential});
 
@@ -164,7 +160,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                   // Show employees if manageEmployees state is loaded
                   else if (state is ManageEmployeesLoaded) {
                     List<EmployeeData> employeeList =
-                        state.employees; // employees list
+                        state.employees; // Employees list
 
                     // Display nothing if no employees
                     if (employeeList.isEmpty) {
@@ -183,7 +179,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                 itemCount: employeeList.length,
                                 itemBuilder: (context, index) {
                                   EmployeeData employee =
-                                      employeeList[index]; // employee info
+                                      employeeList[index]; // Employee info
                                   return Card(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15.0),
@@ -282,7 +278,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                   mainAxisSize: MainAxisSize
                                       .min, // Set column to minimum size
                                   crossAxisAlignment: CrossAxisAlignment.start,
-                                  //Textfields
+                                  // Textfields
                                   children: [
                                     InputTextField(
                                         controller: _emailController,
@@ -304,7 +300,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                           onChanged:
                                               employeeEditCubit.updateState,
                                         )),
-                                    //Submit or Cancel
+                                    // Submit or Cancel
                                     Row(
                                       children: [
                                         Expanded(
@@ -354,6 +350,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
     );
   }
 
+  // Function to navigate to tasks page
   void tasksFunction(EmployeeData employee) {
     Navigator.push(
         context,
@@ -364,6 +361,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                 )));
   }
 
+  // Function to toggle employee account status
   void toggleAccount(EmployeeData employee) {
     ManageEmployeesCubit manageEmployeesCubit =
         context.read<ManageEmployeesCubit>();
@@ -402,7 +400,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
                                               content: Text(
-                                                  "Account disabled successfuly!")));
+                                                  "Account disabled successfully!")));
                                     });
                                   } else {
                                     manageEmployeesCubit
@@ -414,7 +412,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
                                               content: Text(
-                                                  "Account enabled successfuly!")));
+                                                  "Account enabled successfully!")));
                                     });
                                   }
                                 }),
@@ -433,6 +431,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
         });
   }
 
+  // Function to navigate to profile page
   void profileFunction(EmployeeData employee) {
     Navigator.push(
         context,
@@ -442,6 +441,7 @@ class _EmployeesPageState extends State<_EmployeesPageContent> {
                 userReference: employee.reference)));
   }
 
+  // Initialize user info
   Future<void> _initializeUserInfo() async {
     try {
       if (DefaultFirebaseOptions.currentPlatform !=

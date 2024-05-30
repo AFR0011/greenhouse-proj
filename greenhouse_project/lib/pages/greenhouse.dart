@@ -2,11 +2,6 @@
 /// - Plants
 /// - Programs
 /// - Equipment
-///
-/// TODO:
-/// - Remove _sensors list; data already available in readings cubit
-/// - Improve code readability for scaffold body (line 153-*)
-///
 library;
 
 import 'package:firebase_messaging/firebase_messaging.dart';

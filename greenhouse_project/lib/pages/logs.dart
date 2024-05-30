@@ -1,8 +1,4 @@
 /// Logs page - notifications, welcome message, and search
-///
-/// TODO:
-/// - Add delete notification option (individual and all)
-///
 library;
 
 import 'package:firebase_auth/firebase_auth.dart';

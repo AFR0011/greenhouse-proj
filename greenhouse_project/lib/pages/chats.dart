@@ -1,8 +1,4 @@
 /// Chats Page - all chats associated with the user
-///
-/// TODO:
-/// - Display chats properly (with username etc.)
-///
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 library;
@@ -24,11 +20,13 @@ import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
+// Web VAPID key for Firebase Cloud Messaging
 const String webVapidKey =
     "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
+// ChatsPage widget - displays all chats associated with the user
 class ChatsPage extends StatelessWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
   const ChatsPage({super.key, required this.userCredential});
 
@@ -58,8 +56,9 @@ class ChatsPage extends StatelessWidget {
   }
 }
 
+// _ChatsPageContent widget - manages the state of the chats page
 class _ChatsPageContent extends StatefulWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
   const _ChatsPageContent({required this.userCredential});
 
@@ -67,7 +66,7 @@ class _ChatsPageContent extends StatefulWidget {
   State<_ChatsPageContent> createState() => _ChatsPageState();
 }
 
-// Main page content goes here
+// _ChatsPageState class - manages the state of the chats page content
 class _ChatsPageState extends State<_ChatsPageContent> {
   // User info local variables
   late String _userRole = "";
@@ -79,13 +78,13 @@ class _ChatsPageState extends State<_ChatsPageContent> {
   // Index of footer nav selection
   final int _selectedIndex = 4;
 
-  // Dispose (destructor)
+  // Dispose method to clean up resources
   @override
   void dispose() {
     super.dispose();
   }
 
-  // InitState - get user info state to check authentication later
+  // InitState method to initialize user info
   @override
   void initState() {
     super.initState();
@@ -118,12 +117,11 @@ class _ChatsPageState extends State<_ChatsPageContent> {
             // Call function to create chats page
             return Theme(data: customTheme, child: _createChatsPage());
           }
-          // Show error if there is an issues with user info
+          // Show error if there are issues with user info
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           }
-          // If somehow state doesn't match predefined states;
-          // never happens; but, anything can happen
+          // Handle unexpected states
           else {
             return const Center(
               child: Text('Unexpected state'),
@@ -134,168 +132,182 @@ class _ChatsPageState extends State<_ChatsPageContent> {
     );
   }
 
+  // Create chats page function
   Widget _createChatsPage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
     // Main page content
     return Scaffold(
-        appBar: createMainAppBar(
-            context, widget.userCredential, _userReference, 'Chats'),
-        body: Container(
-            height: MediaQuery.of(context).size.height,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.lightBlueAccent.shade100.withOpacity(0.6),
-                  Colors.teal.shade100.withOpacity(0.6),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              image: DecorationImage(
-                image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
-                fit: BoxFit.cover,
-                colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.05),
-                  BlendMode.dstATop,
-                ),
-              ),
+      appBar: createMainAppBar(
+          context, widget.userCredential, _userReference, 'Chats'),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Colors.lightBlueAccent.shade100.withOpacity(0.6),
+              Colors.teal.shade100.withOpacity(0.6),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          image: DecorationImage(
+            image: const AssetImage('lib/utils/Icons/leaf_pat.jpg'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.05),
+              BlendMode.dstATop,
             ),
-            child: _buildChatsList()),
-        bottomNavigationBar: PreferredSize(
-          preferredSize: const Size.fromHeight(50.0),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.green.shade700,
-                  Colors.teal.shade400,
-                  Colors.blue.shade300
-                ],
-                stops: const [0.2, 0.5, 0.9],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
-                ),
-              ],
-            ),
-            child: ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(30.0),
-                  topRight: Radius.circular(30.0),
-                ),
-                child:
-                    createFooterNav(_selectedIndex, footerNavCubit, _userRole)),
           ),
         ),
-        floatingActionButton: GreenElevatedButton(
-            text: "New Chat",
-            onPressed: () {
-              ChatsCubit chatsCubit = context.read<ChatsCubit>();
-              ChatUsersCubit chatUsersCubit = context.read<ChatUsersCubit>();
-              showDialog(
-                  context: context,
-                  builder: (context) {
-                    return BlocBuilder<ChatUsersCubit, ChatUsersState>(
-                      bloc: chatUsersCubit,
-                      builder: (context, state) {
-                        if (state is ChatUsersLoading) {
-                          // Show loading indicator while employees are being fetched
-                          return const Center(
-                              child: CircularProgressIndicator());
-                        } else if (state is ChatUsersLoaded) {
-                          final chatUsersList = state.chatUsers;
-                          if (chatUsersList.isEmpty) {
-                            // Display a message if there are no Employees
-                            return const Center(child: Text("No Employees..."));
-                          } else {
-                            // Display the list of Employees
-                            return AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                                side: const BorderSide(
-                                    color: Colors.transparent,
-                                    width: 2.0), // Add border color and width
-                              ),
-                              content: SingleChildScrollView(
-                                child: Container(
-                                  constraints:
-                                      const BoxConstraints(maxWidth: 400),
-                                  width: MediaQuery.of(context).size.width * .6,
-                                  child: ListView.builder(
-                                    padding: const EdgeInsets.all(16.0),
-                                    shrinkWrap: true,
-                                    itemCount: chatUsersList.length,
-                                    itemBuilder: (context, index) {
-                                      final employee = chatUsersList[index];
-                                      return Card(
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15.0),
+        child: _buildChatsList(),
+      ),
+      bottomNavigationBar: PreferredSize(
+        preferredSize: const Size.fromHeight(50.0),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.green.shade700,
+                Colors.teal.shade400,
+                Colors.blue.shade300,
+              ],
+              stops: const [0.2, 0.5, 0.9],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, 3), // Changes position of shadow
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(30.0),
+              topRight: Radius.circular(30.0),
+            ),
+            child: createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+          ),
+        ),
+      ),
+      floatingActionButton: GreenElevatedButton(
+        text: "New Chat",
+        onPressed: () {
+          // Show dialog to create a new chat
+          ChatsCubit chatsCubit = context.read<ChatsCubit>();
+          ChatUsersCubit chatUsersCubit = context.read<ChatUsersCubit>();
+          showDialog(
+            context: context,
+            builder: (context) {
+              return BlocBuilder<ChatUsersCubit, ChatUsersState>(
+                bloc: chatUsersCubit,
+                builder: (context, state) {
+                  if (state is ChatUsersLoading) {
+                    // Show loading indicator while employees are being fetched
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  } else if (state is ChatUsersLoaded) {
+                    final chatUsersList = state.chatUsers;
+                    if (chatUsersList.isEmpty) {
+                      // Display a message if there are no Employees
+                      return const Center(
+                        child: Text("No Employees..."),
+                      );
+                    } else {
+                      // Display the list of Employees
+                      return AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          side: const BorderSide(
+                            color: Colors.transparent,
+                            width: 2.0, // Add border color and width
+                          ),
+                        ),
+                        content: SingleChildScrollView(
+                          child: Container(
+                            constraints: const BoxConstraints(maxWidth: 400),
+                            width: MediaQuery.of(context).size.width * .6,
+                            child: ListView.builder(
+                              padding: const EdgeInsets.all(16.0),
+                              shrinkWrap: true,
+                              itemCount: chatUsersList.length,
+                              itemBuilder: (context, index) {
+                                final employee = chatUsersList[index];
+                                return Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  elevation: 4.0,
+                                  margin: const EdgeInsets.only(bottom: 16.0),
+                                  child: ListTile(
+                                    leading: Container(
+                                      padding: const EdgeInsets.all(8.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.withOpacity(0.1),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: ClipOval(
+                                        child: Image.memory(
+                                          employee.picture,
+                                          width: 50,
+                                          height: 50,
+                                          fit: BoxFit.cover,
                                         ),
-                                        elevation: 4.0,
-                                        margin: EdgeInsets.only(bottom: 16.0),
-                                        child: ListTile(
-                                          leading: Container(
-                                            padding: const EdgeInsets.all(8.0),
-                                            decoration: BoxDecoration(
-                                              color:
-                                                  Colors.green.withOpacity(0.1),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: ClipOval(
-                                              child: Image.memory(
-                                                employee.picture,
-                                                width: 50,
-                                                height: 50,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                          title: Text(
-                                              " ${employee.name + employee.surname}",
-                                              style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12)),
-                                          subtitle: Text(employee.role,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w300,
-                                                color: Colors.grey,
-                                                fontSize: 8.0,
-                                              )),
-                                          onTap: () {
-                                            chatsCubit.createChat(
-                                                context, employee.reference);
-                                          },
-                                        ),
-                                      );
+                                      ),
+                                    ),
+                                    title: Text(
+                                      " ${employee.name + employee.surname}",
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      employee.role,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w300,
+                                        color: Colors.grey,
+                                        fontSize: 8.0,
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      // Create a new chat when an employee is tapped
+                                      chatsCubit.createChat(
+                                          context, employee.reference);
                                     },
                                   ),
-                                ),
-                              ),
-                            );
-                          }
-                        } else if (state is ChatUsersError) {
-                          // Display an error message if chats cannot be loaded
-                          return Center(child: Text('Error: ${state.error}'));
-                        } else {
-                          // Display a generic error message if an unexpected state occurs
-                          return const Center(
-                              child: Text("Something went wrong..."));
-                        }
-                      },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  } else if (state is ChatUsersError) {
+                    // Display an error message if chat users cannot be loaded
+                    return Center(child: Text('Error: ${state.error}'));
+                  } else {
+                    // Display a generic error message if an unexpected state occurs
+                    return const Center(
+                      child: Text("Something went wrong..."),
                     );
-                  });
-            }));
+                  }
+                },
+              );
+            },
+          );
+        },
+      ),
+    );
   }
 
+  // Build the list of chats
   Widget _buildChatsList() {
     // BlocBuilder for chats cubit (all chats)
     return BlocBuilder<ChatsCubit, ChatsState>(
@@ -331,72 +343,78 @@ class _ChatsPageState extends State<_ChatsPageContent> {
     );
   }
 
+  // Build individual chat item
   Widget _buildChatItem(ChatsData? chat) {
     final receiverData = chat?.receiverData;
     // Display chat information
     return Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        elevation: 4.0,
-        margin: const EdgeInsets.only(bottom: 16.0),
-        child: GestureDetector(
-          onTap: () {
-            // Navigate to the chat page when a chat is tapped
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatPage(
-                  userCredential: widget.userCredential,
-                  chatReference: chat.reference,
-                ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      elevation: 4.0,
+      margin: const EdgeInsets.only(bottom: 16.0),
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to the chat page when a chat is tapped
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ChatPage(
+                userCredential: widget.userCredential,
+                chatReference: chat.reference,
               ),
-            );
-          },
-          child: Container(
-            decoration: const BoxDecoration(border: Border.symmetric()),
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width * 0.9,
-              child: Row(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(top: 5, bottom: 5),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: ClipOval(
-                          child: Image.memory(
+            ),
+          );
+        },
+        child: Container(
+          decoration: const BoxDecoration(border: Border.symmetric()),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.9,
+            child: Row(
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(top: 5, bottom: 5),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: ClipOval(
+                      child: Image.memory(
                         chat!.receiverPicture,
                         width: 50,
                         height: 50,
                         fit: BoxFit.cover,
-                      )),
+                      ),
                     ),
                   ),
-                  Expanded(
-                    child: Container(
-                        margin: const EdgeInsets.only(left: 5),
-                        child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              overflow: TextOverflow.ellipsis,
-                              "${receiverData?['name']} ${receiverData?['surname']}",
-                              style: bodyTextStyle,
-                            ))),
+                ),
+                Expanded(
+                  child: Container(
+                    margin: const EdgeInsets.only(left: 5),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        overflow: TextOverflow.ellipsis,
+                        "${receiverData?['name']} ${receiverData?['surname']}",
+                        style: bodyTextStyle,
+                      ),
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ));
-    //it's up
+        ),
+      ),
+    );
   }
 
+  // Initialize user info
   Future<void> _initializeUserInfo() async {
     try {
       if (DefaultFirebaseOptions.currentPlatform !=
           DefaultFirebaseOptions.android) {
         context.read<UserInfoCubit>().getUserInfo(widget.userCredential, null);
       } else {
+        // Get Firebase Cloud Messaging token for Android
         String? deviceFcmToken =
             await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
         if (mounted) {

@@ -1,7 +1,4 @@
 /// Programs page - CRUD for arduino-side programs
-///
-/// TODO:
-///
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';

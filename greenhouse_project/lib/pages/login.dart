@@ -1,9 +1,4 @@
 /// Login page - login to the app
-///
-/// TODO:
-/// - Handle animation with Cubits
-/// - Convert state management stuff
-/// - Review cubit usage; builder and listener usage might be unnecessary
 library;
 
 import 'package:flutter/material.dart';
