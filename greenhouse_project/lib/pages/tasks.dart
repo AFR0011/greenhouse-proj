@@ -147,6 +147,7 @@ class _TasksPageState extends State<_TasksPageContent> {
     );
   }
 
+  /// Create tasks page UI
   Widget _createTasksPage() {
     // Get instance of footer nav cubit from main context
     final FooterNavCubit footerNavCubit =
@@ -375,6 +376,7 @@ class _TasksPageState extends State<_TasksPageContent> {
     ManageEmployeesCubit manageEmployeesCubit =
         context.read<ManageEmployeesCubit>();
 
+    // Set initial values for text controllers
     _titleController.text = task.title;
     _descController.text = task.description;
     _duedateController.text = task.dueDate.toString();
@@ -388,6 +390,7 @@ class _TasksPageState extends State<_TasksPageContent> {
           bloc: manageEmployeesCubit,
           builder: (context, state) {
             if (state is ManageEmployeesLoaded) {
+              // Populate dropdown items with employees
               for (var employee in state.employees) {
                 dropdownItems.addEntries({
                   "${employee.name} ${employee.surname}": employee.reference
@@ -417,10 +420,10 @@ class _TasksPageState extends State<_TasksPageContent> {
                         constraints: const BoxConstraints(maxWidth: 400),
                         width: MediaQuery.of(context).size.width * .6,
                         child: Column(
-                          mainAxisSize:
-                              MainAxisSize.min, // Set column to minimum size
+                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Title input field
                             InputTextField(
                               controller: _titleController,
                               errorText: taskEditState[0]
@@ -428,6 +431,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   : "Title should not be empty",
                               labelText: "Title",
                             ),
+                            // Description input field
                             InputTextField(
                               controller: _descController,
                               errorText: taskEditState[1]
@@ -435,6 +439,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   : "Description should not be empty",
                               labelText: "Description",
                             ),
+                            // Dropdown for selecting employees
                             InputDropdown(
                               items: dropdownItems,
                               value: dropdownItems.entries
@@ -445,6 +450,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   .value,
                               onChanged: taskDropdownCubit.updateDropdown,
                             ),
+                            // DatePicker widget for selecting due date
                             Padding(
                               padding: const EdgeInsets.fromLTRB(0, 10, 0, 5),
                               child: Center(
@@ -452,7 +458,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 25),
                                   child: DatePickerWidget(
-                                    looping: false, // default is not looping
+                                    looping: false,
                                     firstDate: DateTime.now(),
                                     lastDate: DateTime(2040, 1, 1),
                                     initialDate: DateTime.now(),
@@ -476,13 +482,14 @@ class _TasksPageState extends State<_TasksPageContent> {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            // Submit & Cancel
+                            // Submit & Cancel buttons
                             Row(
                               children: [
                                 Expanded(
                                   child: GreenElevatedButton(
                                     text: 'Submit',
                                     onPressed: () {
+                                      // Validate input fields
                                       List<dynamic> validation = [
                                         true,
                                         true,
@@ -498,6 +505,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                       bool isValid =
                                           taskEditCubit.updateState(validation);
                                       if (isValid) {
+                                        // Update task
                                         taskCubit.updateTask(
                                             task.taskReference,
                                             {
@@ -512,8 +520,10 @@ class _TasksPageState extends State<_TasksPageContent> {
                                             },
                                             _userReference);
 
+                                        // Close dialogs
                                         Navigator.pop(context);
                                         Navigator.pop(context);
+                                        // Show success message
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(const SnackBar(
                                                 content: Text(
@@ -528,6 +538,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                   child: WhiteElevatedButton(
                                     text: 'Cancel',
                                     onPressed: () {
+                                      // Close dialogs and clear text controllers
                                       Navigator.pop(context);
                                       Navigator.pop(context);
                                       _titleController.clear();
@@ -555,61 +566,66 @@ class _TasksPageState extends State<_TasksPageContent> {
   }
 
   void showDeleteForm(TaskData task) {
+    // Get instance of TaskCubit from the main context
     TaskCubit taskCubit = BlocProvider.of<TaskCubit>(context);
     showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                side: const BorderSide(
-                    color: Colors.transparent,
-                    width: 2.0), // Add border color and width
-              ),
-              title: const Text("Are you sure?"),
-              content: SingleChildScrollView(
-                child: Container(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  width: MediaQuery.of(context).size.width *
-                      .6, // Set maximum width
-                  child: Column(
-                    mainAxisSize:
-                        MainAxisSize.min, // Set column to minimum size
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            side: const BorderSide(
+              color: Colors.transparent,
+              width: 2.0, // Add border color and width
+            ),
+          ),
+          title: const Text("Are you sure?"),
+          content: SingleChildScrollView(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 400),
+              width: MediaQuery.of(context).size.width * .6,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: RedElevatedButton(
-                                text: "Yes",
-                                onPressed: () {
-                                  taskCubit.removeTask(
-                                      task.taskReference, _userReference);
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              "Task deleted succesfully!")));
-                                }),
-                          ),
-                          Expanded(
-                            child: WhiteElevatedButton(
-                                text: "No",
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                }),
-                          )
-                        ],
+                      Expanded(
+                        child: RedElevatedButton(
+                            text: "Yes",
+                            onPressed: () {
+                              // Remove task and close dialogs
+                              taskCubit.removeTask(
+                                  task.taskReference, _userReference);
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                              // Show success message
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content:
+                                          Text("Task deleted successfully!")));
+                            }),
+                      ),
+                      Expanded(
+                        child: WhiteElevatedButton(
+                            text: "No",
+                            onPressed: () {
+                              // Close dialog
+                              Navigator.pop(context);
+                            }),
                       )
                     ],
-                  ),
-                ),
-              ));
-        });
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
-  Future<void> showAddDialog() async {
+  void showAddDialog() async {
     // Get instance of cubits from the main context
     TaskCubit taskCubit = context.read<TaskCubit>();
     TaskEditCubit taskEditCubit = context.read<TaskEditCubit>();
@@ -648,10 +664,10 @@ class _TasksPageState extends State<_TasksPageContent> {
                             constraints: const BoxConstraints(maxWidth: 400),
                             width: MediaQuery.of(context).size.width * .6,
                             child: Column(
-                              mainAxisSize: MainAxisSize
-                                  .min, // Set column to minimum size
+                              mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                // Title input field
                                 InputTextField(
                                   controller: _titleController,
                                   errorText: taskEditState[0]
@@ -659,6 +675,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                       : "Title should not be empty",
                                   labelText: "Title",
                                 ),
+                                // Description input field
                                 InputTextField(
                                   controller: _descController,
                                   errorText: taskEditState[1]
@@ -666,19 +683,20 @@ class _TasksPageState extends State<_TasksPageContent> {
                                       : "Description should not be empty",
                                   labelText: "Description",
                                 ),
+                                // Dropdown for selecting employees
                                 InputDropdown(
                                   items: dropdownItems,
                                   value: dropdownItems.entries
                                       .firstWhere(
-                                        (element) =>
-                                            element.value ==
-                                            widget.userReference,
-                                        orElse: () =>
-                                            dropdownItems.entries.first,
-                                      )
+                                          (element) =>
+                                              element.value ==
+                                              widget.userReference,
+                                          orElse: () =>
+                                              dropdownItems.entries.first)
                                       .value,
                                   onChanged: taskDropdownCubit.updateDropdown,
                                 ),
+                                // DatePicker widget for selecting due date
                                 Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(0, 10, 0, 5),
@@ -716,13 +734,14 @@ class _TasksPageState extends State<_TasksPageContent> {
                                 const SizedBox(
                                   height: 10,
                                 ),
-                                //Submit & Cancel
+                                //Submit & Cancel buttons
                                 Row(
                                   children: [
                                     Expanded(
                                       child: GreenElevatedButton(
                                         text: 'Submit',
                                         onPressed: () {
+                                          // Validate input fields
                                           List<dynamic> validation = [
                                             true,
                                             true,
@@ -738,13 +757,16 @@ class _TasksPageState extends State<_TasksPageContent> {
                                           bool isValid = taskEditCubit
                                               .updateState(validation);
                                           if (isValid) {
+                                            // Add task
                                             taskCubit.addTask(
                                               _titleController.text,
                                               _descController.text,
                                               taskEditState[2],
                                               taskEditState[3],
                                             );
+                                            // Close dialog
                                             Navigator.pop(context);
+                                            // Show success message
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -760,6 +782,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                       child: WhiteElevatedButton(
                                         text: 'Cancel',
                                         onPressed: () {
+                                          // Close dialog and clear text controllers
                                           Navigator.pop(context);
                                           _titleController.clear();
                                           _descController.clear();
@@ -783,9 +806,11 @@ class _TasksPageState extends State<_TasksPageContent> {
         });
   }
 
-  completeTask(BuildContext context, DocumentReference taskReference) {
+  void completeTask(BuildContext context, DocumentReference taskReference) {
     context.read<TaskCubit>().completeTask(taskReference);
+    // Close dialog
     Navigator.pop(context);
+    // Show completion message
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: _userRole == "manager"
             ? const Text("Task completion approved!")
@@ -793,7 +818,8 @@ class _TasksPageState extends State<_TasksPageContent> {
                 "Task completion request sent, wait for manager approval.")));
   }
 
-  contactManager(BuildContext context, DocumentReference managerReference) {
+  void contactManager(
+      BuildContext context, DocumentReference managerReference) {
     context.read<ChatsCubit>().createChat(context, managerReference);
   }
 
