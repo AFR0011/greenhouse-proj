@@ -47,9 +47,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    passwordController.text = "123456";
-    emailController.text = "admin2@admin.com";
-
     return Scaffold(
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
@@ -103,8 +100,8 @@ class _LoginPageState extends State<LoginPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SizedBox(
-                              height: MediaQuery.of(context).size.height*.3,
-                              width: MediaQuery.of(context).size.height*.3,
+                              height: MediaQuery.of(context).size.height * .3,
+                              width: MediaQuery.of(context).size.height * .3,
                               child: Image.asset('lib/utils/Icons/logo.png')),
                           Container(
                             constraints: const BoxConstraints(maxWidth: 400),
