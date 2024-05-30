@@ -255,7 +255,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                   createFooterNav(_selectedIndex, footerNavCubit, _userRole)),
         ),
       ),
-      floatingActionButton: _userRole == "manager"
+      floatingActionButton: _userRole != "admin"
           ? GreenElevatedButton(
               text: "Add Item",
               // Display addition form
@@ -443,31 +443,35 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                         InputTextField(
                             controller: _equipmentController,
                             errorText: state[0]
-                                ? ""
+                                ? null
                                 : "Name should be longer than 1 characters.",
                             labelText: "Name"),
 
                         InputTextField(
                             controller: _descController,
                             errorText: state[1]
-                                ? ""
+                                ? null
                                 : "Description should be longer than 2 characters.",
                             labelText: "Description"),
 
-                        TextFormField(
-                          controller: _amountController,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly
-                          ],
-                          decoration: InputDecoration(
-                            labelText: "Amount",
-                            filled: true,
-                            fillColor: theme.colorScheme.secondary,
-                            errorText:
-                                state[2] ? "" : "Amount should be more than 0.",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
+                        Container(
+                          margin: EdgeInsets.only(bottom: 12),
+                          child: TextFormField(
+                            controller: _amountController,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly
+                            ],
+                            decoration: InputDecoration(
+                              labelText: "Amount",
+                              filled: true,
+                              fillColor: theme.colorScheme.secondary,
+                              errorText: state[2]
+                                  ? null
+                                  : "Amount should be more than 0.",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
                             ),
                           ),
                         ),
@@ -581,55 +585,35 @@ class _InventoryPageState extends State<_InventoryPageContent> {
                         InputTextField(
                             controller: _equipmentController,
                             errorText: state[0]
-                                ? ""
+                                ? null
                                 : "Name should be longer than 1 characters.",
                             labelText: "Name"),
-                        // TextField(
-                        //   controller: _equipmentController,
-                        //   decoration: InputDecoration(
-                        //       errorText: state[0]
-                        //           ? ""
-                        //           : "Name should be longer than 1 characters."),
-                        // ),
                         InputTextField(
                             controller: _descController,
                             errorText: state[1]
-                                ? ""
+                                ? null
                                 : "Description should be longer than 2 characters.",
                             labelText: "Description"),
-                        // TextField(
-                        //   controller: _descController,
-                        //   decoration: InputDecoration(
-                        //       errorText: state[1]
-                        //           ? ""
-                        //           : "Description should be longer than 2 characters."),
-                        // ),
-                        TextFormField(
-                            controller: _amountController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: <TextInputFormatter>[
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            decoration: InputDecoration(
-                              labelText: "Amount",
-                              filled: true,
-                              fillColor: theme.colorScheme.secondary,
-                              errorText: state[2]
-                                  ? ""
-                                  : "Amount should be more than 0.",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                            )
-                            // controller: _amountController,
-                            // keyboardType: TextInputType.number,
-                            // inputFormatters: <TextInputFormatter>[
-                            //   FilteringTextInputFormatter.digitsOnly
-                            // ],
-                            // decoration: InputDecoration(
-                            //     errorText:
-                            //         state[2] ? "" : "Amount should be more than 0."),
-                            ),
+                        Container(
+                          margin: EdgeInsets.only(bottom: 12),
+                          child: TextFormField(
+                              controller: _amountController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: <TextInputFormatter>[
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              decoration: InputDecoration(
+                                labelText: "Amount",
+                                filled: true,
+                                fillColor: theme.colorScheme.secondary,
+                                errorText: state[2]
+                                    ? null
+                                    : "Amount should be more than 0.",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              )),
+                        ),
                         // Submit and Cancel buttons
                         Row(
                           children: [

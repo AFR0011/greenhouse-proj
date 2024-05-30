@@ -59,9 +59,6 @@ class SettingsPageContent extends StatefulWidget {
 }
 
 class _SettingsPageContentState extends State<SettingsPageContent> {
-  // Define custom theme
-  final ThemeData customTheme = theme;
-
   @override
   void initState() {
     super.initState();
@@ -80,7 +77,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
           }
         },
         child: Theme(
-            data: customTheme,
+            data: theme,
             child: Scaffold(
               appBar: createAltAppbar(context, "Settings"),
               body: Container(
@@ -134,41 +131,6 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                                 // context
                                 //     .read<NotificationsCubit>()
                                 //     .toggleNotifications(position);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    //Dark mode switch
-                    Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Dark Mode",
-                            style: subheadingTextStyle,
-                          ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: LiteRollingSwitch(
-                              value: true,
-                              textOn: "On",
-                              textOnColor: Colors.white,
-                              textOff: "Off",
-                              textOffColor: Colors.black,
-                              colorOn: Colors.black,
-                              colorOff: Colors.grey.shade400,
-                              iconOn: Icons.dark_mode,
-                              iconOff: Icons.light_mode_outlined,
-                              textSize: 18.0,
-                              width: 130,
-                              onTap: () {},
-                              onSwipe: () {},
-                              onDoubleTap: () {},
-                              onChanged: (bool position) {
-                                // Set theme to "dark" for "true"
                               },
                             ),
                           ),

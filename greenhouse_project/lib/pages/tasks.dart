@@ -226,6 +226,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                     }
                     // Display tasks
                     else {
+                      BuildContext mainContext = context;
                       return Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
@@ -271,7 +272,6 @@ class _TasksPageState extends State<_TasksPageContent> {
                                         trailing: WhiteElevatedButton(
                                           text: 'Details',
                                           onPressed: () {
-                                            BuildContext mainContext = context;
                                             showDialog(
                                               context: context,
                                               builder: (context) {
@@ -429,14 +429,14 @@ class _TasksPageState extends State<_TasksPageContent> {
                             InputTextField(
                               controller: _titleController,
                               errorText: taskEditState[0]
-                                  ? ""
+                                  ? null
                                   : "Title should not be empty",
                               labelText: "Title",
                             ),
                             InputTextField(
                               controller: _descController,
                               errorText: taskEditState[1]
-                                  ? ""
+                                  ? null
                                   : "Description should not be empty",
                               labelText: "Description",
                             ),
@@ -660,14 +660,14 @@ class _TasksPageState extends State<_TasksPageContent> {
                                 InputTextField(
                                   controller: _titleController,
                                   errorText: taskEditState[0]
-                                      ? ""
+                                      ? null
                                       : "Title should not be empty",
                                   labelText: "Title",
                                 ),
                                 InputTextField(
                                   controller: _descController,
                                   errorText: taskEditState[1]
-                                      ? ""
+                                      ? null
                                       : "Description should not be empty",
                                   labelText: "Description",
                                 ),
