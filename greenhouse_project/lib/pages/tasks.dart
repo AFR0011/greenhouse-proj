@@ -528,9 +528,7 @@ class _TasksPageState extends State<_TasksPageContent> {
                                             .showSnackBar(const SnackBar(
                                                 content: Text(
                                                     "Task edited successfully")));
-                                      } else {
-                                        print("no");
-                                      }
+                                      } else {}
                                     },
                                   ),
                                 ),

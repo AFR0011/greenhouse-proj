@@ -1,9 +1,6 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
 
 part 'equipment_status_state.dart';
 
@@ -62,23 +59,7 @@ class EquipmentStatusCubit extends Cubit<EquipmentStatusState> {
       "userId": userReference,
       "externalId": equipment,
     });
-    final url = Uri.parse(
-        'https://greenhouse-5b1d55d4ffae.herokuapp.com/sync/firestore-to-realtime');
 
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({"data": "equipment"}),
-    );
-
-    if (response.statusCode == 200) {
-      print('Sync successful!');
-    } else {
-      print('Failed to sync databases: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    }
     _isProcessing = false;
     _getEquipmentStatus();
   }

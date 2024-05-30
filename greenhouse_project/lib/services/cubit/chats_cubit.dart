@@ -135,15 +135,12 @@ class ChatsData {
 
     final List<DocumentReference> users =
         data["users"].cast<DocumentReference>().toList();
-        print(users);
     DocumentReference receiverReference =
         users[0] == userReference ? users[1] : users[0];
-        print("rceiver reference: $receiverReference");
 
     // Fetch receiver data asynchronously
     final snapshot = await receiverReference.get();
     final receiverSnapshotData = snapshot.data();
-        print("data reference: $receiverSnapshotData\n");
     final receiverData = receiverSnapshotData as Map<String, dynamic>;
 
     final Uint8List? receiverPicture = await FirebaseStorage.instance

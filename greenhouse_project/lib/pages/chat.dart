@@ -233,8 +233,7 @@ class _ChatPageState extends State<_ChatPageContent> {
             } else if (state is ChatLoaded) {
               return _buildChatContent(state.messages, chat);
             } else if (state is ChatError) {
-              print(state.error);
-              return const Text("Something went wrong...");
+              return Text("Something went wrong: ${state.error}");
             } else {
               return const Center(child: Text('Unexpected State'));
             }

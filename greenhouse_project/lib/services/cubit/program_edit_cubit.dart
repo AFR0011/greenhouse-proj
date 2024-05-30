@@ -28,7 +28,6 @@ class ProgramEditCubit extends Cubit<List<dynamic>> {
     if (values[5] == null) {
       validation[5] = false;
     }
-    print(validation);
     emit([...values]);
     return validation;
   }

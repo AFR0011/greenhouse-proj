@@ -63,10 +63,8 @@ class PlantStatusCubit extends Cubit<PlantStatusState> {
         "userId": userReference,
         "externalId": externalId,
       });
-    } catch (error, stack) {
+    } catch (error) {
       emit(PlantsError(error.toString()));
-      print(stack);
-      print(error);
     }
   }
 

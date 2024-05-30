@@ -42,8 +42,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    passwordController.text ;
-    emailController.text ;
+    passwordController.text;
+    emailController.text;
 
     return Scaffold(
       body: SizedBox(
@@ -87,7 +87,6 @@ class _LoginPageState extends State<LoginPage> {
                   child: CircularProgressIndicator(),
                 );
               }
-              context.read<AuthCubit>().checkLoggedIn();
               return SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.all(25.0),
@@ -108,8 +107,8 @@ class _LoginPageState extends State<LoginPage> {
                               controller: emailController,
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor:
-                                    theme.colorScheme.background.withOpacity(.4),
+                                fillColor: theme.colorScheme.background
+                                    .withOpacity(.4),
                                 labelText: 'Email',
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20)),
@@ -125,7 +124,8 @@ class _LoginPageState extends State<LoginPage> {
                               obscureText: _isSecurePassword,
                               decoration: InputDecoration(
                                 filled: true,
-                                fillColor:theme.colorScheme.background.withOpacity(.4),
+                                fillColor: theme.colorScheme.background
+                                    .withOpacity(.4),
                                 labelText: 'Password',
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20)),

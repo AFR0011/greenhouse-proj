@@ -122,7 +122,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
         builder: (context, state) {
           // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
-            print("hi1");
             return const Center(
               child: CircularProgressIndicator(),
             );
@@ -309,7 +308,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
               builder: (context, state) {
                 // Show "loading screen" if processing notification state
                 if (state is NotificationsLoading) {
-                  print("hi2");
                   return const Center(child: CircularProgressIndicator());
                 }
                 // Show equipment status once notification state is loaded
@@ -392,7 +390,6 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
             child: BlocBuilder<ReadingsCubit, GreenhouseState>(
                 builder: (context, state) {
               if (state is ReadingsLoading) {
-                print("hi3");
                 return const Center(
                   child: CircularProgressIndicator(),
                 );

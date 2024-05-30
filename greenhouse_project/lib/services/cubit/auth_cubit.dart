@@ -27,8 +27,7 @@ class AuthCubit extends Cubit<AuthState> {
             'userCredentials', jsonEncode(userCredential.toString()));
       });
       emit(AuthSuccess(userCredential));
-    } on FirebaseAuthException catch (e, stack) {
-      print(stack);
+    } on FirebaseAuthException catch (e) {
       emit(AuthFailure(e.message));
     }
   }
@@ -46,17 +45,6 @@ class AuthCubit extends Cubit<AuthState> {
     } catch (e) {
       emit(AuthFailure("Logout Failed"));
     }
-  }
-
-  Future<void> checkLoggedIn() async {
-    final prefs = await _prefs;
-    if (prefs.getBool('isLoggedIn') ?? false) {
-      // UserCredential userCredential =
-      //     jsonDecode(prefs.getString("userCredentials")!);
-      // print(jsonDecode(prefs.getString("userCredentials")!));
-      // emit(AuthSuccess(userCredential));
-    }
-    return;
   }
 
   @override

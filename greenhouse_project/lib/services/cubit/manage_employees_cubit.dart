@@ -82,7 +82,6 @@ class ManageEmployeesCubit extends ManagementCubit {
       });
 
       // Use EmailJS to send email
-      print("hi");
       String emailMessage =
           '''Your email  used to create an account in the Greenhouse Control
           System environment.\n\nIf you think this is a mistake, please ignore
@@ -92,10 +91,8 @@ class ManageEmployeesCubit extends ManagementCubit {
       EmailJS.init(const Options(
           publicKey: "Dzqja-Lc3erScWnmb", privateKey: "6--KQwTNaq-EKoZJg4-t6"));
 
-      EmailJSResponseStatus res = await EmailJS.send("service_1i330zn", "template_zx9tnxd",
-          {"receiver": email, "message": emailMessage});
-          print(res);
-
+      EmailJSResponseStatus res = await EmailJS.send("service_1i330zn",
+          "template_zx9tnxd", {"receiver": email, "message": emailMessage});
     } catch (error) {
       emit(ManageEmployeesError(error.toString()));
     }
