@@ -1,10 +1,9 @@
 /// Equipment page - view and modify equipment status
 ///
-/// TODO:
-/// -
-///
+/// This Dart file contains the implementation of the EquipmentPage and its related content.
 library;
 
+// Import necessary packages
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -18,11 +17,13 @@ import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
+// Define the web VAPID key for Firebase Cloud Messaging
 const String webVapidKey =
     "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
+// EquipmentPage class
 class EquipmentPage extends StatelessWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
   const EquipmentPage({super.key, required this.userCredential});
 
@@ -49,8 +50,9 @@ class EquipmentPage extends StatelessWidget {
   }
 }
 
+// _EquipmentPageContent class, which holds the main content of the page
 class _EquipmentPageContent extends StatefulWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
   const _EquipmentPageContent({required this.userCredential});
 
@@ -58,19 +60,19 @@ class _EquipmentPageContent extends StatefulWidget {
   State<_EquipmentPageContent> createState() => _EquipmentPageContentState();
 }
 
-// Main page content goes here
+// State class for _EquipmentPageContent
 class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   late DocumentReference _userReference;
   // Custom theme
   final ThemeData customTheme = theme;
 
-  // Dispose (destructor)
+  // Dispose method
   @override
   void dispose() {
     super.dispose();
   }
 
-  // InitState - get user info state to check authentication later
+  // Initialize state method
   @override
   void initState() {
     super.initState();
@@ -82,14 +84,13 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     // BlocBuilder for user info
     return BlocBuilder<UserInfoCubit, HomeState>(
       builder: (context, state) {
-        // Show "loading screen" if processing user info
+        // Show loading indicator while processing user info
         if (state is UserInfoLoading) {
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
-        // Initiate page creation once user info is loaded
-        // Show content once user info is loaded
+        // Proceed with page creation once user info is loaded
         else if (state is UserInfoLoaded) {
           _userReference = state.userReference;
           // Call function to create equipment page
@@ -99,8 +100,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
         else if (state is UserInfoError) {
           return Center(child: Text('Error: ${state.errorMessage}'));
         }
-        // If somehow state doesn't match predefined states;
-        // never happens; but, anything can happen
+        // Unexpected state (shouldn't occur)
         else {
           return const Center(child: Text('Unexpected State'));
         }
@@ -108,7 +108,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  // Create equipment page function
+  // Function to create the equipment page
   Widget _createEquipmentPage() {
     return Scaffold(
       appBar: createAltAppbar(context, "Equipments"),
@@ -137,14 +137,14 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
               // BlocBuilder for Equipment Status
               BlocBuilder<EquipmentStatusCubit, EquipmentStatusState>(
                 builder: (context, state) {
-                  // Show "loading screen" if processing equipment state
+                  // Show loading indicator while processing equipment status
                   if (state is StatusLoading) {
                     return const Center(child: CircularProgressIndicator());
-                    // Show equipment status once equipment status state is loaded
+                    // Display equipment status once loaded
                   } else if (state is StatusLoaded) {
                     List<EquipmentStatus> equipmentList =
-                        state.status; //equipment list
-                    // Display nothing if no equipment
+                        state.status; // List of equipment
+                    // Display message if no equipment
                     if (equipmentList.isEmpty) {
                       return const Center(child: Text("No Equipments..."));
                     }
@@ -168,7 +168,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                           itemCount: equipmentList.length,
                           itemBuilder: (context, index) {
                             EquipmentStatus equipment =
-                                equipmentList[index]; //equipment data
+                                equipmentList[index]; // Equipment data
                             // Display equipment info
                             return ToggleButtonContainer(
                               context: context,
@@ -181,12 +181,11 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                       );
                     }
                   }
-                  // Show error message once an error occurs
+                  // Show error message if an error occurs
                   else if (state is StatusError) {
                     return Center(child: Text('Error: ${state.error}'));
                   }
-                  // If the state is not any of the predefined states;
-                  // never happens; but, anything can happen
+                  // Unexpected state (shouldn't occur)
                   else {
                     return const Center(child: Text('Unexpected State'));
                   }
@@ -199,6 +198,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
+  // Method to initialize user information
   Future<void> _initializeUserInfo() async {
     try {
       if (DefaultFirebaseOptions.currentPlatform !=

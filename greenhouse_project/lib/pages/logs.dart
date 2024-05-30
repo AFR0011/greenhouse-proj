@@ -1,8 +1,4 @@
 /// Logs page - notifications, welcome message, and search
-///
-/// TODO:
-/// - Add delete notification option (individual and all)
-///
 library;
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,13 +12,15 @@ import 'package:greenhouse_project/services/cubit/logs_cubit.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
+// Web VAPID Key for Firebase Cloud Messaging
 const String webVapidKey =
     "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
+/// Logs Page Widget
 class LogsPage extends StatelessWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
-  const LogsPage({super.key, required this.userCredential});
+  const LogsPage({Key? key, required this.userCredential}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,8 +45,9 @@ class LogsPage extends StatelessWidget {
   }
 }
 
+/// Logs Page Content Widget
 class _LogsPageContent extends StatefulWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
   const _LogsPageContent({required this.userCredential});
 
@@ -56,24 +55,19 @@ class _LogsPageContent extends StatefulWidget {
   State<_LogsPageContent> createState() => _LogsPageContentState();
 }
 
-// Main page content goes here
+/// State class for Logs Page Content
 class _LogsPageContentState extends State<_LogsPageContent> {
-  // Custom theme
-  final ThemeData customTheme = theme;
+  final ThemeData customTheme = theme; // Custom theme for the page
 
-  // Text controllers
-
-  // Dispose (destructor)
   @override
   void dispose() {
     super.dispose();
   }
 
-  // InitState - get user info state to check authentication later
   @override
   void initState() {
     super.initState();
-    _initializeUserInfo();
+    _initializeUserInfo(); // Initialize user info upon page load
   }
 
   @override
@@ -107,14 +101,14 @@ class _LogsPageContentState extends State<_LogsPageContent> {
     );
   }
 
-  // Create notifications page function
+  /// Create Logs Page Function
   Widget _createLogsPage() {
     // Page content
     return Scaffold(
       // Main appbar (header)
       appBar: createAltAppbar(context, "Logs"),
 
-      // Call function to build notificaitons list
+      // Call function to build notifications list
       body: Container(
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
@@ -139,6 +133,7 @@ class _LogsPageContentState extends State<_LogsPageContent> {
     );
   }
 
+  /// Build Logs Widget
   Widget _buildLogs() {
     return BlocBuilder<LogsCubit, LogsState>(
       builder: (context, state) {
@@ -148,7 +143,7 @@ class _LogsPageContentState extends State<_LogsPageContent> {
         }
         // Show equipment status once notification state is loaded
         else if (state is LogsLoaded) {
-          List<LogsData> logsList = state.logs; // notifications list
+          List<LogsData> logsList = state.logs; // List of notifications
           // Display nothing if no notifications
           if (logsList.isEmpty) {
             return const Center(child: Text("No Logs..."));
@@ -161,7 +156,7 @@ class _LogsPageContentState extends State<_LogsPageContent> {
                 shrinkWrap: true,
                 itemCount: logsList.length,
                 itemBuilder: (context, index) {
-                  LogsData log = logsList[index]; // notification data
+                  LogsData log = logsList[index]; // Notification data
                   // Notification message
                   return Card(
                     shape: RoundedRectangleBorder(
@@ -198,6 +193,7 @@ class _LogsPageContentState extends State<_LogsPageContent> {
     );
   }
 
+  /// Initialize User Info Function
   Future<void> _initializeUserInfo() async {
     try {
       if (DefaultFirebaseOptions.currentPlatform !=
