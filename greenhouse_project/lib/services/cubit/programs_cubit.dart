@@ -160,28 +160,13 @@ class ProgramsCubit extends Cubit<ProgramsState> {
         "userId": userReference,
         "externalId": externalId,
       });
+      
+      _isProcessing = false;
+      _getPrograms();
+
     } catch (error) {
       emit(ProgramsError(error.toString()));
     }
-    final url = Uri.parse(
-        'https://greenhouse-5b1d55d4ffae.herokuapp.com/sync/firestore-to-realtime');
-
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({"data": "programs"}),
-    );
-
-    if (response.statusCode == 200) {
-      print('Sync successful!');
-    } else {
-      print('Failed to sync databases: ${response.statusCode}');
-      print('Response body: ${response.body}');
-    }
-    _isProcessing = false;
-    _getPrograms();
   }
 
   @override
