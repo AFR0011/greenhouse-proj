@@ -1,7 +1,3 @@
-/// TODO:
-/// - Add default pfp storage reference to create_worker
-/// - Create remote config and a new email for mailer setup
-
 part of 'management_cubit.dart';
 
 class ManageEmployeesCubit extends ManagementCubit {

@@ -1,7 +1,4 @@
-///
-/// TODO:
-/// - Configure notifications for IOS and Android
-/// - (then) write code to send notifications when they occur
+/// Home Cubit
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';

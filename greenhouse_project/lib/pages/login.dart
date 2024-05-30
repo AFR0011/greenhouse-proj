@@ -1,9 +1,4 @@
-/// Login page - login to the app
-///
-/// TODO:
-/// - Handle animation with Cubits
-/// - Convert state management stuff
-/// - Review cubit usage; builder and listener usage might be unnecessary
+/// This is the login page of the app where users can log in using their email and password.
 library;
 
 import 'package:flutter/material.dart';
@@ -21,14 +16,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Text controllers
+  // Text controllers for email and password fields
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
-  // Firebase authentication init
+  // Firebase authentication instance
   FirebaseAuth auth = FirebaseAuth.instance;
 
-  // Show/hide password
+  // Flag to toggle password visibility
   bool _isSecurePassword = true;
 
   // Dispose of controllers for better performance
@@ -183,6 +178,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  // Widget to toggle password visibility
   Widget togglePassword() {
     return IconButton(
         onPressed: () {

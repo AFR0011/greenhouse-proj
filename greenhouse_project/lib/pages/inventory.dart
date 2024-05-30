@@ -1,10 +1,7 @@
 /// Inventory page - CRUD for inventory items
-///
-/// TODO:
-/// - Add form validation to delete, edit, and add operations
-///
 library;
 
+// Import necessary packages
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -25,12 +22,16 @@ import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 import 'package:list_utilities/list_utilities.dart';
 
+// Web VAPID key for push notifications
 const String webVapidKey =
     "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
+// Inventory Page widget
 class InventoryPage extends StatelessWidget {
-  final UserCredential userCredential; // user auth credentials
+  // User authentication credentials
+  final UserCredential userCredential;
 
+  // Constructor
   const InventoryPage({super.key, required this.userCredential});
 
   @override
@@ -59,16 +60,19 @@ class InventoryPage extends StatelessWidget {
   }
 }
 
+// Private class for the main content of Inventory Page
 class _InventoryPageContent extends StatefulWidget {
-  final UserCredential userCredential; // user auth credentials
+  // User authentication credentials
+  final UserCredential userCredential;
 
+  // Constructor
   const _InventoryPageContent({required this.userCredential});
 
   @override
   State<_InventoryPageContent> createState() => _InventoryPageState();
 }
 
-// Main page content goes here
+// State class for the main content of Inventory Page
 class _InventoryPageState extends State<_InventoryPageContent> {
   // User info local variables
   late String _userRole = "";
@@ -77,7 +81,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   // Custom theme
   final ThemeData customTheme = theme;
 
-  // Text controllers
+  // Text controllers for form inputs
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _equipmentController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
@@ -86,7 +90,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
   // Index of footer nav selection
   final int _selectedIndex = 1;
 
-  // Dispose (destructor)
+  // Dispose method to clean up resources
   @override
   void dispose() {
     _textController.dispose();
@@ -96,7 +100,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     super.dispose();
   }
 
-  // InitState - get user info state to check authentication later
+  // Initialize user info on widget creation
   @override
   void initState() {
     super.initState();
@@ -134,10 +138,6 @@ class _InventoryPageState extends State<_InventoryPageContent> {
           else if (state is UserInfoError) {
             return Center(child: Text('Error: ${state.errorMessage}'));
           }
-          // Show error if there is an issues with user info
-          else if (state is UserInfoError) {
-            return Center(child: Text('Error: ${state.errorMessage}'));
-          }
           // If somehow state doesn't match predefined states;
           // never happens; but, anything can happen
           else {
@@ -150,7 +150,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     );
   }
 
-  // Main page content
+  // Main content of Inventory Page
   Widget _createInventoryPage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
@@ -266,7 +266,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     );
   }
 
-  // Create inventory list function
+  // Function to create inventory list
   Widget _createInventoryList(
       List actualInventory, List pendingInventory, BuildContext mainContext) {
     return Padding(
@@ -409,7 +409,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
     );
   }
 
-  // Item addition form function
+  // Function to display the form for adding a new inventory item
   void _showAdditionForm(BuildContext context) {
     // Get instance of inventory cubit from main context
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
@@ -547,7 +547,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         });
   }
 
-  // Item edit form function
+  // Function to display the form for editing an existing inventory item
   void showEditForm(BuildContext context, InventoryData inventory) {
     // Get instance of inventory cubit from main context
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
@@ -688,7 +688,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         });
   }
 
-  // Create item deletion form function
+  // Function to display the form for deleting an inventory item
   void showDeleteForm(BuildContext context, InventoryData inventory) {
     InventoryCubit inventoryCubit = BlocProvider.of<InventoryCubit>(context);
     showDialog(
@@ -747,6 +747,7 @@ class _InventoryPageState extends State<_InventoryPageContent> {
         });
   }
 
+  // Function to initialize user information
   Future<void> _initializeUserInfo() async {
     try {
       if (DefaultFirebaseOptions.currentPlatform !=

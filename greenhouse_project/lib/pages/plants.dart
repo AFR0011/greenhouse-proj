@@ -1,8 +1,4 @@
 /// Plants page - view plants and sensor readings
-///
-/// TODO:
-/// - Chat graphs
-///
 library;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,17 +17,20 @@ import 'package:greenhouse_project/utils/dialogs.dart';
 import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
+// Web VAPID key for Firebase Cloud Messaging
 const String webVapidKey =
-    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
+    "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9U";
 
+// Plants page widget
 class PlantsPage extends StatelessWidget {
   final UserCredential userCredential;
   final DocumentReference userReference;
+
   const PlantsPage({
-    super.key,
+    Key? key,
     required this.userCredential,
     required this.userReference,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -53,29 +52,28 @@ class PlantsPage extends StatelessWidget {
   }
 }
 
+// Content of the Plants page
 class _PlantsPageContent extends StatefulWidget {
   final UserCredential userCredential;
 
-  const _PlantsPageContent({required this.userCredential});
+  const _PlantsPageContent({Key? key, required this.userCredential})
+      : super(key: key);
 
   @override
   State<_PlantsPageContent> createState() => _PlantsPageState();
 }
 
-// Main page content
+// State of the Plants page content
 class _PlantsPageState extends State<_PlantsPageContent> {
-  // User info local variables
   late DocumentReference _userReference;
   late String _userRole;
 
-  // Custom theme
   final ThemeData customTheme = theme;
 
   // Text controllers
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _typeController = TextEditingController();
 
-  // Dispose (destructor)
   @override
   void dispose() {
     _textController.dispose();
@@ -83,7 +81,6 @@ class _PlantsPageState extends State<_PlantsPageContent> {
     super.dispose();
   }
 
-  // InitState - get user info state to check authentication later
   @override
   void initState() {
     super.initState();
@@ -92,30 +89,19 @@ class _PlantsPageState extends State<_PlantsPageContent> {
 
   @override
   Widget build(BuildContext context) {
-    // BlocBuilder for user info
     return BlocBuilder<UserInfoCubit, HomeState>(
       builder: (context, state) {
-        // Show "loading screen" if processing user info
         if (state is UserInfoLoading) {
           return const Center(
             child: CircularProgressIndicator(),
           );
-        }
-        // Show content once user info is loaded
-        else if (state is UserInfoLoaded) {
-          // Call function to create plants page
+        } else if (state is UserInfoLoaded) {
           _userReference = state.userReference;
           _userRole = state.userRole;
-
           return Theme(data: customTheme, child: _createPlantsPage());
-        }
-        // Show error if there is an issues with user info
-        else if (state is UserInfoError) {
+        } else if (state is UserInfoError) {
           return Center(child: Text('Error: ${state.errorMessage}'));
-        }
-        // If somehow state doesn't match predefined states;
-        // never happens; but, anything can happen
-        else {
+        } else {
           return const Center(
             child: Text('Unexpected state'),
           );
@@ -124,12 +110,9 @@ class _PlantsPageState extends State<_PlantsPageContent> {
     );
   }
 
-  // Function to create plants page
   Widget _createPlantsPage() {
     return Scaffold(
-      // Appbar (header)
       appBar: createAltAppbar(context, "Plants"),
-      // Plants section
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
@@ -153,30 +136,21 @@ class _PlantsPageState extends State<_PlantsPageContent> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Plants subheading
               Padding(
                 padding: const EdgeInsets.only(top: 40),
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width - 20,
                 ),
               ),
-              // BlocBuilder for plantStatus state
               BlocBuilder<PlantStatusCubit, PlantStatusState>(
                 builder: (context, state) {
-                  // show "loading screen" if processing plantStatus state
                   if (state is PlantsLoading) {
                     return const Center(child: CircularProgressIndicator());
-                  }
-                  // Show plants once plantStatus state is loaded
-                  else if (state is PlantsLoaded) {
-                    List<PlantData> plantList = state.plants; // plants list
-
-                    // Display nothing if no plants
+                  } else if (state is PlantsLoaded) {
+                    List<PlantData> plantList = state.plants;
                     if (plantList.isEmpty) {
                       return const Center(child: Text("No Plants..."));
-                    }
-                    // Display plants
-                    else {
+                    } else {
                       return Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Column(
@@ -186,10 +160,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                 shrinkWrap: true,
                                 itemCount: plantList.length,
                                 itemBuilder: (context, index) {
-                                  PlantData plant =
-                                      plantList[index]; //plant data
-
-                                  // Display plant info
+                                  PlantData plant = plantList[index];
                                   return Card(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15.0),
@@ -217,10 +188,8 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                       ),
                                       subtitle: Text(plant.subtype),
                                       trailing: WhiteElevatedButton(
-                                        // Show details and sensor readings
                                         text: 'Details',
                                         onPressed: () {
-                                          // _showPlantDetails(plant);
                                           BuildContext mainContext = context;
                                           showDialog(
                                               context: context,
@@ -242,15 +211,9 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                         ),
                       );
                     }
-                  }
-
-                  // Show error message once an error occurs
-                  else if (state is PlantsError) {
+                  } else if (state is PlantsError) {
                     return Center(child: Text('Error: ${state.error}'));
-                  }
-                  // If the state is not any of the predefined states;
-                  // never happens; but, anything can happen
-                  else {
+                  } else {
                     return const Center(child: Text('Unexpected State'));
                   }
                 },
@@ -259,7 +222,6 @@ class _PlantsPageState extends State<_PlantsPageContent> {
           ),
         ),
       ),
-
       floatingActionButton: _userRole == "manager"
           ? GreenElevatedButton(
               text: "Add Plant", onPressed: () => showAdditionForm(context))
@@ -267,14 +229,12 @@ class _PlantsPageState extends State<_PlantsPageContent> {
     );
   }
 
-  // Item addition form function
   void showAdditionForm(BuildContext context) {
-    // Get instance of inventory cubit from main context
     PlantStatusCubit plantStatusCubit =
         BlocProvider.of<PlantStatusCubit>(context);
+
     PlantsEditCubit plantsEditCubit = BlocProvider.of<PlantsEditCubit>(context);
     String dropdownValue = "1";
-    // Display item addition form
     showDialog(
         context: context,
         builder: (context) {
@@ -310,7 +270,6 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                 ? null
                                 : "Subtype should be longer than 2 characters.",
                             labelText: "Subtype"),
-                        //insert dropdown HERE!!
                         DropdownButtonFormField<String>(
                           value: dropdownValue,
                           decoration: const InputDecoration(
@@ -330,7 +289,6 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                         SizedBox(
                           height: 10,
                         ),
-                        // Submit and cancel buttons
                         Row(
                           children: [
                             Expanded(
@@ -364,7 +322,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(const SnackBar(
                                                 content: Text(
-                                                    "Plant added succesfully!")));
+                                                    "Plant added successfully!")));
                                       });
                                     }
                                   }),
@@ -390,7 +348,6 @@ class _PlantsPageState extends State<_PlantsPageContent> {
         });
   }
 
-  // Plant deletion form function
   void showDeleteForm(BuildContext context, PlantData plant) {
     PlantStatusCubit plantStatusCubit =
         BlocProvider.of<PlantStatusCubit>(context);
@@ -408,11 +365,9 @@ class _PlantsPageState extends State<_PlantsPageContent> {
               content: SingleChildScrollView(
                 child: Container(
                   constraints: const BoxConstraints(maxWidth: 400),
-                  width: MediaQuery.of(context).size.width *
-                      .6, // Set maximum width
+                  width: MediaQuery.of(context).size.width * .6,
                   child: Column(
-                    mainAxisSize:
-                        MainAxisSize.min, // Set column to minimum size
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
@@ -430,7 +385,7 @@ class _PlantsPageState extends State<_PlantsPageContent> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             content: Text(
-                                                "Item deleted succesfully!")));
+                                                "Plant deleted successfully!")));
                                   });
                                 }),
                           ),
