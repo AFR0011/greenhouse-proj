@@ -1,6 +1,7 @@
 /// Home page - notifications
 library;
 
+// Importing necessary packages
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -23,9 +24,11 @@ import 'package:greenhouse_project/utils/input.dart';
 import 'package:greenhouse_project/utils/text_styles.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
+// Vapid Key for web notifications
 const String webVapidKey =
     "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
+// HomePage class to display main content
 class HomePage extends StatelessWidget {
   final UserCredential userCredential; // user auth credentials
 
@@ -51,6 +54,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
+// Stateful widget for the main content of the page
 class _EquipmentPageContent extends StatefulWidget {
   final UserCredential userCredential; // user auth credentials
 
@@ -60,7 +64,7 @@ class _EquipmentPageContent extends StatefulWidget {
   State<_EquipmentPageContent> createState() => _EquipmentPageContentState();
 }
 
-// Main page content goes here
+// State class for the main content of the page
 class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // User info local variables
   late String _userRole = "";
@@ -71,14 +75,16 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // Custom theme
   final ThemeData customTheme = theme;
 
+  // Function to determine which widget to display based on selection
   Widget _getDisplayWidget() {
     if (_isSelected[0]) {
-      return _buildDashbord();
+      return _buildDashboard();
     } else {
       return _buildNotifications();
     }
   }
 
+  // Function to handle toggle button selection
   void _onToggle(int index) {
     setState(() {
       for (int i = 0; i < _isSelected.length; i++) {
@@ -90,13 +96,13 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
   // Index of footer nav selection
   final int _selectedIndex = 2;
 
-  // Dispose (destructor)
+  // Dispose method
   @override
   void dispose() {
     super.dispose();
   }
 
-  // InitState - get user info state to check authentication later
+  // InitState method to get user info state for authentication check
   @override
   void initState() {
     super.initState();
@@ -151,7 +157,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  // Create greenhouse page function
+  // Function to create home page
   Widget _createHomePage() {
     // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
@@ -172,7 +178,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
               )),
         ),
 
-        // Call function to build notificaitons list
+        // Call function to build notifications list
         body: SingleChildScrollView(
           child: Expanded(
             child: Container(
@@ -222,7 +228,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                                 child: Padding(
                                   padding: EdgeInsets.all(8.0),
                                   child: Text(
-                                    'Dashbord',
+                                    'Dashboard', // Label for Dashboard tab
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 ),
@@ -235,7 +241,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                                 child: Padding(
                                   padding: EdgeInsets.all(8.0),
                                   child: Text(
-                                    'Notifications',
+                                    'Notifications', // Label for Notifications tab
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 ),
@@ -245,7 +251,9 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                         ),
                       ),
                     ),
-                    Container(child: _getDisplayWidget())
+                    Container(
+                        child:
+                            _getDisplayWidget()) // Display selected widget based on toggle
                   ],
                 )),
           ),
@@ -280,12 +288,13 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
                   topLeft: Radius.circular(30.0),
                   topRight: Radius.circular(30.0),
                 ),
-                child:
-                    createFooterNav(_selectedIndex, footerNavCubit, _userRole),
+                child: createFooterNav(_selectedIndex, footerNavCubit,
+                    _userRole), // Creating footer navigation
               )),
         ));
   }
 
+  // Widget to build the notifications tab
   Widget _buildNotifications() {
     return SingleChildScrollView(
       child: Container(
@@ -371,7 +380,8 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
-  Widget _buildDashbord() {
+  // Widget to build the dashboard tab
+  Widget _buildDashboard() {
     return Column(
       children: [
         Align(
@@ -522,6 +532,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
+  // Widget to display when the user account is disabled
   _createHomePageDisabled() {
     UserInfoCubit userInfoCubit = context.read<UserInfoCubit>();
     AuthCubit authCubit = context.read<AuthCubit>();
@@ -570,6 +581,7 @@ class _EquipmentPageContentState extends State<_EquipmentPageContent> {
     );
   }
 
+  // Function to initialize user info
   Future<void> _initializeUserInfo() async {
     try {
       if (DefaultFirebaseOptions.currentPlatform !=

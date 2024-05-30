@@ -20,11 +20,13 @@ import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
+// Web VAPID key for Firebase Cloud Messaging
 const String webVapidKey =
     "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
+/// Main widget for the Greenhouse Page
 class GreenhousePage extends StatelessWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
   const GreenhousePage({super.key, required this.userCredential});
 
@@ -51,8 +53,9 @@ class GreenhousePage extends StatelessWidget {
   }
 }
 
+/// Widget for the main content of the Greenhouse Page
 class _GreenhousePageContent extends StatefulWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
   const _GreenhousePageContent({required this.userCredential});
 
@@ -60,67 +63,48 @@ class _GreenhousePageContent extends StatefulWidget {
   State<_GreenhousePageContent> createState() => _GreenhousePageContentState();
 }
 
-// Main page content goes here
+/// State class for the Greenhouse Page Content
 class _GreenhousePageContentState extends State<_GreenhousePageContent> {
-  // User info local variables
-  late String _userRole = "";
-  late DocumentReference _userReference;
+  late String _userRole = ""; // User role
+  late DocumentReference _userReference; // Reference to user document
 
-  // Custom theme
-  final ThemeData customTheme = theme;
+  final ThemeData customTheme = theme; // Custom theme for the page
+  final int _selectedIndex = 3; // Index of selected item in the footer nav
 
-  // Index of footer nav selection
-  final int _selectedIndex = 3;
-
-  // Dispose (destructor)
   @override
   void dispose() {
     super.dispose();
   }
 
-  // InitState - get user info state to check authentication later
   @override
   void initState() {
     super.initState();
-    _initializeUserInfo();
+    _initializeUserInfo(); // Initialize user information
   }
 
   @override
   Widget build(BuildContext context) {
-    // BlocListener for handling footer nav events
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
         navigateToPage(context, state, _userRole, widget.userCredential,
             userReference: _userReference);
       },
-
-      // BlocBuilder for user info
       child: BlocBuilder<UserInfoCubit, HomeState>(
         builder: (context, state) {
-          // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
+            // Show loading indicator while fetching user info
             return const Center(
               child: CircularProgressIndicator(),
             );
-          }
-
-          // Show content once user info is loaded
-          else if (state is UserInfoLoaded) {
-            // Assign user info to local variables
+          } else if (state is UserInfoLoaded) {
+            // Display content when user info is loaded
             _userRole = state.userRole;
             _userReference = state.userReference;
-
-            // Call function to create greenhouse page
             return Theme(data: customTheme, child: _createGreenhousePage());
-          }
-          // Show error if there is an issues with user info
-          else if (state is UserInfoError) {
+          } else if (state is UserInfoError) {
+            // Show error if there's an issue with user info
             return Center(child: Text('Error: ${state.errorMessage}'));
-          }
-
-          // If somehow state doesn't match predefined states;
-          // never happens; but, anything can happen
-          else {
+          } else {
             return const Center(child: Text('Unexpected State'));
           }
         },
@@ -128,7 +112,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
     );
   }
 
-  // Define a function to navigate to greenhouse subpages
+  // Function to navigate to details page
   void _navigateToDetailsPage(Widget pageWidget) {
     Navigator.push(
       context,
@@ -179,43 +163,16 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
               ),
             ),
           ),
-          // child: Padding(
-          //   padding: const EdgeInsets.fromLTRB(10, 10, 0, 0),
-          //   child: Row(
-          //     children: [
-          //       Expanded(
-          //         child: Text(
-          //           subheading,
-          //           style: subheadingTextStyle,
-          //         ),
-          //       ),
-          //       Padding(
-          //         padding: const EdgeInsets.fromLTRB(25, 15, 25, 15),
-          //         child: WhiteElevatedButton(
-          //           text: "Details",
-          // onPressed: () {
-          //   _navigateToDetailsPage(pageWidget);
-          // },
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
         ));
   }
 
   /// Creates the main content of the greenhouse page.
   Widget _createGreenhousePage() {
-    // Get instance of footer nav cubit from main context
     final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
 
-    // Page content
     return Scaffold(
-        // Main appbar (header)
         appBar: createMainAppBar(
             context, widget.userCredential, _userReference, "Greenhouse"),
-
-        // Scrollable column for items
         body: Container(
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
@@ -242,7 +199,6 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Plant status subheading and details button
                   _buildSubheadingRow(
                     "Plant Status",
                     PlantsPage(
@@ -252,16 +208,12 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
                     Colors.greenAccent,
                     Icons.local_florist,
                   ),
-
-                  // Active programs subheading and details button
                   _buildSubheadingRow(
                     "Active Programs",
                     ProgramsPage(userCredential: widget.userCredential),
                     Colors.blueAccent,
                     Icons.play_circle_fill,
                   ),
-
-                  // Equipment status subheading and details button
                   _buildSubheadingRow(
                     "Equipment Status",
                     EquipmentPage(userCredential: widget.userCredential),
@@ -273,8 +225,6 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
             ),
           ),
         ),
-
-        // Footer nav bar
         bottomNavigationBar: PreferredSize(
           preferredSize: Size.fromHeight(50.0),
           child: Container(
@@ -309,6 +259,7 @@ class _GreenhousePageContentState extends State<_GreenhousePageContent> {
         ));
   }
 
+  // Initialize user info including FCM token
   Future<void> _initializeUserInfo() async {
     try {
       if (DefaultFirebaseOptions.currentPlatform !=

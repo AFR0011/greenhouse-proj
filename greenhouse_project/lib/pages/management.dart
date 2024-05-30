@@ -1,10 +1,8 @@
 /// Management page - links to subpages: workers and tasks
 library;
 
-//import 'dart:math';
-
+// Import required packages
 import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -22,11 +20,13 @@ import 'package:greenhouse_project/utils/footer_nav.dart';
 import 'package:greenhouse_project/utils/appbar.dart';
 import 'package:greenhouse_project/utils/theme.dart';
 
+// Firebase Web Vapid Key
 const String webVapidKey =
     "BKWvS-G0BOBMCAmBJVz63de5kFb5R2-OVxrM_ulKgCoqQgVXSY8FqQp7QM5UoC5S9hKs5crmzhVJVyyi_sYDC9I";
 
+/// Management Page Widget
 class ManagementPage extends StatelessWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
   const ManagementPage({super.key, required this.userCredential});
 
@@ -53,8 +53,9 @@ class ManagementPage extends StatelessWidget {
   }
 }
 
+/// Management Page Content Stateful Widget
 class _ManagementPageContent extends StatefulWidget {
-  final UserCredential userCredential; // user auth credentials
+  final UserCredential userCredential; // User authentication credentials
 
   const _ManagementPageContent({required this.userCredential});
 
@@ -62,77 +63,57 @@ class _ManagementPageContent extends StatefulWidget {
   State<_ManagementPageContent> createState() => _ManagementPageState();
 }
 
+/// Management Page State
 class _ManagementPageState extends State<_ManagementPageContent> {
-  // User info local variables
-  late String _userRole = "";
-  late DocumentReference _userReference;
+  late String _userRole = ""; // User role
+  late DocumentReference _userReference; // User reference in Firestore
 
-  // Custom theme
-  final ThemeData customTheme = theme;
+  final ThemeData customTheme = theme; // Custom theme
 
-  // Text controllers
-  final TextEditingController _textController = TextEditingController();
+  final TextEditingController _textController =
+      TextEditingController(); // Text controller
 
-  // Index of footer nav selection
-  final int _selectedIndex = 0;
+  final int _selectedIndex = 0; // Index of footer nav selection
 
-  // Dispose (destructor)
   @override
   void dispose() {
-    _textController.dispose();
+    _textController.dispose(); // Dispose text controller
     super.dispose();
   }
 
-  // InitState - get user info state to check authentication later
   @override
   void initState() {
     super.initState();
-    _initializeUserInfo();
+    _initializeUserInfo(); // Initialize user info
   }
 
   @override
   Widget build(BuildContext context) {
-    // BlocListener for handling footer nav events
     return BlocListener<FooterNavCubit, int>(
       listener: (context, state) {
+        // Navigate to page based on footer nav selection
         navigateToPage(context, state, _userRole, widget.userCredential,
             userReference: _userReference);
       },
-
-      // BlocBuilder for user info
       child: BlocBuilder<UserInfoCubit, HomeState>(
         builder: (context, state) {
-          // Show "loading screen" if processing user info
           if (state is UserInfoLoading) {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(), // Show loading screen
             );
-          }
-
-          // Show content once user info is loaded
-          else if (state is UserInfoLoaded) {
-            // Assign user info to local variables
-            _userRole = state.userRole;
+          } else if (state is UserInfoLoaded) {
+            _userRole = state.userRole; // Assign user info
             _userReference = state.userReference;
 
-            // Call function to create management page
-            return Theme(data: customTheme, child: _createManagementPage());
-          }
-          // Show error if there is an issues with user info
-          else if (state is UserInfoError) {
-            return Center(child: Text('Error: ${state.errorMessage}'));
-          }
-          // If somehow state doesn't match predefined states;
-          // never happens; but, anything can happen
-          // Show error if there is an issues with user info
-          else if (state is UserInfoError) {
-            return Center(child: Text('Error: ${state.errorMessage}'));
-          }
-          // If somehow state doesn't match predefined states;
-          // never happens; but, anything can happen
-          else {
+            return Theme(
+                data: customTheme,
+                child: _createManagementPage()); // Create management page
+          } else if (state is UserInfoError) {
+            return Center(
+                child: Text('Error: ${state.errorMessage}')); // Show error
+          } else {
             return const Center(
-              child: Text('Unexpected state'),
+              child: Text('Unexpected state'), // Unexpected state
             );
           }
         },
@@ -140,11 +121,12 @@ class _ManagementPageState extends State<_ManagementPageContent> {
     );
   }
 
-  // Main page content
+  /// Create Management Page Widget
   Widget _createManagementPage() {
-    // Get instance of footer nav cubit from main context
-    final footerNavCubit = BlocProvider.of<FooterNavCubit>(context);
+    final footerNavCubit =
+        BlocProvider.of<FooterNavCubit>(context); // Get footer nav cubit
     final pages = [
+      // Pages list
       {
         'route': _userRole == "admin"
             ? LogsPage(userCredential: widget.userCredential)
@@ -163,14 +145,11 @@ class _ManagementPageState extends State<_ManagementPageContent> {
         "icon": "lib/utils/Icons/worker.png"
       }
     ] as List<Map<String, dynamic>>;
-    // Page content;
-    return Scaffold(
-      // Main appbar (header)
-      appBar: createMainAppBar(
-          context, widget.userCredential, _userReference, "Management"),
 
-      // Scrollable list of items
-      // Tasks subsection
+    return Scaffold(
+      appBar: createMainAppBar(context, widget.userCredential, _userReference,
+          "Management"), // Main appbar
+
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: BoxDecoration(
@@ -220,7 +199,6 @@ class _ManagementPageState extends State<_ManagementPageContent> {
         ),
       ),
 
-      // Footer nav bar
       bottomNavigationBar: PreferredSize(
           preferredSize: const Size.fromHeight(50.0),
           child: Container(
@@ -237,10 +215,11 @@ class _ManagementPageState extends State<_ManagementPageContent> {
               ),
               boxShadow: [
                 BoxShadow(
+                  // Footer nav bar shadow
                   color: Colors.black.withOpacity(0.2),
                   spreadRadius: 5,
                   blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
+                  offset: const Offset(0, 3), // Changes position of shadow
                 ),
               ],
             ),
@@ -249,24 +228,25 @@ class _ManagementPageState extends State<_ManagementPageContent> {
                   topLeft: Radius.circular(30.0),
                   topRight: Radius.circular(30.0),
                 ),
-                child:
-                    createFooterNav(_selectedIndex, footerNavCubit, _userRole)),
+                child: createFooterNav(_selectedIndex, footerNavCubit,
+                    _userRole)), // Create footer nav bar
           )),
     );
   }
 
+  /// Initialize User Info
   Future<void> _initializeUserInfo() async {
     try {
       if (DefaultFirebaseOptions.currentPlatform !=
           DefaultFirebaseOptions.android) {
-        context.read<UserInfoCubit>().getUserInfo(widget.userCredential, null);
+        context.read<UserInfoCubit>().getUserInfo(widget.userCredential,
+            null); // Get user info for non-Android platforms
       } else {
-        String? deviceFcmToken =
-            await FirebaseMessaging.instance.getToken(vapidKey: webVapidKey);
+        String? deviceFcmToken = await FirebaseMessaging.instance
+            .getToken(vapidKey: webVapidKey); // Get FCM token for Android
         if (mounted) {
-          context
-              .read<UserInfoCubit>()
-              .getUserInfo(widget.userCredential, deviceFcmToken);
+          context.read<UserInfoCubit>().getUserInfo(widget.userCredential,
+              deviceFcmToken); // Get user info with FCM token
         }
       }
     } catch (e) {
