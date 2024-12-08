@@ -117,10 +117,6 @@ flutter run
 3. Start the Express.js server to handle API requests and push notifications.
 4. Use the Flutter application to interact with the greenhouse system, monitor sensor data, and control equipment.
 
-## Contributing
-
-We welcome contributions! Please read our [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
-
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
