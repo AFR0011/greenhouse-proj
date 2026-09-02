@@ -3,14 +3,19 @@ const admin = require("firebase-admin");
 const bodyParser = require("body-parser");
 const path = require("path");
 
-// Fetch the service account key JSON file contents
-var serviceAccount = require("../greenhouse-ctrl-system-firebase-adminsdk-9eh50-d761bbaa6a.json");
+const databaseURL = process.env.FIREBASE_DATABASE_URL;
 
-// Initialize Firebase Admin SDK
+if (!databaseURL) {
+  throw new Error(
+    "FIREBASE_DATABASE_URL is required. See backend/.env.example for local setup.",
+  );
+}
+
+// Use Application Default Credentials. For local development, point
+// GOOGLE_APPLICATION_CREDENTIALS at an untracked service-account file.
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL:
-    "https://greenhouse-ctrl-system-default-rtdb.europe-west1.firebasedatabase.app/",
+  credential: admin.credential.applicationDefault(),
+  databaseURL,
 });
 
 // Create Express app

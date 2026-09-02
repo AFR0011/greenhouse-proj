@@ -7,6 +7,7 @@
 #include <WiFiUDP.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
+#include "secrets.h"
 
 #define BoardNo "1"
 
@@ -20,15 +21,17 @@ struct Config {
   String userEmail;
   String userPassword;
   String databaseUrl;
+  String serverUrl;
 };
 
 Config config = {
-  .ssid = "REMOVED_REVOKED_CREDENTIAL'",
-  .password = "REMOVED_REVOKED_CREDENTIAL",
-  .apiKey = "REMOVED_REVOKED_CREDENTIAL",
-  .userEmail = "REMOVED_REVOKED_CREDENTIAL",
-  .userPassword = "REMOVED_REVOKED_CREDENTIAL",
-  .databaseUrl = "https://greenhouse-ctrl-system-default-rtdb.europe-west1.firebasedatabase.app"
+  .ssid = WIFI_SSID,
+  .password = WIFI_PASSWORD,
+  .apiKey = FIREBASE_API_KEY,
+  .userEmail = FIREBASE_USER_EMAIL,
+  .userPassword = FIREBASE_USER_PASSWORD,
+  .databaseUrl = FIREBASE_DATABASE_URL,
+  .serverUrl = BACKEND_SERVER_URL
 };
 
 
@@ -183,7 +186,7 @@ void sendPostRequest(String readings) {
     HTTPClient http;
 
     // Specify the URL
-    http.begin(client, "https://greenhouse-5b1d55d4ffae.herokuapp.com/sync/realtime-to-firestore");
+    http.begin(client, config.serverUrl + "/sync/realtime-to-firestore");
 
     // Specify content-type header
     http.addHeader("Content-Type", "application/json");

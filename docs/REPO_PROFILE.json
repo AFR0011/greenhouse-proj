@@ -1,0 +1,109 @@
+{
+  "schema_version": "agentic-workflow/v2",
+  "root": "C:\\Users\\farro\\Documents\\Codex\\2026-08-29\\go-x20\\work\\portfolio-audit\\greenhouse-proj",
+  "files_scanned": 254,
+  "scan_truncated": false,
+  "primary_type": "software",
+  "traits": [],
+  "confidence": "high",
+  "existing_profile": null,
+  "scores": {
+    "software": 47
+  },
+  "evidence": {
+    "software": [
+      "file:build.gradle",
+      "file:package.json",
+      "file:CMakeLists.txt",
+      "dir:test",
+      "dir:app",
+      "dir:src",
+      "dir:lib",
+      "ext:.java(1)",
+      "ext:.kt(1)",
+      "ext:.swift(6)",
+      "ext:.js(3)",
+      "ext:.cpp(4)",
+      "keywords:service"
+    ]
+  },
+  "extension_counts": {
+    ".dart": 73,
+    ".png": 57,
+    "": 15,
+    ".json": 11,
+    ".plist": 8,
+    ".xcconfig": 8,
+    ".h": 8,
+    ".xml": 7,
+    ".swift": 6,
+    ".jpg": 5,
+    ".txt": 5,
+    ".cc": 4,
+    ".cpp": 4,
+    ".md": 3,
+    ".js": 3,
+    ".yaml": 3,
+    ".lock": 3,
+    ".gradle": 3,
+    ".xcworkspacedata": 3,
+    ".properties": 2,
+    ".storyboard": 2,
+    ".pbxproj": 2,
+    ".xcsettings": 2,
+    ".xcscheme": 2,
+    ".cmake": 2,
+    ".entitlements": 2,
+    ".ino": 2,
+    ".yml": 1,
+    ".java": 1,
+    ".kt": 1
+  },
+  "existing_governance": [
+    "README.md"
+  ],
+  "top_level": [
+    ".DS_Store",
+    ".firebaserc",
+    ".gitattributes",
+    ".gitignore",
+    "Hardware/",
+    "LICENSE",
+    "ProcFile",
+    "README.md",
+    "backend/",
+    "cors.json",
+    "firebase.json",
+    "greenhouse-ctrl-system-firebase-adminsdk-9eh50-d761bbaa6a.json",
+    "greenhouse_project/",
+    "heroku.yml",
+    "package-lock.json",
+    "package.json"
+  ],
+  "entry_points": [
+    "backend\\app.js",
+    "greenhouse_project\\lib\\main.dart",
+    "greenhouse_project\\linux\\main.cc",
+    "greenhouse_project\\web\\index.html",
+    "package.json"
+  ],
+  "commands": [
+    {
+      "purpose": "start",
+      "command": "npm run start",
+      "evidence": "package.json scripts"
+    },
+    {
+      "purpose": "test",
+      "command": "npm run test",
+      "evidence": "package.json scripts"
+    }
+  ],
+  "sensitive_paths": [],
+  "generated_output_roots": [],
+  "protected_input_roots": [],
+  "selected_profile": "software",
+  "selected_traits": [],
+  "selection_source": "explicit CLI selection",
+  "project_name": "greenhouse-proj"
+}

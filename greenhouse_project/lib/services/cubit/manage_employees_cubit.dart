@@ -1,20 +1,12 @@
 part of 'management_cubit.dart';
 
 class ManageEmployeesCubit extends ManagementCubit {
-  static const String _chars =
-      "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890=+-_~!@#%^&*()[]|{}?><";
-  final _rnd = Random.secure();
-
-  String getRandomPassword(int length) =>
-      String.fromCharCodes(Iterable.generate(
-          length, (_) => _chars.codeUnitAt(_rnd.nextInt(_chars.length))));
   // final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.instance;
   final CollectionReference users =
       FirebaseFirestore.instance.collection('users');
   final CollectionReference logs =
       FirebaseFirestore.instance.collection('logs');
   final UserCredential? user;
-  final FirebaseStorage storage = FirebaseStorage.instance;
 
   bool _isActive = true;
   bool _isProcessing = false;
@@ -39,65 +31,15 @@ class ManageEmployeesCubit extends ManagementCubit {
     });
   }
 
-  // Create worker account and send credentials via email
+  // Employee provisioning is intentionally unavailable in this archived case
+  // study. The removed implementation created a password in the client and sent
+  // it through a client-side email provider. A live successor must use a trusted
+  // backend and a password-reset or invitation flow instead.
   Future<void> createEmployee(
       String email, String role, DocumentReference userReference) async {
     if (!_isActive) return;
-    _isProcessing = true;
-    emit(ManageEmployeesLoading());
-
-    // Get url of uploaded image
-    String imageUrl = await storage.ref().child("Default.jpg").getDownloadURL();
-    try {
-      String password = getRandomPassword(16);
-      // Create user profile
-      await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-
-      // Create user document in Firestore
-      DocumentReference externalId = await users.add({
-        "creationDate": Timestamp.now(),
-        "email": email,
-        "name": email,
-        "surname": email,
-        "role": role,
-        "picture": imageUrl,
-        "enabled": true,
-      });
-
-      DocumentSnapshot userSnapshot = await userReference.get();
-      String name = userSnapshot.get("name");
-      String surname = userSnapshot.get("surname");
-      String stringDate = Timestamp.now().toDate().toString().substring(0, 10);
-      String stringTime = Timestamp.now().toDate().toString().substring(11, 19);
-
-      await logs.add({
-        "action": "create",
-        "description":
-            "$role account created by \"$name $surname\" on $stringDate at $stringTime",
-        "timestamp": Timestamp.now(),
-        "type": "message",
-        "userId": userReference,
-        "externalId": externalId,
-      });
-
-      // Use EmailJS to send email
-      String emailMessage =
-          '''Your email  used to create an account in the Greenhouse Control
-          System environment.\n\nIf you think this is a mistake, please ignore
-          this email.\n\nYou can login to your account using the following
-          password: $password''';
-
-      EmailJS.init(const Options(
-          publicKey: "Dzqja-Lc3erScWnmb", privateKey: "REMOVED_REVOKED_CREDENTIAL"));
-
-      EmailJSResponseStatus res = await EmailJS.send("service_1i330zn",
-          "template_zx9tnxd", {"receiver": email, "message": emailMessage});
-    } catch (error) {
-      emit(ManageEmployeesError(error.toString()));
-    }
-    _isProcessing = false;
-    _getEmployees();
+    emit(ManageEmployeesError(
+        "Employee provisioning is disabled in this archived case study."));
   }
 
   Future<void> disableEmployee(

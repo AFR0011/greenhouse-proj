@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Preserve the original firmware sketch's CRLF bytes to avoid a whole-file diff.
+Hardware/wifi_code/wifi_code.ino -text
