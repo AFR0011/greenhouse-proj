@@ -5,13 +5,13 @@ Project: greenhouse-proj
 Repository profile: software
 Initialized: 2026-09-02
 
-- Phase: EXECUTE
-- Cycle status: ACTIVE
-- Active task: Secure current tree and rewrite revoked credentials from local history
+- Phase: CLOSE
+- Cycle status: COMPLETE_WITH_RISKS
+- Active task: None; local Batch 1 is verified
 - Active batch: PHASE2-GREENHOUSE-B1
 - Owner: root
-- Blockers: Public publication is intentionally outside this batch; GitHub authentication and owner publication approval are required later.
+- Blockers: Public publication is intentionally outside this batch; an encrypted/offline tainted backup decision, collaborator freeze, GitHub authentication, and owner publication approval are required later.
 - Current risks: See RISK_REGISTER.md
-- Tester verdict: NOT_RUN
-- Next action: Apply current-tree credential remediation, then rewrite and verify an isolated local mirror.
+- Tester verdict: PASS_WITH_RISKS
+- Next action: Stop locally and request separate approval for Finalization Plan steps 1.20-1.22.
 - Last updated: 2026-09-02

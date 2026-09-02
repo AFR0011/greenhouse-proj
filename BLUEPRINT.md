@@ -11,7 +11,7 @@ Secure archived portfolio case study with preserved project history and verified
 
 ## Active batch
 
-Status: ACCEPTED
+Status: VERIFIED_LOCAL
 Batch ID: PHASE2-GREENHOUSE-B1
 
 ### Objective
