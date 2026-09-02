@@ -29,3 +29,13 @@ Initialized: 2026-09-02
 - A byte-level verifier found no author, committer, timestamp, message, parent-topology, ref, or non-secret tree mismatch.
 - Gitleaks 8.30.1 found no Firebase/GCP keys, service-account paths, or project-owned private keys. Six residual alerts were verified CocoaPods `SPEC CHECKSUMS` entries.
 - No public remote was changed.
+
+## 2026-09-02 - Owner-approved publication verified
+
+- The owner confirmed the publication package, collaborator freeze, and cleanup decisions for Finalization Plan steps 1.20-1.22.
+- Retained the tainted evidence mirror with Windows EFS encryption and verified repository integrity before publication.
+- Temporarily unarchived `AFR0011/greenhouse-proj`, force-updated the existing `main` branch in place to the reviewed successor, and rearchived the same public repository.
+- A fresh partial clone from GitHub resolved to clean rewrite tip `1912a2ed82aa39593ba8b7abca2bb4feec07d823`, contained 204 `main` commits, passed `git fsck --full --strict`, and had a clean checkout.
+- The published tree and the equivalent reviewed full history retain only six Gitleaks alerts, all verified CocoaPods `SPEC CHECKSUMS` values.
+- GitHub still advertises all 11 pull-request heads at their original pre-rewrite object identifiers. GitHub Support cleanup remains required because repository owners cannot rewrite those server-controlled refs.
+- GitHub secret scanning is enabled. Push protection remains disabled while the repository is archived; the archive state prevents writes.

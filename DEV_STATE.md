@@ -7,11 +7,11 @@ Initialized: 2026-09-02
 
 - Phase: CLOSE
 - Cycle status: COMPLETE_WITH_RISKS
-- Active task: None; local Batch 1 is verified
+- Active task: GitHub Support cleanup of stale pull-request refs and cached objects
 - Active batch: PHASE2-GREENHOUSE-B1
 - Owner: root
-- Blockers: Public publication is intentionally outside this batch; an encrypted/offline tainted backup decision, collaborator freeze, GitHub authentication, and owner publication approval are required later.
+- Blockers: None for the owned `main` history. GitHub-controlled pull-request refs still point to pre-rewrite objects and require GitHub Support cleanup.
 - Current risks: See RISK_REGISTER.md
 - Tester verdict: PASS_WITH_RISKS
-- Next action: Stop locally and request separate approval for Finalization Plan steps 1.20-1.22.
+- Next action: Submit the GitHub Support sensitive-data cleanup request, retain the encrypted tainted evidence backup until Support confirms cleanup, and use only a fresh clone for any future work.
 - Last updated: 2026-09-02

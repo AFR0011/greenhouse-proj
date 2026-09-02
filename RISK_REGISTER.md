@@ -7,25 +7,25 @@ Initialized: 2026-09-02
 
 ## Open risks
 
-### RISK-001 - Public refs still contain revoked credentials
+### RISK-001 - GitHub-controlled historical refs may retain revoked credentials
 
 - Severity: Critical
 - Category: security / credential history
-- Status: Mitigated locally; public publication gated
+- Status: Mitigated on owned `main`; Support cleanup pending
 - Evidence: Phase 1 found a Firebase service-account private key and other revoked credentials in current or historical blobs.
-- Mitigation: Remove current copies, rewrite every reachable local ref with exact-value replacement and path removal, then perform two history scans before proposing publication.
-- Owner / next action: root executes and verifies local Batch 1; repository owner separately approves any later public rewrite.
-- Local status: Mitigated in the verified rewrite mirror; public refs remain unchanged until separately approved.
+- Mitigation: Removed current copies, rewrote the owned history with exact-value replacement and path removal, performed independent scans, published the reviewed successor, and rearchived the repository.
+- Owner / next action: root submits a GitHub Support request to purge or dereference the 11 stale pull-request refs and cached sensitive-data views.
+- Current status: Public `main` is clean and verified. GitHub-controlled pull-request heads still resolve to their original identifiers.
 
 ### RISK-002 - History rewrite changes commit identifiers
 
 - Severity: High
 - Category: provenance / collaboration
-- Status: Open
+- Status: Mitigated with residual external refs
 - Evidence: Removing historical blobs necessarily changes affected commits and descendants; pull-request and collaborator clones may retain old objects.
 - Mitigation: Preserve an integrity-checked tainted backup, retain authors/dates/messages/topology, produce a commit map, inventory non-branch refs, and require a collaborator freeze before publication.
-- Owner / next action: root records local evidence; repository owner coordinates publication later.
-- Local status: Commit map, ref map, topology, metadata, and tree-equivalence evidence all pass.
+- Owner / next action: Use only fresh clones after publication; retain the encrypted tainted mirror only as controlled evidence until Support cleanup is confirmed.
+- Current status: Commit map, ref map, topology, metadata, and tree-equivalence evidence pass; the repository is archived to prevent accidental pushes.
 
 ### RISK-003 - Archived provisioning flow cannot remain safely functional
 
@@ -55,11 +55,11 @@ Initialized: 2026-09-02
 - Mitigation: Keep the project archived; handle dependency upgrades as a separately planned batch with compatibility testing.
 - Owner / next action: repository owner decides whether Phase 2 should include dependency modernization.
 
-### RISK-006 - Public rewrite prerequisites remain incomplete
+### RISK-006 - Server-controlled cleanup remains incomplete
 
 - Severity: High
 - Category: publication / recovery
 - Status: Open
-- Evidence: The verified rewrite is local only. The tainted evidence mirror is local but is not an owner-confirmed encrypted/offline backup; collaborator freeze and GitHub authentication are also incomplete.
-- Mitigation: Do not force-push. Resolve backup retention, collaborator coordination, authentication, and explicit publication approval first.
-- Owner / next action: repository owner and root address only in a separately approved publication batch.
+- Evidence: Publication prerequisites were satisfied and public `main` now matches the reviewed successor, but GitHub still advertises 11 original pull-request heads.
+- Mitigation: Submit the GitHub sensitive-data removal request without including secret values; keep the repository archived and old clones disconnected from public push access.
+- Owner / next action: root submits and records the Support request; repository owner monitors it to closure.

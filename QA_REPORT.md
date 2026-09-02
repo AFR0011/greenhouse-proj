@@ -9,7 +9,7 @@ Initialized: 2026-09-02
 
 - Batch: PHASE2-GREENHOUSE-B1
 - Verdict: PASS_WITH_RISKS
-- Evidence: Local history rewrite and clean-checkout verification completed on 2026-09-02.
+- Evidence: Local rewrite verification and independent post-publication GitHub clone verification completed on 2026-09-02.
 
 ## Bootstrap validation
 
@@ -37,6 +37,17 @@ Run the repository audit script and record the result here or in `docs/BOOTSTRAP
 - Project-owned private-key findings: zero.
 - Six `generic-api-key` alerts remain in iOS/macOS `Podfile.lock`; each is a CocoaPods `SPEC CHECKSUMS` value and is retained as dependency integrity metadata.
 
+## Post-publication verification
+
+- Public repository: `AFR0011/greenhouse-proj`, still public and rearchived.
+- Fresh remote clone tip: `1912a2ed82aa39593ba8b7abca2bb4feec07d823`, exactly matching the reviewed successor at publication.
+- Fresh remote `main` commit count: 204.
+- Fresh remote `git fsck --full --strict`: pass.
+- Fresh remote working tree: clean.
+- Fresh remote current-tree Gitleaks result: the same six verified CocoaPods checksum alerts and no Firebase/GCP API-key findings.
+- Full-history equivalence: the public tip's commit identity matches the locally verified full-history mirror, whose all-history Gitleaks and exact/context scans are recorded above.
+- Residual GitHub-controlled refs: all 11 pull-request heads still resolve to their original pre-rewrite identifiers; Support cleanup is pending.
+
 ## Clean-checkout checks
 
 - `npm ci --ignore-scripts`: pass (257 packages installed).
@@ -50,4 +61,4 @@ Run the repository audit script and record the result here or in `docs/BOOTSTRAP
 
 ## Verdict rationale
 
-The accepted local credential-removal and history-preservation criteria pass. The verdict remains `PASS_WITH_RISKS` because full Flutter/firmware builds are unavailable, the Node dependency findings remain, and public rewrite coordination has not occurred.
+The credential-removal, history-preservation, and public publication criteria pass for the owned `main` branch. The verdict remains `PASS_WITH_RISKS` because GitHub-controlled pull-request refs still require Support cleanup, full Flutter/firmware builds are unavailable, and the Node dependency findings remain.

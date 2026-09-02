@@ -4,9 +4,9 @@ Date: 2026-09-02
 
 ## Scope
 
-This evidence covers the local-only Option A Batch 1 rewrite. It does not claim
-that the rewritten history has been pushed to GitHub or that external caches and
-old clones have been erased.
+This evidence covers the Option A Batch 1 rewrite and its owner-approved in-place
+publication to the existing GitHub repository. It does not claim that external
+caches, old clones, or GitHub-controlled pull-request refs have been erased.
 
 ## Inputs and tools
 
@@ -56,9 +56,11 @@ Dart, and Arduino toolchains were unavailable. The repository has no implemented
 Node test suite, and `npm audit` reports existing dependency risks. See
 `QA_REPORT.md` and `RISK_REGISTER.md`.
 
-## Publication gate
+## Publication verification
 
-No public write occurred. Before any force-push, the owner must separately approve
-publication, decide encrypted/offline retention of the tainted backup, coordinate
-a collaborator freeze and reclone instructions, authenticate to GitHub, and verify
-the public refs immediately after publication.
+- The encrypted tainted evidence backup passed integrity checks before publication.
+- The owner approved the destructive in-place update, collaborator freeze, and rearchive procedure.
+- The existing public repository name and visibility were retained.
+- A fresh GitHub clone resolved to clean rewrite tip `1912a2ed82aa39593ba8b7abca2bb4feec07d823` with 204 `main` commits and passed `git fsck --full --strict`.
+- The repository was rearchived immediately after the update.
+- All 11 GitHub-controlled pull-request heads still resolve to pre-rewrite objects. A GitHub Support sensitive-data cleanup request is required; this repository evidence does not claim those objects or external caches are erased.
